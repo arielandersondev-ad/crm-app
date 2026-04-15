@@ -1,0 +1,10 @@
+Detalles de Requerimientos
+ -usar node v22.22.2 o superior
+
+ ✅ 3. Alias en PowerShell (hack limpio)
+
+Puedes hacer:
+
+Set-Alias npm npm.cmd
+
+👉 así puedes escribir npm normalme
