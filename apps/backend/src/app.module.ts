@@ -16,7 +16,7 @@ import { AuthModule } from './modules/auth/auth.module';
     TenantModule,
     MembershipModule,
     AuthModule,
-  ],
+  ],       
   controllers: [],
   providers: [],
 })

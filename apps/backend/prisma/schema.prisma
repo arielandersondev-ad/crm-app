@@ -82,3 +82,7 @@ model Session {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Sucursal {
+  id          String   @id @default(uuid()) @db.Uuid
+  
+}

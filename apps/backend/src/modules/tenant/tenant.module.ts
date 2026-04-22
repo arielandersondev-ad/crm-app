@@ -18,5 +18,12 @@ import { DeleteTenantUseCase } from "./aplication/use-cases/delete-tenant.use-ca
     UpdateTenantUseCase,
     DeleteTenantUseCase,
   ],
+  exports: [
+    CreateTenantUseCase,
+    FindAllTenantsUseCase,
+    FindByIdTenantUseCase,
+    UpdateTenantUseCase,
+    DeleteTenantUseCase,
+  ],
 })
 export class TenantModule {}
