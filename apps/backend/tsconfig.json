@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",   // 🔥 CAMBIA ESTO
+    "moduleResolution": "node", // 🔥 Y ESTO
+    "target": "ES2020",
+    
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    
+    "outDir": "./dist",
+    "sourceMap": true,
+    "incremental": true,
+    "skipLibCheck": true
+  }
+}

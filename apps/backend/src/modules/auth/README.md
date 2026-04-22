@@ -1,0 +1,1 @@
+- deuda tecnica port no implementado
