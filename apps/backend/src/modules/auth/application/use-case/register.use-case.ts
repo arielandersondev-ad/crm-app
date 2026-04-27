@@ -44,7 +44,7 @@ export class RegisterUseCase {
     }
 
     Logger.log('5 creando membership');
-    const membership = await this.createMembershipUseCase.execute({userId: user.id, tenantId: tenant.id, role: rol || 'unknown' as UserRole});
+    const membership = await this.createMembershipUseCase.execute({userId: user.id, tenantId: tenant.id, role: rol ?? UserRole.ADMIN});
     if (!membership) {
       Logger.log('Eliminando el tenant y usuario debido al error al crear membership. Tenant id: ', tenant.id, 'User id: ', user.id);
       await this.deleteTenantUseCase.execute(tenant.id);

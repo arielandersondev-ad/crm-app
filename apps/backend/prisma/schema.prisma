@@ -35,6 +35,7 @@ model Tenant {
   updatedAt DateTime @updatedAt
 
   memberships Membership[]
+  sucursales  Sucursal[]
 }
 
 model User {
@@ -53,6 +54,7 @@ model User {
 
   memberships     Membership[]
   sessions        Session[]
+  sucursales      UserSucursal[]
 }
 
 model Membership {
@@ -67,7 +69,7 @@ model Membership {
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
+  @@unique([userId, tenantId])
   @@index([tenantId])
 }
 
@@ -81,8 +83,37 @@ model Session {
 
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
 model Sucursal {
   id          String   @id @default(uuid()) @db.Uuid
-  
+  tenantId    String   @db.Uuid
+
+  name        String
+  latitude    Float
+  longitude   Float
+  direccion   String?
+  telefono    String?
+  correo      String?
+
+  isDefault   Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  users       UserSucursal[]
+
+  @@index([tenantId])
+  @@unique([tenantId, name])
+}
+model UserSucursal {
+  id          String   @id @default(uuid()) @db.Uuid
+
+  userId      String   @db.Uuid
+  sucursalId  String   @db.Uuid
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sucursal    Sucursal @relation(fields: [sucursalId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sucursalId]) // 👈 no duplicar accesos
+  @@index([sucursalId])
 }
