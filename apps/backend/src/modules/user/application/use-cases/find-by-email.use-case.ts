@@ -7,6 +7,7 @@ export class FindByEmailUseCase {
   ){}
 
   async execute(email: string) {
+    if (!email) {throw new Error(`Email es requerido:__ ${email}`)}
     return this.userRepo.findByEmail(email);
   }
 }

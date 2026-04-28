@@ -20,13 +20,14 @@ export class PrismaUserRepository implements UserRepository {
       user.updatedAt,
     ));
   }
-  async findById(id: string): Promise<User> {
+  async findById(id: string): Promise<User | null> {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
           id,
         },
       });
+      if (!user) return null
       return new User(
         user.id,
         user.email,
@@ -41,13 +42,14 @@ export class PrismaUserRepository implements UserRepository {
       throw error;
     }
   }
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User | null> {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
           email,
         },
       });
+      if (!user) return null
       return new User(
         user.id,
         user.email,

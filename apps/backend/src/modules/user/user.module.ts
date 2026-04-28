@@ -23,5 +23,10 @@ import { FindByIdUseCase } from "./application/use-cases/finst-by-id.use-case";
     FindByEmailUseCase,
     FindByIdUseCase,
   ],
+  exports: [
+    FindByEmailUseCase,
+    CreateUserUseCase,
+    DeleteUserUseCase,
+  ],
 })
 export class UserModule {}
