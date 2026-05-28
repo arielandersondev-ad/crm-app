@@ -20,7 +20,7 @@ export class RegisterUseCase {
   async execute(email: string, password: string, nombres: string, apellidos: string, rol?: string) {
     Logger.log (`datos: ${email}, ${password}, ${nombres}, ${apellidos}, ${rol || 'unknown'}`)
     
-    Logger.log('1 validando Email');
+    Logger.log('1 validando Email (agregar validacion de contraseña)');
     const existUser = await this.findByEmailUseCase.execute(email);
     if (existUser) {
       throw new Error('Email ya esta en uso');
@@ -35,6 +35,7 @@ export class RegisterUseCase {
     if (!tenant) {
       throw new Error('Error creando tenant');
     }
+    Logger.log('3.1 Crear una sucursal por defecto');
     Logger.log('4 Creando user');
     const user = await this.createUserUseCase.execute({email: email, password: hashedPassword, firstName: nombres, lastName: apellidos});
     if (!user) {
@@ -52,6 +53,9 @@ export class RegisterUseCase {
       throw new Error('Error creando membership');
     }
 
+    
     Logger.log('6 creando session');
+    Logger.log('7 responder con el token, usuario, tenant y sucursal');
+    Logger.log('8 meter todo dentro de una transacccion para evitar inconsistencias en los datos agregados(una especi de rollback cuando algo falle a mitad del caso de uso)');
   }
 }

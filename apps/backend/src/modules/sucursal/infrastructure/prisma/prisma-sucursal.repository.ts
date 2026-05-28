@@ -11,12 +11,14 @@ export class PrismaSucursalRepository implements SucursalRepository {
     const sucursales = await this.prisma.sucursal.findMany();
     return sucursales.map(sucursal => new Sucursal(
       sucursal.id,
+      sucursal.tenantId,
       sucursal.name,
       sucursal.direccion,
       sucursal.latitude,
       sucursal.longitude,
       sucursal.telefono,
       sucursal.correo,
+      sucursal.isDefault,
     ));
   }
   async findById(id: string): Promise<Sucursal | null> {
@@ -30,6 +32,7 @@ export class PrismaSucursalRepository implements SucursalRepository {
     }
     return new Sucursal(
       sucursal.id,
+      sucursal.tenantId,
       sucursal.name,
       sucursal.direccion,
       sucursal.latitude,
@@ -53,6 +56,7 @@ export class PrismaSucursalRepository implements SucursalRepository {
     });
     return new Sucursal(
       createdSucursal.id,
+      createdSucursal.tenantId,
       createdSucursal.name,
       createdSucursal.direccion,
       createdSucursal.latitude,
@@ -60,5 +64,12 @@ export class PrismaSucursalRepository implements SucursalRepository {
       createdSucursal.telefono,
       createdSucursal.correo,
     );
+  }
+  async delete(id: string): Promise<void> {
+    await this.prisma.sucursal.delete({
+      where: {
+        id,
+      }
+    });
   }
 }
