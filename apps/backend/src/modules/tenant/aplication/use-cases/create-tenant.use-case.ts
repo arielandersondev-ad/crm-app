@@ -2,10 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { TenantRepository } from "../../domain/repositories/tenant.repository";
 import { CreateTenantDto } from "../../presentation/dto/create-tenant.dto";
 import { Plan } from "@prisma/client";
+import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
 
 @Injectable()
 export class CreateTenantUseCase {
-  constructor(private readonly tenantRepo: TenantRepository) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tenantRepo: TenantRepository
+  ) {}
 
   async execute(dto: CreateTenantDto) {
     if (!dto.name || dto.name.trim() === '') {
@@ -17,6 +21,6 @@ export class CreateTenantUseCase {
     }
 
     const plan = dto.plan || Plan.FREE;
-    return this.tenantRepo.create(dto.name, plan);
+    return this.tenantRepo.create(this.prisma, dto.name, plan);
   }
 }

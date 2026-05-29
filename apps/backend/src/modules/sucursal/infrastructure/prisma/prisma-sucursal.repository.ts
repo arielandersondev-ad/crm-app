@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { SucursalRepository } from "../../domain/repositories/sucursal.repository";
 import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
 import { Sucursal } from "../../domain/entities/sucursal.entity";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class PrismaSucursalRepository implements SucursalRepository {
@@ -42,8 +43,8 @@ export class PrismaSucursalRepository implements SucursalRepository {
     );
   }
 
-  async create(name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string, tenantId: string): Promise<Sucursal> {
-    const createdSucursal = await this.prisma.sucursal.create({
+  async create(db: PrismaService | Prisma.TransactionClient, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string, tenantId: string): Promise<Sucursal> {
+    const createdSucursal = await db.sucursal.create({
       data: {
         name,
         direccion,
@@ -65,11 +66,71 @@ export class PrismaSucursalRepository implements SucursalRepository {
       createdSucursal.correo,
     );
   }
-  async delete(id: string): Promise<void> {
-    await this.prisma.sucursal.delete({
-      where: {
-        id,
+  async update(id: string, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string): Promise<Sucursal> {
+    
+    try {
+      const updatedSucursal = await this.prisma.sucursal.update({ 
+        where: {
+          id,
+        },
+        data: {
+          name,
+          direccion,
+          latitude,
+          longitude,
+          telefono,
+          correo,
+        }
+      });
+      return new Sucursal(
+        updatedSucursal.id,
+        updatedSucursal.tenantId,
+        updatedSucursal.name,
+        updatedSucursal.direccion,
+        updatedSucursal.latitude,
+        updatedSucursal.longitude,
+        updatedSucursal.telefono,
+        updatedSucursal.correo,
+      );
+    } catch (error) {
+
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Sucursal no encontrada');
       }
-    });
+
+      throw error;
+    }
+   }
+  async delete(id: string): Promise<Sucursal> {
+    try {
+      const deletedSucursal = await this.prisma.sucursal.delete({
+        where: {
+          id,
+        }
+      }); 
+      return new Sucursal(
+        deletedSucursal.id,
+        deletedSucursal.tenantId,
+        deletedSucursal.name,
+        deletedSucursal.direccion,
+        deletedSucursal.latitude,
+        deletedSucursal.longitude,
+        deletedSucursal.telefono,
+        deletedSucursal.correo,
+      );
+    } catch (error) {
+
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Sucursal no encontrada');
+      }
+
+      throw error;
+    }
   }
 }
