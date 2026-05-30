@@ -1,5 +1,4 @@
-import { ConflictException, Injectable, Logger } from "@nestjs/common";
-import { FindByEmailUseCase } from "../../../user/application/use-cases/find-by-email.use-case";
+import { ConflictException, Inject, Injectable, Logger } from "@nestjs/common";
 import * as bcrypt from 'bcrypt';
 import { UserRole } from "@prisma/client";
 import { SucursalRepository } from "../../../sucursal/domain/repositories/sucursal.repository";
@@ -7,6 +6,8 @@ import { TenantRepository } from "../../../tenant/domain/repositories/tenant.rep
 import { UserRepository } from "../../../user/domain/repositories/user.repositoriy";
 import { MembershipRepository } from "../../../membership/domain/repositories/membership.repository";
 import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
+import { TOKEN_SERVICE, TokenService } from "../ports/token.service";
+import { JwtPayload } from "../../infrastructure/service/jwt-payload.interface";
 @Injectable()
 export class RegisterUseCase {
   constructor(
@@ -14,6 +15,8 @@ export class RegisterUseCase {
     private readonly membershipRepo: MembershipRepository,
     private readonly tenantRepo: TenantRepository,
     private readonly sucursalRepo: SucursalRepository,
+    @Inject(TOKEN_SERVICE)
+    private readonly TokenService: TokenService,
 
     private readonly prisma: PrismaService,// para transaccion rompe un poco lo exagonal, pero sera una de las exepciones que se puede resolver (permitimos esta injection para la transaccion sin romper el patron de exagonal)
   ) {}
@@ -34,27 +37,33 @@ export class RegisterUseCase {
       Logger.log('3 creando tenant');
       const tenant = await this.tenantRepo.create(tx,'Mi empresa');
 
-      Logger.log('3.1 Crear una sucursal por defecto');
+      Logger.log('4 Crear una sucursal por defecto');
       const sucursal = await this.sucursalRepo.create(tx,'Sucursal-Principal', '-', 0, 0,'', email, tenant.id);
       
-      Logger.log('4 Creando user');
+      Logger.log('5 Creando user');
       const user = await this.userRepo.create(tx,email, hashedPassword, nombres, apellidos);
 
-      Logger.log('5 creando membership');
+      Logger.log('6 creando membership');
       const membership = await this.membershipRepo.create(tx,user.id, tenant.id, rol as UserRole ?? UserRole.ADMIN);
-
+      
+      Logger.log('7 creando session');
+      const payload: JwtPayload = {
+        sub: user.id,
+        email: user.email,
+        tenantId: tenant.id,
+        sucursalId: sucursal.id,
+        role: membership.role,
+      };
+      const accessToken = await this.TokenService.generateAccessToken(payload);
+      Logger.log('8 responder con el token, usuario, tenant y sucursal');
       return {
+        accessToken,
         tenant,
         sucursal,
         user,
         membership,
       }
     })
-
-
-    
-    Logger.log('6 creando session');
-    Logger.log('7 responder con el token, usuario, tenant y sucursal');
     Logger.log('8 meter todo dentro de una transacccion para evitar inconsistencias en los datos agregados(una especi de rollback cuando algo falle a mitad del caso de uso)');
   }
 }

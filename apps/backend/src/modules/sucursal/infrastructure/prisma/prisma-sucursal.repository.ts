@@ -42,6 +42,26 @@ export class PrismaSucursalRepository implements SucursalRepository {
       sucursal.correo,
     );
   }
+  async findByTenantId(tenantId: string): Promise<Sucursal[] | null> {
+    const sucursal = await this.prisma.sucursal.findMany({
+      where: {
+        tenantId,
+      }
+    });
+    if (!sucursal) {
+      return null;
+    }
+    return sucursal.map(sucursal => new Sucursal(
+      sucursal.id,
+      sucursal.tenantId,
+      sucursal.name,
+      sucursal.direccion,
+      sucursal.latitude,
+      sucursal.longitude,
+      sucursal.telefono,
+      sucursal.correo,
+    ));
+  }
 
   async create(db: PrismaService | Prisma.TransactionClient, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string, tenantId: string): Promise<Sucursal> {
     const createdSucursal = await db.sucursal.create({

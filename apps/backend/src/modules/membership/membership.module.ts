@@ -32,6 +32,7 @@ import { DeleteMembershipUseCase } from "./application/use-case/delete-membershi
     FindAllUseCase,
     UpdateMembershipUseCase,
     DeleteMembershipUseCase,
+    MembershipRepository,
   ],
 })
 export class MembershipModule {}
