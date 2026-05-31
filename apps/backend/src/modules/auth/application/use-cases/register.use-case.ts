@@ -16,13 +16,13 @@ export class RegisterUseCase {
     private readonly tenantRepo: TenantRepository,
     private readonly sucursalRepo: SucursalRepository,
     @Inject(TOKEN_SERVICE)
-    private readonly TokenService: TokenService,
+    private readonly tokenService: TokenService,
 
-    private readonly prisma: PrismaService,// para transaccion rompe un poco lo exagonal, pero sera una de las exepciones que se puede resolver (permitimos esta injection para la transaccion sin romper el patron de exagonal)
+    private readonly prisma: PrismaService,
   ) {}
   async execute(email: string, password: string, nombres: string, apellidos: string, rol?: string) {
     
-    Logger.log('1 validando Email (agregar validacion de contraseña)');
+    Logger.log('1 validando Email');
     const existUser = await this.userRepo.findByEmail(email);
     if (existUser) {
       throw new ConflictException('Email ya esta en uso');
@@ -32,38 +32,47 @@ export class RegisterUseCase {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    return this.prisma.$transaction(async (tx) => {
+    let tenant: any, sucursal: any, user: any, membership: any;
 
+    await this.prisma.$transaction(async (tx) => {
       Logger.log('3 creando tenant');
-      const tenant = await this.tenantRepo.create(tx,'Mi empresa');
+      tenant = await this.tenantRepo.create(tx, 'Mi empresa');
 
-      Logger.log('4 Crear una sucursal por defecto');
-      const sucursal = await this.sucursalRepo.create(tx,'Sucursal-Principal', '-', 0, 0,'', email, tenant.id);
+      Logger.log('4 Crear sucursal por defecto');
+      sucursal = await this.sucursalRepo.create(tx, 'Sucursal-Principal', '-', 0, 0, '', email, tenant.id);
       
       Logger.log('5 Creando user');
-      const user = await this.userRepo.create(tx,email, hashedPassword, nombres, apellidos);
+      user = await this.userRepo.create(tx, email, hashedPassword, nombres, apellidos);
 
       Logger.log('6 creando membership');
-      const membership = await this.membershipRepo.create(tx,user.id, tenant.id, rol as UserRole ?? UserRole.ADMIN);
-      
-      Logger.log('7 creando session');
-      const payload: JwtPayload = {
-        sub: user.id,
+      membership = await this.membershipRepo.create(tx, user.id, tenant.id, rol as UserRole ?? UserRole.ADMIN);
+    });
+
+    Logger.log('7 generando tokens');
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      tenantId: tenant.id,
+      sucursalId: sucursal.id,
+      role: membership.role,
+    };
+    const tokens = await this.tokenService.generateTokenPair(payload);
+
+    Logger.log('8 respondiendo');
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      expiresIn: tokens.expiresIn,
+      expiresInRefresh: tokens.expiresInRefresh,
+      user: {
+        id: user.id,
         email: user.email,
-        tenantId: tenant.id,
-        sucursalId: sucursal.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         role: membership.role,
-      };
-      const accessToken = await this.TokenService.generateAccessToken(payload);
-      Logger.log('8 responder con el token, usuario, tenant y sucursal');
-      return {
-        accessToken,
-        tenant,
-        sucursal,
-        user,
-        membership,
-      }
-    })
-    Logger.log('8 meter todo dentro de una transacccion para evitar inconsistencias en los datos agregados(una especi de rollback cuando algo falle a mitad del caso de uso)');
+      },
+      tenant: { id: tenant.id, name: tenant.name, plan: tenant.plan },
+      sucursal: sucursal ? { id: sucursal.id, name: sucursal.name } : null,
+    };
   }
 }

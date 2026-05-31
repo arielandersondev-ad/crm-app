@@ -9,7 +9,9 @@ import { JwtTokenService } from "./infrastructure/service/jwt.-token.service";
 import { JwtModule } from "@nestjs/jwt";
 import { TOKEN_SERVICE } from "./application/ports/token.service";
 import { LoginUseCase } from "./application/use-cases/login.use-case";
+import { GetMeUseCase } from "./application/use-cases/get-me.use-case";
 import { JwtStrategy } from "./infrastructure/security/jwt.estrategy";
+import { RefreshTokenUseCase } from "./application/use-cases/refresh-token.use-case";
 
 @Module({
   imports: [
@@ -25,8 +27,10 @@ import { JwtStrategy } from "./infrastructure/security/jwt.estrategy";
   providers: [
     RegisterUseCase,
     LoginUseCase,
+    GetMeUseCase,
     JwtTokenService,
     JwtStrategy,
+    RefreshTokenUseCase,
     {
       provide: TOKEN_SERVICE,
       useClass: JwtTokenService,

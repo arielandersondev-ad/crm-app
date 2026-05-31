@@ -1,4 +1,3 @@
-// Request
 import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 
 export class RegisterRequestDto {
@@ -18,13 +17,4 @@ export class RegisterRequestDto {
   @IsString()
   @IsNotEmpty({ message: 'Apellidos requeridos' })
   apellidos: string;
-}
-
-// Response
-export class RegisterResponseDto {
-  accessToken: string;
-  refreshToken: string;
-  user: { id: string; email: string; firstName: string; lastName: string };
-  tenant: { id: string; name: string; plan: string };
-  sucursal: { id: string; name: string };
 }
