@@ -14,6 +14,7 @@ export function AuthProvider({
   const setUser = useAuthStore((s) => s.setUser);
   const setTenant = useAuthStore((s) => s.setTenant);
   const setBranch = useAuthStore((s) => s.setBranch);
+  const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
     async function loadSession() {
@@ -24,14 +25,14 @@ export function AuthProvider({
         setTenant(session.tenant);
         setBranch(session.branch);
       } catch {
-        // usuario no autenticado
+        logout()
       } finally {
         setIsLoading(false);
       }
     }
 
     loadSession();
-  }, [setUser, setTenant, setBranch]);
+  }, [setUser, setTenant, setBranch, logout]);
 
   if (isLoading) {
     return null;
