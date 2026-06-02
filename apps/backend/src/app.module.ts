@@ -6,6 +6,7 @@ import { TenantModule } from './modules/tenant/tenant.module';
 import { MembershipModule } from './modules/membership/membership.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SucursalModule } from './modules/sucursal/sucursal.module';
+import { ClienteModule } from './modules/cliente/cliente.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SucursalModule } from './modules/sucursal/sucursal.module';
     SucursalModule,
     MembershipModule,
     AuthModule,
+    ClienteModule,
   ],       
   controllers: [],
   providers: [],

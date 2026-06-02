@@ -16,7 +16,7 @@ export const navigation = [
   },
   {
     label: "Clientes",
-    href: "/clientes",
+    href: "/dashboard/clientes",
     icon: Users,
   },
   {
