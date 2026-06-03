@@ -1,11 +1,9 @@
-import { IsEmail, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsEmail, IsOptional, IsString } from "class-validator";
 
 export class CreateClienteDto {
-  @IsUUID()
-  tenantId: string;
 
   @IsString()
-  fullname: string;
+  fullName: string;
 
   @IsEmail()
   email: string;
@@ -19,7 +17,7 @@ export class CreateClienteDto {
 
   @IsOptional()
   @IsString()
-  birthday?: string;
+  birthDate?: string;
 
   @IsOptional()
   @IsString()

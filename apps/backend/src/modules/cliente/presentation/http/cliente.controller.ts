@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from "@nestjs/common";
 import { FindAllUseCase } from "../../application/use-cases/find-all.use-case";
 import { FindByIdUseCase } from "../../application/use-cases/find-by-id.use-case";
 import { FindByTenantIdUseCase } from "../../application/use-cases/find-by-tenantId.use-case";
@@ -8,8 +8,11 @@ import { DeleteClienteUseCase } from "../../application/use-cases/delete-cliente
 import { CreateClienteDto } from "../dto/create-cliente.dto";
 import { UpdateClienteDto } from "../dto/update-cliente.dto";
 import { ActivateClienteUseCase } from "../../application/use-cases/activate.use-case";
+import { JwtAuthGuard } from "../../../auth/infrastructure/security/jwt-auth.guard";
+import { CurrentUser } from "../../../../common/decorators/current-user.decorator";
 
 @Controller('cliente')
+@UseGuards(JwtAuthGuard)
 export class ClienteController {
   constructor(
     private readonly findAllUseCase: FindAllUseCase,
@@ -24,31 +27,33 @@ export class ClienteController {
   async findAll() {
     return this.findAllUseCase.execute();
   }
+  @Get('tenant')
+  async findByTenantId(
+    @CurrentUser('tenantId') tenantId: string,
+  ) { 
+    return this.findByTenantIdUseCase.execute(tenantId);
+  }
+  @Post('create')
+  async create(
+    @CurrentUser('tenantId') tenantId: string,
+    @Body() dto: CreateClienteDto
+  ) {
+    return this.createUseCase.execute(tenantId, dto);
+  }
+  @Patch('update/:id')
+  async update(
+    @CurrentUser('tenantId') tenantId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateClienteDto
+  ) {
+
+    return this.updateUseCase.execute(tenantId, id, dto);
+  }
   @Get(':id')
   async findById(
     @Param('id', ParseUUIDPipe) id: string
   ) {
     return this.findByIdUseCase.execute(id);
-  }
-  @Get('tenant/:tenantId')
-  async findByTenantId(
-    @Param('tenantId', ParseUUIDPipe) tenantId: string
-  ) { 
-    return this.findByTenantIdUseCase.execute(tenantId);
-  }
-  @Post()
-  async create(
-    @Body() dto: CreateClienteDto
-  ) {
-    return this.createUseCase.execute(dto);
-  }
-  @Patch('update/:id')
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateClienteDto
-  ) {
-
-    return this.updateUseCase.execute(id, dto);
   }
   @Delete('delete/:id')
   async delete(

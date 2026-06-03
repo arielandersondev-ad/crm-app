@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { clientService } from "../services/client.service";
 
@@ -8,5 +8,31 @@ export function useClients() {
 
     queryFn: () =>
       clientService.getClients(),
+  });
+}
+export function useCreateClient() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: clientService.createClient,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["clients"],
+      });
+    },
+  });
+}
+export function useUpdateClient() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: clientService.updateClient,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["clients"],
+      });
+    },
   });
 }

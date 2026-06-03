@@ -8,11 +8,11 @@ export class CreateClienteUseCase {
   constructor(
     private readonly clienteRepo: ClienteRepository
   ) {}
-  async execute(createClienteDto: CreateClienteDto): Promise<Cliente> {
-    if (!createClienteDto.tenantId) {
+  async execute(tenantId: string, createClienteDto: CreateClienteDto): Promise<Cliente> {
+    if (!tenantId) {
       throw new Error('TenantId es requerido');
     }
-    if (!createClienteDto.fullname) {
+    if (!createClienteDto.fullName) {
       throw new Error('Fullname es requerido');
     }
     if (!createClienteDto.email) {
@@ -21,6 +21,6 @@ export class CreateClienteUseCase {
     if (!createClienteDto.phone) {
       throw new Error('Phone es requerido');
     }
-    return await this.clienteRepo.create(createClienteDto.tenantId, createClienteDto.fullname, createClienteDto.email, createClienteDto.phone, createClienteDto.documentNumber, createClienteDto.birthday, createClienteDto.address, createClienteDto.notes);
+    return await this.clienteRepo.create(tenantId, createClienteDto.fullName, createClienteDto.email, createClienteDto.phone, createClienteDto.documentNumber, createClienteDto.birthDate, createClienteDto.address, createClienteDto.notes);
   }
 }

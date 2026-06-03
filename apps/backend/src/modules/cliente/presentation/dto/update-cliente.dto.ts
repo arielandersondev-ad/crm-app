@@ -2,11 +2,8 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 export class UpdateClienteDto {
 
   @IsNotEmpty()
-  tenantId: string;
-  
-  @IsNotEmpty()
   @IsString()
-  fullname: string;  
+  fullName: string;  
 
   @IsNotEmpty()
   @IsString()
@@ -21,7 +18,7 @@ export class UpdateClienteDto {
   documentNumber?: string;
  
   @IsOptional()
-  birthday?: string;
+  birthDate?: string;
   
   @IsOptional()
   address?: string;
