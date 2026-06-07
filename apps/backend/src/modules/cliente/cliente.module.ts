@@ -9,6 +9,7 @@ import { FindByTenantIdUseCase } from "./application/use-cases/find-by-tenantId.
 import { ClienteRepository } from "./domain/repository/cliente.repository";
 import { PrismaClienteRepository } from "./infrastructure/prisma/prisma-cliente.repository";
 import { ActivateClienteUseCase } from "./application/use-cases/activate.use-case";
+import { FindByTenantIdActivoClienteUseCase } from "./application/use-cases/find-by-active.use-case";
 
 @Module({
   controllers: [
@@ -18,6 +19,7 @@ import { ActivateClienteUseCase } from "./application/use-cases/activate.use-cas
     FindByIdUseCase, 
     FindAllUseCase,
     FindByTenantIdUseCase,
+    FindByTenantIdActivoClienteUseCase,
     DeleteClienteUseCase,
     UpdateClienteUseCase,
     CreateClienteUseCase,

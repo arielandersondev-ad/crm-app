@@ -49,6 +49,8 @@ export interface ColumnConfig<T = any> {
   ) => React.ReactNode;
 
   statusOptions?: StatusOption[];
+
+  defaultVisible?: boolean;
 }
 
 export interface ActionButton<T = any> {

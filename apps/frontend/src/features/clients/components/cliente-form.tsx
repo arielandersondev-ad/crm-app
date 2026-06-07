@@ -1,8 +1,8 @@
 import { UseFormRegister } from "react-hook-form";
-import { CreateClientDto } from "../types/client";
+import { ClientFormData } from "../schemas/client.schema";
 
 interface ClientFormProps {
-  register: UseFormRegister<CreateClientDto>;
+  register: UseFormRegister<ClientFormData>;
   errors?: Record<string, any>;
 }
 

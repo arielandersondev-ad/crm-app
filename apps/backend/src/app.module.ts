@@ -7,6 +7,7 @@ import { MembershipModule } from './modules/membership/membership.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SucursalModule } from './modules/sucursal/sucursal.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
+import { ServiceModule } from './modules/service/service.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ClienteModule } from './modules/cliente/cliente.module';
     MembershipModule,
     AuthModule,
     ClienteModule,
+    ServiceModule,
   ],       
   controllers: [],
   providers: [],

@@ -10,6 +10,7 @@ import { UpdateClienteDto } from "../dto/update-cliente.dto";
 import { ActivateClienteUseCase } from "../../application/use-cases/activate.use-case";
 import { JwtAuthGuard } from "../../../auth/infrastructure/security/jwt-auth.guard";
 import { CurrentUser } from "../../../../common/decorators/current-user.decorator";
+import { FindByTenantIdActivoClienteUseCase } from "../../application/use-cases/find-by-active.use-case";
 
 @Controller('cliente')
 @UseGuards(JwtAuthGuard)
@@ -22,6 +23,7 @@ export class ClienteController {
     private readonly updateUseCase: UpdateClienteUseCase,
     private readonly deleteUseCase: DeleteClienteUseCase,
     private readonly activateUseCase: ActivateClienteUseCase,
+    private readonly findByTenantIdActivoUseCase: FindByTenantIdActivoClienteUseCase,
   ){}
   @Get()
   async findAll() {
@@ -32,6 +34,12 @@ export class ClienteController {
     @CurrentUser('tenantId') tenantId: string,
   ) { 
     return this.findByTenantIdUseCase.execute(tenantId);
+  }
+  @Get('activo/tenant')
+  async findByTenantIdActivo(
+    @CurrentUser('tenantId') tenantId: string,
+  ) { 
+    return this.findByTenantIdActivoUseCase.execute(tenantId);
   }
   @Post('create')
   async create(
@@ -49,23 +57,26 @@ export class ClienteController {
 
     return this.updateUseCase.execute(tenantId, id, dto);
   }
+  @Delete('delete/:id')
+  async delete(
+    @CurrentUser('tenantId') tenantId: string,
+    @Param('id', ParseUUIDPipe) id: string
+  ) {
+    console.log('Controller delete: ', id);
+    return this.deleteUseCase.execute(tenantId, id);
+  }
   @Get(':id')
   async findById(
     @Param('id', ParseUUIDPipe) id: string
   ) {
     return this.findByIdUseCase.execute(id);
   }
-  @Delete('delete/:id')
-  async delete(
-    @Param('id', ParseUUIDPipe) id: string
-  ) {
-    return this.deleteUseCase.execute(id);
-  }
   @Post('activate/:id')
   async activate(
+    @CurrentUser('tenantId') tenantId: string,  
     @Param('id', ParseUUIDPipe) id: string
   ) {
-    return this.activateUseCase.execute(id);
+    return this.activateUseCase.execute(tenantId, id);
   }
 
 }

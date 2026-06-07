@@ -4,7 +4,7 @@ import { PageContainer } from "@/shared/components/page-container";
 import { PageHeader } from "@/shared/components/page-header";
 import { EmptyState } from "@/shared/components/empty-state";
 
-import { useClients, useCreateClient, useUpdateClient } from "../hooks/use-clients";
+import { useClients, useCreateClient, useDeleteClient, useUpdateClient } from "../hooks/use-clients";
 import { ClientsTable } from "../components/clients-table";
 import { LoadingState } from "@/shared/components/loading-state";
 import { Button } from "@/shared/components/ui/button";
@@ -12,17 +12,20 @@ import { Download, Plus } from "lucide-react";
 import { useState } from "react";
 import { ClientModal } from "../components/cliente-modal";
 import { Client } from "../types/client";
+import { DeleteClientDialog } from "../components/delete-cliente-dialog";
+import { toast } from "sonner";
 
 export function ClientsPage() {
   const { data: clients, isLoading, isError } = useClients();
   const createClientMutation = useCreateClient();
   const updateClientMutation = useUpdateClient();
+  const deleteClientMutation = useDeleteClient();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [deleteClient, setDeleteClient] = useState('');
   const [editingClient, setEditingClient] = useState<Client | null>(null);
-  if (isLoading) {
-    return <LoadingState />;
-  }
+
+  if (isLoading) return <LoadingState />
 
   if (isError) {
     return (
@@ -63,9 +66,8 @@ export function ClientsPage() {
       ) : (
         <ClientsTable 
           clients={clients}
-          onEdit={(client) => {
-            setEditingClient(client);
-          }}
+          onEdit={(client) => setEditingClient(client)}
+          onDelete={(client) => setDeleteClient(client.id)}
         />
       )}
       <ClientModal
@@ -74,8 +76,10 @@ export function ClientsPage() {
         onClose={() => setIsCreateOpen(false)}
         onSubmit={async (data) => {
           await createClientMutation.mutateAsync(data);
+          toast.success('Cliente creado correctamente');
           setIsCreateOpen(false);
         }}
+        loading={createClientMutation.isPending}
       />
      <ClientModal
         open={!!editingClient}
@@ -88,8 +92,26 @@ export function ClientsPage() {
             id: editingClient.id,
             ...data,
           });
+          toast.success('Cliente actualizado correctamente');
           setEditingClient(null);
         }}
+        loading={updateClientMutation.isPending}
+      />
+      <DeleteClientDialog
+        open={!!deleteClient}
+        onClose={() => setDeleteClient('')}
+        onConfirm={async () => {
+          console.log('Confirm delete: ', deleteClient);
+          if (!deleteClient) return;
+
+            await deleteClientMutation.mutateAsync(
+              deleteClient
+            );
+            toast.success('Cliente eliminado correctamente');
+
+            setDeleteClient('');
+        }}
+        loading={deleteClientMutation.isPending}
       />
     </PageContainer>
   );

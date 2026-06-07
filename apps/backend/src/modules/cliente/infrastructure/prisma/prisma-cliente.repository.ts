@@ -26,6 +26,29 @@ export class PrismaClienteRepository implements ClienteRepository {
       updatedAt: item.updatedAt,
     }));
   }
+  async findByTenantIdActivo(tenantId: string): Promise<Cliente[]> {
+    const clientes = await this.prisma.client.findMany({
+      where: {
+        tenantId: tenantId,
+        isActive: true,
+      },
+    });
+    return clientes.map((item) => ({
+      ...item,
+      id: item.id,
+      tenantId: item.tenantId,
+      type: item.type,
+      fullName: item.fullName,
+      email: item.email,
+      phone: item.phone,
+      documentNumber: item.documentNumber,
+      birthday: item.birthDate?.toISOString().substring(0, 10) || new Date().toISOString().substring(0, 10).toString(),
+      direccion: item.address,
+      activo: item.isActive,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    }));
+  }
   async findById(id: string): Promise<Cliente> {
     const cliente = await this.prisma.client.findUnique({
       where: {
@@ -146,9 +169,10 @@ export class PrismaClienteRepository implements ClienteRepository {
       },
     });
   }
-  async softDeleteById(id: string): Promise<void> {
+  async softDeleteById(tenantId: string, id: string): Promise<void> {
     await this.prisma.client.update({
       where: {
+        tenantId: tenantId,
         id: id,
       },
       data: {
@@ -156,9 +180,10 @@ export class PrismaClienteRepository implements ClienteRepository {
       },
     });
   }
-  async restore(id: string): Promise<void> {
+  async restore(tenantId: string, id: string): Promise<void> {
     await this.prisma.client.update({
       where: {
+        tenantId: tenantId,
         id: id,
       },
       data: {

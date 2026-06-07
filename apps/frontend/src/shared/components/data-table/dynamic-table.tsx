@@ -45,6 +45,14 @@ export function DynamicTable<
 
   className = '',
 }: DynamicTableProps<T>) {
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(
+    columns.filter((c) => c.defaultVisible !== false).map((c) => c.key as string)
+  );
+
+  const displayedColumns = columns.filter(
+    column => visibleColumns.includes(String(column.key))
+  );
+  
   const [searchTerm, setSearchTerm] =
     useState('');
 
@@ -203,6 +211,18 @@ export function DynamicTable<
             setSearchTerm(value);
             setCurrentPage(1);
           }}
+          columns={columns.map((c) => ({
+            key: String(c.key),
+            label: c.label,
+          }))}
+          visibleColumns={visibleColumns}
+          onToggleColumn={(key) => {
+            setVisibleColumns((prev) =>
+              prev.includes(key)
+                ? prev.filter((c) => c !== key)
+                : [...prev, key]
+            );
+          }}
         />
       )}
 
@@ -219,7 +239,7 @@ export function DynamicTable<
             `}
           >
             <tr>
-              {columns.map(
+              {displayedColumns.map(
                 (column) => (
                   <th
                     key={String(
@@ -281,7 +301,7 @@ export function DynamicTable<
               <tr>
                 <td
                   colSpan={
-                    columns.length +
+                    displayedColumns.length +
                     (actions.length >
                     0
                       ? 1
@@ -319,7 +339,7 @@ export function DynamicTable<
                       }
                     `}
                   >
-                    {columns.map(
+                    {displayedColumns.map(
                       (
                         column
                       ) => (

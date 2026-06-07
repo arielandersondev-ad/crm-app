@@ -2,15 +2,14 @@
 import { DynamicTable } from "@/shared/components/data-table/dynamic-table";
 import type { Client } from "../types/client";
 import { ActionButton, ColumnConfig } from "@/shared/components/data-table/types";
-import { useState } from "react";
-import { ClientModal } from "./cliente-modal";
 
 interface ClientsTableProps {
   clients: Client[];
   onEdit?: (client: Client) => void;
+  onDelete?: (client: Client) => void;
 }
 
-export function ClientsTable({ clients, onEdit }: ClientsTableProps) {
+export function ClientsTable({ clients, onEdit, onDelete }: ClientsTableProps) {
   const columns: ColumnConfig<Client>[] = [
     {
       key: 'fullName',
@@ -42,22 +41,21 @@ export function ClientsTable({ clients, onEdit }: ClientsTableProps) {
   {
     label: "Eliminar",
     onClick: (client: Client) => {
+      onDelete?.(client);
       console.log("eliminar", client);
     },
     variant: "danger",
   },
 ];
   return (
-    <>
-      <DynamicTable
-        data={clients}
-        columns={columns}
-        actions={actions}
-        showToolbar
-        showPagination
-        pageSize={10}
-        stickyHeader
-      />
-    </>
+    <DynamicTable
+      data={clients}
+      columns={columns}
+      actions={actions}
+      showToolbar={true}
+      showPagination={true}
+      pageSize={10}
+      stickyHeader={true}
+    />
   );
 }

@@ -15,6 +15,7 @@ export function useCreateClient() {
 
   return useMutation({
     mutationFn: clientService.createClient,
+    mutationKey: ["createClient"],
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -28,6 +29,22 @@ export function useUpdateClient() {
 
   return useMutation({
     mutationFn: clientService.updateClient,
+    mutationKey: ["updateClient"],
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["clients"],
+      });
+    },
+  });
+}
+
+export function useDeleteClient() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: clientService.deleteClient,
+    mutationKey: ["deleteClient"],
 
     onSuccess: () => {
       queryClient.invalidateQueries({

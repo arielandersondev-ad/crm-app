@@ -1,6 +1,6 @@
 export interface Client {
   id: string;
-  tenantId: string;
+  //tenantId: string;
   type: string;
   fullName: string;
   phone?: string;
@@ -14,7 +14,6 @@ export interface Client {
   updatedAt: Date;
 }
 export interface CreateClientDto {
-  tenantId: string;
   type?: string;
   fullName: string;
   phone: string;

@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { ClientForm } from "./cliente-form";
 import type { Client, CreateClientDto } from "../types/client";
 import { Modal } from "@/shared/components/modal";
+import  { zodResolver } from "@hookform/resolvers/zod";
+import { ClientSchema, ClientFormData } from "../schemas/client.schema";
 
 // Función para formatear fecha ISO a YYYY-MM-DD
 const formatDateForInput = (dateString: string | null | undefined): string => {
@@ -22,11 +24,13 @@ interface ClientModalProps {
   loading?: boolean;
 
   onClose: () => void;
-  onSubmit: ( values: CreateClientDto ) => Promise<void> | void;
+  onSubmit: ( values: ClientFormData ) => Promise<void> | void;
 }
 
 export function ClientModal({ open, mode, client, loading, onClose, onSubmit }: ClientModalProps) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CreateClientDto>();
+  const resolver = zodResolver(ClientSchema);
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<ClientFormData>( { resolver } );
+
 
   useEffect(() => {
     if (mode === "edit" && client) {
@@ -57,16 +61,8 @@ export function ClientModal({ open, mode, client, loading, onClose, onSubmit }: 
     <Modal
       open={open}
       onClose={onClose}
-      title={
-        mode === "create"
-          ? "Nuevo Cliente"
-          : "Editar Cliente"
-      }
-      description={
-        mode === "create"
-          ? "Crea un nuevo cliente"
-          : "Edita los detalles del cliente"
-      }
+      title={ mode === "create" ? "Nuevo Cliente" : "Editar Cliente" }
+      description={ mode === "create" ? "Crea un nuevo cliente" : "Edita los detalles del cliente"}
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -80,6 +76,7 @@ export function ClientModal({ open, mode, client, loading, onClose, onSubmit }: 
         <div className="flex justify-end gap-2">
           <button
             type="button"
+            disabled={loading}
             onClick={onClose}
             className="px-4 py-2 border rounded-md"
           >
@@ -91,9 +88,7 @@ export function ClientModal({ open, mode, client, loading, onClose, onSubmit }: 
             disabled={loading}
             className="px-4 py-2 rounded-md bg-primary text-white"
           >
-            {mode === "create"
-              ? "Crear"
-              : "Guardar"}
+            {loading  ? "Guardando..."  : mode === "create" ? "Crear" : "Guardar"}
           </button>
         </div>
       </form>

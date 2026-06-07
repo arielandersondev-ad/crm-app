@@ -6,7 +6,7 @@ export class ActivateClienteUseCase {
   constructor(
     private readonly clienteRepository: ClienteRepository,
   ) {}
-  async execute(id: string): Promise<void> {
-    return this.clienteRepository.restore(id);
+  async execute(tenantId: string, id: string): Promise<void> {
+    return this.clienteRepository.restore(tenantId, id);
   }
 }

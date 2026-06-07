@@ -38,6 +38,15 @@ class ClientService {
       throw error;
     }
   }
+  
+  async deleteClient(id: string) {
+    console.log('Serivice delete: ', id);
+    const response = await api.delete<Client>(ENDPOINTS.REMOVE.replace(":id", id));
+    console.log(ENDPOINTS.REMOVE.replace(":id", id) );
+    console.log('response: ', response);
+
+    return response.data;
+  }
 }
 
 export const clientService = new ClientService();

@@ -20,6 +20,11 @@ export const navigation = [
     icon: Users,
   },
   {
+    label: "Servicios",
+    href: "/dashboard/servicios",
+    icon: Package,
+  },
+  {
     label: "Mascotas",
     href: "/mascotas",
     icon: PawPrint,

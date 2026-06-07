@@ -6,10 +6,10 @@ export class DeleteClienteUseCase {
   constructor(
     private readonly clienteRepo: ClienteRepository
   ) {}
-  async execute(id: string): Promise<void> {
+  async execute(tenantId: string, id: string): Promise<void> {
     if (!id) {
       throw new Error('Id es requerido');
     }
-    await this.clienteRepo.softDeleteById(id);
+    await this.clienteRepo.softDeleteById(tenantId, id);
   }
 }
