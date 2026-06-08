@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { SucursalModule } from './modules/sucursal/sucursal.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
 import { ServiceModule } from './modules/service/service.module';
+import { VisitaModule } from './modules/visitas/visita-module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ServiceModule } from './modules/service/service.module';
     AuthModule,
     ClienteModule,
     ServiceModule,
+    VisitaModule,
   ],       
   controllers: [],
   providers: [],

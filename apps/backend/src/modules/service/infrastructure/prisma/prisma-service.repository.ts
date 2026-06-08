@@ -3,14 +3,15 @@ import { PrismaService } from "../../../../common/infrastructure/database/prisma
 import { ServiceEntity } from "../../domain/entities/service.entity";
 import { CreateServiceDto } from "../../presentation/dto/create.service.dto";
 import { UpdateServiceDto } from "../../presentation/dto/update.service.dto";
+import { ServiceRepository } from "../../domain/repository/service.repository";
 
 @Injectable()
-export class PrismaServiceRepository {
+export class PrismaServiceRepository implements ServiceRepository {
   constructor(
-    private readonly prismaService: PrismaService,
+    private readonly prisma: PrismaService,
   ) {}
   async findAllActive(tenantId: string): Promise<ServiceEntity[]> {
-    const services = await this.prismaService.service.findMany({
+    const services = await this.prisma.service.findMany({
       where: {
         tenantId,
         isActive: true,
@@ -28,7 +29,7 @@ export class PrismaServiceRepository {
     ));
   }
   async create(tenantId: string, service: CreateServiceDto): Promise<ServiceEntity> {
-    const createdService = await this.prismaService.service.create({
+    const createdService = await this.prisma.service.create({
       data: {
         tenantId,
         ...service,
@@ -46,7 +47,7 @@ export class PrismaServiceRepository {
     );
   }
   async update(tenantId: string, service: UpdateServiceDto): Promise<ServiceEntity> {
-    const updatedService = await this.prismaService.service.update({
+    const updatedService = await this.prisma.service.update({
       where: {
         id: service.id,
         tenantId,
@@ -67,7 +68,7 @@ export class PrismaServiceRepository {
     );
   }
   async softDelete(tenantId: string, id: string): Promise<ServiceEntity> {
-    const deletedService = await this.prismaService.service.update({
+    const deletedService = await this.prisma.service.update({
       where: {
         id,
         tenantId,
@@ -88,7 +89,7 @@ export class PrismaServiceRepository {
     );
   }
   async activate(tenantId: string, id: string): Promise<ServiceEntity> {
-    const activatedService = await this.prismaService.service.update({
+    const activatedService = await this.prisma.service.update({
       where: {
         id,
         tenantId,

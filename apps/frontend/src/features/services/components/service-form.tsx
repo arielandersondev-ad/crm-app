@@ -64,30 +64,6 @@ export function ServiceForm({ register, errors }: ServiceFormProps) {
           </p>
         )}
       </div>
-      {
-/* 
-      <div>
-        <div className="flex flex-col md:flex-row justify-between">
-          <label className="block mb-1">Estado</label>
-          <label className="text-sm text-red-300">requerido</label>
-        </div>
-
-        <select
-          {...register("isActive", {valueAs: true})}
-          className="w-full border rounded-md p-2"
-        >
-          <option value="active">Activo</option>
-          <option value="inactive">Inactivo</option>
-        </select>
-
-        {errors?.isActive && (
-          <p className="text-red-500 text-sm">
-            {errors.isActive.message}
-          </p>
-        )}
-      </div> */
-      }
-
     </div>
   );
 }

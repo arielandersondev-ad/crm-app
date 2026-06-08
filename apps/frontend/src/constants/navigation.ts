@@ -6,6 +6,7 @@ import {
   Package,
   ShoppingCart,
   Settings,
+  Disc,
 } from "lucide-react";
 
 export const navigation = [
@@ -24,6 +25,11 @@ export const navigation = [
     href: "/dashboard/servicios",
     icon: Package,
   },
+  {
+    label: "Visitas",
+    href: "/dashboard/visitas",
+    icon: Disc,
+   },
   {
     label: "Mascotas",
     href: "/mascotas",
