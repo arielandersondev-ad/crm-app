@@ -1,6 +1,7 @@
 import { ActionButton, ColumnConfig } from "@/shared/components/data-table/types";
 import { Visit } from "../types/visit";
 import { DynamicTable } from "@/shared/components/data-table/dynamic-table";
+import { formatDateTime, toDateTimeLocal } from "@/constants/format";
 
 interface VisitTableProps {
   visits: Visit[];
@@ -11,14 +12,40 @@ interface VisitTableProps {
 export function VisitTables({ visits, onEdit, onDelete }: VisitTableProps) {
   const columns: ColumnConfig<Visit>[] = [
     {
-      key: 'name',
-      label: "Nombre",
+      key: 'status',
+      label: "Estado",
       searchable: true,
       sortable: true,
     },
     {
-      key: 'userId',
-      label: 'ID de usuario',
+      key: 'user.firstName',
+      label: 'Encargado',
+      searchable: true,
+      sortable: true,
+    },
+    {
+      key: 'client.fullName',
+      label: 'Cliente',
+      searchable: true,
+      sortable: true,
+    },
+    {
+      key: 'startedAt',
+      label: 'Inicio',
+      searchable: true,
+      sortable: true,
+      render: (value: string) => formatDateTime(value),
+    },
+    {
+      key: 'completedAt',
+      label: 'Fin',
+      searchable: true,
+      sortable: true,
+      render: (value: string) => formatDateTime(value),
+    },
+    {
+      key: 'notes',
+      label: 'Notas',
       searchable: true,
       sortable: true,
     },
@@ -27,8 +54,8 @@ export function VisitTables({ visits, onEdit, onDelete }: VisitTableProps) {
     {
       label: "Editar",
       onClick: (visit: Visit) => {
-        onEdit?.(visit);
         console.log("editar", visit);
+        onEdit?.(visit);
       },
     },
     {

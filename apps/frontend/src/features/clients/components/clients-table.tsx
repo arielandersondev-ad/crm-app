@@ -7,9 +7,10 @@ interface ClientsTableProps {
   clients: Client[];
   onEdit?: (client: Client) => void;
   onDelete?: (client: Client) => void;
+  onVisit?: (client: Client) => void;
 }
 
-export function ClientsTable({ clients, onEdit, onDelete }: ClientsTableProps) {
+export function ClientsTable({ clients, onEdit, onDelete, onVisit }: ClientsTableProps) {
   const columns: ColumnConfig<Client>[] = [
     {
       key: 'fullName',
@@ -45,6 +46,21 @@ export function ClientsTable({ clients, onEdit, onDelete }: ClientsTableProps) {
       console.log("eliminar", client);
     },
     variant: "danger",
+  },
+  {
+    label: "Visita",
+    onClick: (client: Client) => {
+      onVisit?.(client);
+      console.log("llegaron datos: ", client);
+    },
+    variant: "primary",
+  },
+  {
+    label: "Detalles",
+    onClick: (client: Client) => {
+      console.log("detalles", client);
+    },
+    variant: "neutral",
   },
 ];
   return (

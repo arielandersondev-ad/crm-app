@@ -5,6 +5,6 @@ export const ENDPOINTS = {
     FIND_ALL_FOR_FORM: '/visitas/all/complete',
   },
   CREATE: '/visitas/create',
-  UPDATE: '/visitas/update',
+  UPDATE: '/visitas/update/:id',
   REMOVE: '/visitas/soft-delete/:id',
 }

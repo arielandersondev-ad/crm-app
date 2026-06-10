@@ -14,14 +14,19 @@ import { ClientModal } from "../components/cliente-modal";
 import { Client } from "../types/client";
 import { DeleteClientDialog } from "../components/delete-cliente-dialog";
 import { toast } from "sonner";
+import { VisitModal } from "@/features/visits/components/visit-modal";
+import { useCreateVisit, useVisits } from "@/features/visits/hooks/use-visits";
 
 export function ClientsPage() {
   const { data: clients, isLoading, isError } = useClients();
+  const { data: visits, isLoading: visitsLoading, isError: visitsIsError } = useVisits();
   const createClientMutation = useCreateClient();
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
+  const createVisitMutation = useCreateVisit();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isVisitOpen, setIsVisitOpen] = useState<Client | null>(null);
   const [deleteClient, setDeleteClient] = useState('');
   const [editingClient, setEditingClient] = useState<Client | null>(null);
 
@@ -68,6 +73,7 @@ export function ClientsPage() {
           clients={clients}
           onEdit={(client) => setEditingClient(client)}
           onDelete={(client) => setDeleteClient(client.id)}
+          onVisit={(client) => setIsVisitOpen(client)}
         />
       )}
       <ClientModal
@@ -103,15 +109,23 @@ export function ClientsPage() {
         onConfirm={async () => {
           console.log('Confirm delete: ', deleteClient);
           if (!deleteClient) return;
-
-            await deleteClientMutation.mutateAsync(
-              deleteClient
-            );
+            await deleteClientMutation.mutateAsync( deleteClient );
             toast.success('Cliente eliminado correctamente');
-
             setDeleteClient('');
         }}
         loading={deleteClientMutation.isPending}
+      />
+      <VisitModal
+        open={!!isVisitOpen}
+        mode= 'create'
+        client={isVisitOpen || undefined}
+        onClose={() => setIsVisitOpen(null)}
+        onSubmit={async (data) => {
+          if (!isVisitOpen) return;
+          await createVisitMutation.mutateAsync(data);
+          toast.success('Visita creada correctamente');
+          setIsVisitOpen(null);
+        }}
       />
     </PageContainer>
   );

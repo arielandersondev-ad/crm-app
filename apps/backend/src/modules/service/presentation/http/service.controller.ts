@@ -7,7 +7,6 @@ import { CreateServiceUseCase } from "../../application/use-cases/create-service
 import { UpdateServiceUseCase } from "../../application/use-cases/update-service.use-case";
 import { UpdateServiceDto } from "../dto/update.service.dto";
 import { SoftDeleteUseCase } from "../../application/use-cases/soft-delete.use-case";
-import { ActivateClienteUseCase } from "../../../cliente/application/use-cases/activate.use-case";
 
 @Controller('service')
 @UseGuards(JwtAuthGuard)

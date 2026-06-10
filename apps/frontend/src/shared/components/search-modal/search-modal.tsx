@@ -33,7 +33,7 @@ export function SearchModal<T extends SearchableItem>({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-lg">
       <div className="bg-white rounded-lg w-full max-w-lg p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">
@@ -82,3 +82,18 @@ export function SearchModal<T extends SearchableItem>({
     </div>
   );
 }
+
+//uso
+{/* <EntitySelector
+  label="Servicio"
+  items={services}
+  value={selectedService}
+  onSelect={(service) => {
+    setSelectedService(service);
+
+    setValue(
+      "serviceId",
+      service.id
+    );
+  }}
+/> */}

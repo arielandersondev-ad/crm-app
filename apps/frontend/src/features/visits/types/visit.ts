@@ -3,32 +3,49 @@ export interface Visit {
   tenantId: string;
   sucursalId: string;
   clientId: string;
-  serviceId: string;
   userId: string;
-  apointmentId: string;
+  appointmentId: string | null;
   status: string;
   notes: string;
+  startedAt: string;
+  completedAt: string;
   createdAt: Date;
   updatedAt: Date;
+  // Relaciones (para la página de detalle)
+  client?: {
+    id: string;
+    fullName: string;
+    email?: string;
+    phone?: string;
+  };
+  user?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  details?: VisitDetail[];
 }
 
-export interface CreateVisitDto {
-
-  clientId: string;
-  serviceId: string | null;
-  userId: string | null;
-  apointmentId: string | null;
-}
-export interface UpdateVisitDto {
+export interface VisitDetail {
   id: string;
-  tenantId: string;
-  sucursalId: string;
-  clientId: string;
+  visitId: string;
   serviceId: string;
-  userId: string;
-  apointmentId: string;
-  status: string;
-  notes: string;
+  quantity: number;
+  serviceName: string;
+  unitPrice: number; // Decimal
+  totalPrice: number; // Decimal
+  notes?: string;
   createdAt: Date;
-  updatedAt: Date;
+}
+
+export interface CreateVisitDetailDto {
+  serviceId: string;
+  quantity: number;
+  notes?: string;
+}
+
+export interface UpdateVisitDetailDto {
+  id: string;
+  quantity?: number;
+  notes?: string;
 }

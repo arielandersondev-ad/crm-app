@@ -54,27 +54,49 @@ export class PrismaVisitaRepository implements VisitRepository {
       visit.updatedAt,
     ))
   }
-  async findAllBySucursalIdComplete(tenantId: string, sucursalId: string): Promise<VisitEntity[]> {
+  async findAllBySucursalIdComplete(tenantId: string, sucursalId: string): Promise<any[]> {
     const prismaResult = await this.prisma.visit.findMany({
       where: {
         tenantId,
         sucursalId,
+      },
+      include: {
+        tenant:{
+          select: {
+            id: true,
+            name: true,
+          }
+        },
+        sucursal:{
+          select: {
+            id: true,
+            name: true,
+          }
+        },
+        client: {
+          select: {
+            id: true,
+            fullName: true,
+          }
+        },
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          }
+        },
+        appointment: {
+          select: {
+            id: true,
+            status: true,
+          }
+        },
+        details: true,
+        payments: true,
       }
     })
-    return prismaResult.map((visit) => new VisitEntity(
-      visit.id,
-      visit.tenantId,
-      visit.sucursalId,
-      visit.clientId,
-      visit.userId,
-      visit.appointmentId,
-      visit.status,
-      visit.notes,
-      visit.startedAt?.toISOString(),
-      visit.completedAt?.toISOString(),
-      visit.createdAt,
-      visit.updatedAt,
-    ))
+    return prismaResult
   }
   async findById(tenantId: string, id: string): Promise<VisitEntity | null> {
     const prismaResult = await this.prisma.visit.findUnique({
@@ -130,7 +152,7 @@ export class PrismaVisitaRepository implements VisitRepository {
       prismaResult.updatedAt,
     )
   }
-  async update(tenantId: string, id: string, sucursalId: string, userId: string, data: UpdateVisitDto): Promise<VisitEntity> {
+  async update(tenantId: string, sucursalId: string, id: string, userId: string, data: UpdateVisitDto): Promise<VisitEntity> {
     const prismaResult = await this.prisma.visit.update({
       where: {
         tenantId,
@@ -141,7 +163,7 @@ export class PrismaVisitaRepository implements VisitRepository {
         tenantId,
         sucursalId,
         clientId: data.clientId,
-        userId,
+        userId: data.userId || userId,
         appointmentId: data.appointmentId,
         notes: data.notes,
         status: data.status as any,

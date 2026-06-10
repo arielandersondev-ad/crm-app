@@ -348,6 +348,7 @@ model VisitDetail {
   notes String?
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   visit Visit @relation(fields: [visitId], references: [id], onDelete: Cascade)
 

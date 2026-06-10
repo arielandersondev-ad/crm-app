@@ -6,7 +6,7 @@ import { SearchableItem } from "./types";
 
 interface EntitySelectorProps<T extends SearchableItem> {
   label: string;
-
+  input: boolean;
   items: T[];
 
   value?: T;
@@ -18,6 +18,7 @@ interface EntitySelectorProps<T extends SearchableItem> {
 
 export function EntitySelector<T extends SearchableItem>({
   label,
+  input,
   items,
   value,
   placeholder = "Seleccionar",
@@ -33,13 +34,14 @@ export function EntitySelector<T extends SearchableItem>({
         </label>
 
         <div className="flex gap-2">
-          <input
+          {input && (
+            <input
             readOnly
             value={value?.label ?? ""}
             placeholder={placeholder}
             className="w-full border rounded-md p-2"
           />
-
+          )}
           <button
             type="button"
             onClick={() => setOpen(true)}

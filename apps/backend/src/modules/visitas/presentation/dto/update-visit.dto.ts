@@ -8,6 +8,14 @@ export class UpdateVisitDto {
 
   @IsOptional()
   @IsString()
+  userId?: string;
+
+  @IsOptional()
+  @IsString()
+  serviceId?: string;
+
+  @IsOptional()
+  @IsString()
   appointmentId?: string;
 
   @IsOptional()

@@ -1,5 +1,5 @@
 import { api } from "@/infrastructure/api/axios";
-import { CreateVisitDto, UpdateVisitDto, Visit } from "../types/visit";
+import { CreateVisitDetailDto, UpdateVisitDetailDto, Visit } from "../types/visit";
 import { ENDPOINTS } from "../api/endpoints";
 
 class VisitService {
@@ -11,13 +11,13 @@ class VisitService {
     const response = await api.get<any[]>(ENDPOINTS.GET.FIND_ALL_FOR_FORM);
     return response.data;
   }
-  async createVisit(data: CreateVisitDto): Promise<Visit> {
+  async createVisit(data: CreateVisitDetailDto): Promise<Visit> {
     const response = await api.post<Visit>(ENDPOINTS.CREATE, data);
     return response.data;
   }
-  async updateVisit( data: UpdateVisitDto): Promise<Visit> {
+  async updateVisit( data: UpdateVisitDetailDto): Promise<Visit> {
     const {id, ...rest }= data;
-    const response = await api.put<Visit>(ENDPOINTS.UPDATE.replace(":id", id), rest);
+    const response = await api.patch<Visit>(ENDPOINTS.UPDATE.replace(":id", id), rest);
     return response.data;
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../../auth/infrastructure/security/jwt-auth.guard";
 import { FindAllBySucursalIdUseCase } from "../../application/find-all-sucursalId.use-case";
 import { UpdateVisitUseCase } from "../../application/update-visit.use-case";
@@ -35,7 +35,7 @@ export class VisitController {
     return this.createVisitUseCase.execute(createVisitDto, tenantId, sucursalId, userId);
   }
 
-  @Post('update/:id')
+  @Patch('update/:id')
   updateVisit(
     @CurrentUser('tenantId') tenantId: string,
     @CurrentUser('sucursalId') sucursalId: string,
@@ -43,7 +43,7 @@ export class VisitController {
     @Param('id') id: string,
     @Body() updateVisitDto: UpdateVisitDto,
   ) {
-    return this.updateVisitUseCase.execute(updateVisitDto, tenantId, sucursalId, id, userId);
+    return this.updateVisitUseCase.execute(tenantId, sucursalId, id, userId, updateVisitDto);
   }
 
   @Get('all/complete')
