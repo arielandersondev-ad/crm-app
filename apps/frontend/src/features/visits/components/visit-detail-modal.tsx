@@ -1,7 +1,6 @@
-// apps/frontend/src/features/visits/components/visit-detail-modal.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
@@ -9,15 +8,35 @@ import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
-import { Visit, VisitDetail } from '../types/visit';
-import { Trash2, Plus } from 'lucide-react';
+import { UpdateVisitDetailDto, Visit, VisitDetail, CreateVisitDetailDto } from '../types/visit';
+import { Trash2, Plus, RefreshCcw } from 'lucide-react';
 import { Modal } from '@/shared/components/modal';
 import { useServices } from '@/features/services/hooks/use-services';
 import { SearchModal } from '@/shared/components/search-modal/search-modal';
+import { 
+  useDetailsVisit, 
+  useUpdateVisitDetail, 
+  useCreateVisitDetail, 
+  useCreateManyVisitDetails, 
+  useDeleteVisitDetail 
+} from '../hooks/use-visits';
+import { toast } from 'sonner';
 
-// Schema para el formulario de detalle de visita
-const VisitDetailFormSchema = z.object({
-  clientId: z.string().optional(),
+// Tipo auxiliar para detalles locales (solo lo que necesitamos sin fechas)
+type LocalVisitDetail = {
+  id: string;
+  visitId: string;
+  serviceId: string;
+  serviceName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  notes?: string;
+};
+
+// Schema para el formulario de la visita principal
+const VisitMainFormSchema = z.object({
+  clientId: z.string(), // Hacemos clientId requerido (la visita siempre tiene uno)
   status: z.string().optional(),
   notes: z.string().optional(),
   userId: z.string().optional(),
@@ -25,24 +44,45 @@ const VisitDetailFormSchema = z.object({
   completedAt: z.string().optional(),
 });
 
-type VisitDetailFormValues = z.infer<typeof VisitDetailFormSchema>;
+type VisitMainFormValues = z.infer<typeof VisitMainFormSchema>;
+
+// Schema para editar detalle
+const EditDetailSchema = z.object({
+  quantity: z.number().min(1),
+  notes: z.string().optional(),
+});
+
+type EditDetailValues = z.infer<typeof EditDetailSchema>;
 
 interface VisitDetailModalProps {
   open: boolean;
   onClose: () => void;
   visit: Visit;
-  onSubmit?: (data: VisitDetailFormValues) => Promise<void>;
+  onSubmit?: (data: VisitMainFormValues) => Promise<void>;
   loading?: boolean;
 }
 
 export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: VisitDetailModalProps) {
-  const [details, setDetails] = useState<VisitDetail[]>(visit.details || []);
+  const [localDetails, setLocalDetails] = useState<LocalVisitDetail[]>([]);
+  const [editDetailVisitService, setEditDetailVisitService] = useState<UpdateVisitDetailDto | null>(null);
+  const { data: detailsVisit, isLoading: detailsLoading } = useDetailsVisit(visit.id);
   const { data: services, isLoading: servicesLoading } = useServices();
+  
+  // Hooks para las mutaciones
+  const updateDetailMutation = useUpdateVisitDetail(visit.id);
+  const createDetailMutation = useCreateVisitDetail(visit.id);
+  const createManyDetailsMutation = useCreateManyVisitDetails(visit.id);
+  const deleteDetailMutation = useDeleteVisitDetail(visit.id);
+
+  // Estados auxiliares
   const [showServiceSelector, setShowServiceSelector] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm<VisitDetailFormValues>({
-    resolver: zodResolver(VisitDetailFormSchema),
+  const hasPersistedDetails = !!detailsVisit && detailsVisit.length > 0;
+
+  // Formulario para la visita principal
+  const { register, handleSubmit, formState: { errors } } = useForm<VisitMainFormValues>({
+    resolver: zodResolver(VisitMainFormSchema),
     defaultValues: {
-      clientId: visit.clientId,
+      clientId: visit.clientId, // Agregamos clientId a los valores por defecto
       status: visit.status,
       notes: visit.notes,
       userId: visit.userId,
@@ -50,6 +90,30 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
       completedAt: visit.completedAt ? new Date(visit.completedAt).toISOString().slice(0, 16) : '',
     }
   });
+
+  // Form para editar detalle
+  const { register: registerEdit, handleSubmit: handleSubmitEdit, reset: resetEdit, formState: { errors: errorsEdit } } = useForm<EditDetailValues>({
+    resolver: zodResolver(EditDetailSchema),
+  });
+
+  // Resetear formulario cuando se selecciona un detalle para editar
+  useEffect(() => {
+    if (editDetailVisitService) {
+      resetEdit({
+        quantity: editDetailVisitService.quantity || 1,
+        notes: editDetailVisitService.notes || '',
+      });
+    }
+  }, [editDetailVisitService, resetEdit]);
+
+  // Sincronizar estado local con datos de la API cuando lleguen
+  useEffect(() => {
+    if (detailsVisit && detailsVisit.length === 0) {
+      setLocalDetails([]);
+    }
+  }, [detailsVisit]);
+
+  // Opciones de servicios para el selector
   const serviceOptions = services?.map(service => ({
     id: service.id,
     label: service.name,
@@ -57,6 +121,7 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
     service,
   })) ?? [];
 
+  // Funciones de ayuda
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'OPEN': return 'secondary';
@@ -66,8 +131,18 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
       default: return 'outline';
     }
   };
-  const handleUpdateQuantity = (detailId: string, newQuantity: number) => {
-    setDetails(prev => prev.map(detail => {
+
+  // Calcular total
+  const calculateTotal = (items: any[]) => {
+    return items.reduce((sum, detail) => sum + Number(detail.totalPrice), 0);
+  };
+
+  const total = hasPersistedDetails ? calculateTotal(detailsVisit || []) : calculateTotal(localDetails);
+  const currentDetails = hasPersistedDetails ? detailsVisit || [] : localDetails;
+
+  // Manejadores de eventos para el escenario 1 (no hay detalles persistidos)
+  const handleLocalUpdateQuantity = (detailId: string, newQuantity: number) => {
+    setLocalDetails(prev => prev.map(detail => {
       if (detail.id === detailId) {
         const newTotal = detail.unitPrice * newQuantity;
         return { ...detail, quantity: newQuantity, totalPrice: newTotal };
@@ -76,11 +151,87 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
     }));
   };
 
-  const handleDeleteService = (id: string) => {
-    setDetails(details.filter(d => d.id !== id));
+  const handleLocalDeleteService = (id: string) => {
+    setLocalDetails(prev => prev.filter(d => d.id !== id));
   };
 
-  const total = details.reduce((sum, detail) => sum + detail.totalPrice, 0);
+  const handleLocalAddService = (item: any) => {
+    const service = item.service;
+    const newDetail: LocalVisitDetail = {
+      id: crypto.randomUUID(),
+      visitId: visit.id,
+      serviceId: service.id,
+      serviceName: service.name,
+      quantity: 1,
+      unitPrice: service.basePrice,
+      totalPrice: service.basePrice,
+      notes: '',
+    };
+    setLocalDetails(prev => [...prev, newDetail]);
+    setShowServiceSelector(false);
+  };
+
+  const handleSaveLocalDetails = async () => {
+    if (localDetails.length === 0) {
+      toast.info('No hay servicios para guardar');
+      return;
+    }
+
+    const dataForApi = {
+      visitId: visit.id,
+      details: localDetails.map(detail => ({
+        serviceId: detail.serviceId,
+        quantity: detail.quantity,
+        notes: detail.notes,
+      })),
+    };
+
+    await createManyDetailsMutation.mutateAsync(dataForApi);
+    toast.success('Servicios guardados correctamente');
+  };
+
+  // Manejadores de eventos para el escenario 2 (hay detalles persistidos)
+  const handlePersistedUpdateQuantity = async (detailId: string, newQuantity: number) => {
+    const detail = currentDetails.find(d => d.id === detailId);
+    if (!detail) return;
+
+    await updateDetailMutation.mutateAsync({
+      id: detailId,
+      visitId: visit.id,
+      quantity: newQuantity,
+    });
+  };
+
+  const handlePersistedDeleteService = async (id: string) => {
+    await deleteDetailMutation.mutateAsync(id);
+    toast.success('Servicio eliminado');
+  };
+
+  const handlePersistedAddService = async (item: any) => {
+    const service = item.service;
+    const data: CreateVisitDetailDto = {
+      visitId: visit.id,
+      serviceId: service.id,
+      quantity: 1,
+      notes: '',
+    };
+    await createDetailMutation.mutateAsync(data);
+    setShowServiceSelector(false);
+    toast.success('Servicio agregado');
+  };
+
+  const handleSaveEditDetail = async (data: EditDetailValues) => {
+    if (!editDetailVisitService) return;
+
+    await updateDetailMutation.mutateAsync({
+      ...editDetailVisitService,
+      quantity: data.quantity,
+      notes: data.notes,
+    });
+
+    setEditDetailVisitService(null);
+    toast.success('Servicio actualizado');
+  };
 
   return (
     <Modal
@@ -90,7 +241,7 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
       title=""
       description=""
     >
-      <form onSubmit={handleSubmit(onSubmit || (() => {}))} className="space-y-6 max-h-[80vh] overflow-y-auto">
+      <div className="space-y-6 max-h-[80vh] overflow-y-auto">
         {/* Header del Modal */}
         <div className="flex justify-between items-start border-b pb-4">
           <div className="flex items-center gap-3">
@@ -99,6 +250,9 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
           </div>
           <p className="text-sm text-muted-foreground">ID: {visit.id.slice(0, 8)}</p>
         </div>
+
+        {/* Campo oculto para clientId (requerido por el backend) */}
+        <input type="hidden" {...register('clientId')} />
 
         {/* Sección 1: Información General */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -184,61 +338,106 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
               </CardTitle>
                 <Button type="button" onClick={() => setShowServiceSelector(true)}>
                   <Plus className="size-4 mr-2" />
-                  Agregar Servicio
+                  Buscar Servicio
                 </Button>
               
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Servicio</TableHead>
-                  <TableHead>Cantidad</TableHead>
-                  <TableHead>Precio Unitario</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {details.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                      No hay servicios agregados
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  details.map((detail) => (
-                    <TableRow key={detail.id}>
-                      <TableCell className="font-medium">{detail.serviceName}</TableCell>
-                      <TableCell>
-                        <input
-                          type="number"
-                          min="1"
-                          value={detail.quantity}
-                          onChange={(e) => handleUpdateQuantity(detail.id, parseInt(e.target.value) || 1)}
-                          className="w-20 border rounded-md p-1 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>Bs. {detail.unitPrice.toFixed(2)}</TableCell>
-                      <TableCell>Bs. {detail.totalPrice.toFixed(2)}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteService(detail.id)}>
-                          <Trash2 className="size-4 text-destructive" />
-                        </Button>
-                      </TableCell>
+            {detailsLoading ? (
+              <div className="flex justify-center items-center py-8">
+                <p className="text-muted-foreground">Cargando detalles...</p>
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Servicio</TableHead>
+                      <TableHead>Cantidad</TableHead>
+                      <TableHead>Precio Unitario</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {currentDetails.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                          No hay servicios agregados
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      currentDetails.map((detail) => (
+                        <TableRow key={detail.id}>
+                          <TableCell className="font-medium">{detail.serviceName}</TableCell>
+                          <TableCell>
+                            <input
+                              type="number"
+                              min="1"
+                              value={detail.quantity}
+                              onChange={(e) => {
+                                const newQty = parseInt(e.target.value) || 1;
+                                if (hasPersistedDetails) {
+                                  handlePersistedUpdateQuantity(detail.id, newQty);
+                                } else {
+                                  handleLocalUpdateQuantity(detail.id, newQty);
+                                }
+                              }}
+                              className="w-20 border rounded-md p-1 text-center"
+                            />
+                          </TableCell>
+                          <TableCell>Bs. {detail.unitPrice}</TableCell>
+                          <TableCell>Bs. {detail.totalPrice}</TableCell>
+                          <TableCell className="text-right">
+                            <Button type="button" variant="ghost" size="sm" onClick={
+                              () => setEditDetailVisitService({
+                                id: detail.id,
+                                visitId: visit.id,
+                                serviceId: detail.serviceId,
+                                quantity: detail.quantity,
+                                notes: detail.notes,
+                              })
+                            }>
+                              <RefreshCcw className="size-4 text-blue-500" />
+                            </Button>
+                            <Button type="button" variant="ghost" size="sm" onClick={() => {
+                              if (hasPersistedDetails) {
+                                handlePersistedDeleteService(detail.id);
+                              } else {
+                                handleLocalDeleteService(detail.id);
+                              }
+                            }}>
+                              <Trash2 className="size-4 text-destructive" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
 
-            {details.length > 0 && (
-              <div className="flex justify-end border-t pt-4 mt-4">
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Total</p>
-                  <p className="text-xl font-bold">Bs. {total.toFixed(2)}</p>
-                </div>
+                {currentDetails.length > 0 && (
+                  <div className="flex justify-end border-t pt-4 mt-4">
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Total</p>
+                      <p className="text-xl font-bold">Bs. {total}</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Botón Guardar Servicios (solo para escenario 1) */}
+            {!hasPersistedDetails && (
+              <div className="flex justify-end mt-4 pt-4 border-t">
+                <Button 
+                  type="button" 
+                  onClick={handleSaveLocalDetails}
+                  disabled={createManyDetailsMutation.isPending}
+                >
+                  {createManyDetailsMutation.isPending ? 'Guardando...' : 'Guardar Servicios'}
+                </Button>
               </div>
             )}
           </CardContent>
@@ -259,11 +458,15 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
           <Button type="button" variant="outline" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type="submit" disabled={loading}>
+          <Button 
+            type="button" 
+            disabled={loading}
+            onClick={handleSubmit(onSubmit || (() => {}))}
+          >
             {loading ? 'Guardando...' : 'Guardar Cambios'}
           </Button>
         </div>
-      </form>
+      </div>
 
       <SearchModal
         title="Seleccionar Servicio"
@@ -271,24 +474,61 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
         items={serviceOptions}
         onClose={() => setShowServiceSelector(false)}
         onSelect={(item) => {
-          const service = item.service;
-          setDetails(prev => [
-            ...prev,
-            {
-              id: crypto.randomUUID(),
-              visitId: visit.id,
-              serviceId: service.id,
-              serviceName: service.name,
-              quantity: 1,
-              unitPrice: service.basePrice,
-              totalPrice: service.basePrice,
-              notes: '',
-              createdAt: new Date(),
-            } as VisitDetail
-          ]);
-          setShowServiceSelector(false);
+          if (hasPersistedDetails) {
+            handlePersistedAddService(item);
+          } else {
+            handleLocalAddService(item);
+          }
         }}
       />
+
+      {/* Modal para editar detalle */}
+      <Modal
+        open={!!editDetailVisitService}
+        onClose={() => setEditDetailVisitService(null)}
+        title="Editar Servicio"
+        description="Modifica la cantidad o las notas del servicio"
+      >
+        <form onSubmit={handleSubmitEdit(handleSaveEditDetail)} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Cantidad</label>
+            <input
+              type="number"
+              min="1"
+              {...registerEdit('quantity', { valueAsNumber: true })}
+              className="w-full border rounded-md p-2"
+            />
+            {errorsEdit.quantity && (
+              <p className="text-red-500 text-sm">{errorsEdit.quantity.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Notas (opcional)</label>
+            <textarea
+              {...registerEdit('notes')}
+              className="w-full border rounded-md p-2 min-h-[80px]"
+              placeholder="Agregar notas..."
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditDetailVisitService(null)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              disabled={updateDetailMutation.isPending}
+            >
+              {updateDetailMutation.isPending ? 'Guardando...' : 'Guardar'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </Modal>
   );
 }

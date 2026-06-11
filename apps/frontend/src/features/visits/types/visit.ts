@@ -39,13 +39,27 @@ export interface VisitDetail {
 }
 
 export interface CreateVisitDetailDto {
+  visitId: string;
   serviceId: string;
   quantity: number;
   notes?: string;
 }
 
+export interface CreateVisitItemDto {
+  serviceId: string;
+  quantity: number;
+  notes?: string;
+}
+
+export interface CreateManyVisitDetailDto {
+  visitId: string;
+  details: CreateVisitItemDto[];
+}
+
 export interface UpdateVisitDetailDto {
   id: string;
+  visitId?: string;
+  serviceId?: string;
   quantity?: number;
   notes?: string;
 }

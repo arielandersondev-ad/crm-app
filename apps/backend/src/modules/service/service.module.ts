@@ -23,6 +23,8 @@ import { ActivateServiceUseCase } from "./application/use-cases/activate.use-cas
       useClass: PrismaServiceRepository,
     },
   ],
-  exports: [],
+  exports: [
+    ServiceRepository,
+  ],
 })
 export class ServiceModule {}

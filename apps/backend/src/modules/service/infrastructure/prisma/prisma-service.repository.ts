@@ -28,6 +28,23 @@ export class PrismaServiceRepository implements ServiceRepository {
       service.updatedAt,
     ));
   }
+  async findById(id: string): Promise<ServiceEntity> {
+    const service = await this.prisma.service.findUnique({
+      where: {
+        id,
+      },
+    });
+    return new ServiceEntity(
+      service.id,
+      service.tenantId,
+      service.name,
+      service.description,
+      service.basePrice.toNumber(),
+      service.isActive,
+      service.createdAt,
+      service.updatedAt,
+    );
+  }
   async create(tenantId: string, service: CreateServiceDto): Promise<ServiceEntity> {
     const createdService = await this.prisma.service.create({
       data: {

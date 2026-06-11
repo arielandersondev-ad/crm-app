@@ -9,7 +9,7 @@ import { SucursalModule } from './modules/sucursal/sucursal.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
 import { ServiceModule } from './modules/service/service.module';
 import { VisitaModule } from './modules/visitas/visita-module';
-import { VisitDetailModule } from './modules/visit-detail/visit-deetail.module';
+import { VisitDetailModule } from './modules/visit-detail/visit-detail.module';
 
 @Module({
   imports: [

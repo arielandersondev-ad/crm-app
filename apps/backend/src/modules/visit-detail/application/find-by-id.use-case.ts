@@ -3,7 +3,7 @@ import { VisitDetailRepository } from "../domain/repositories/visit-detail.repos
 import { VisitDetailEntity } from "../domain/entities/visit-detail.entity";
 
 @Injectable()
-export class FindByIdVisitDetailUseCase {
+export class FindByIdUseCase {
   constructor(
     private readonly visitDetailRepo: VisitDetailRepository,
   ) {}
