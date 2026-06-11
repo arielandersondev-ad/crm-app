@@ -10,6 +10,7 @@ import { ClienteModule } from './modules/cliente/cliente.module';
 import { ServiceModule } from './modules/service/service.module';
 import { VisitaModule } from './modules/visitas/visita-module';
 import { VisitDetailModule } from './modules/visit-detail/visit-detail.module';
+import { PagoModule } from './modules/pago/pago.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { VisitDetailModule } from './modules/visit-detail/visit-detail.module';
     ClienteModule,
     ServiceModule,
     VisitaModule,
+    PagoModule,
   ],       
   controllers: [],
   providers: [],
