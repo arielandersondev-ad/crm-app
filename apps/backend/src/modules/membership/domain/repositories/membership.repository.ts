@@ -1,8 +1,9 @@
 
-import { UserRole } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
+import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
 
 export abstract class MembershipRepository {
-  abstract create(userId: string, tenantId: string, role: UserRole): Promise<any>;
+  abstract create(db: PrismaService | Prisma.TransactionClient, userId: string, tenantId: string, role: UserRole): Promise<any>;
   abstract findByUserId(userId: string): Promise<any>;
   abstract findById(id: string): Promise<any>
   abstract findAll(): Promise<any>

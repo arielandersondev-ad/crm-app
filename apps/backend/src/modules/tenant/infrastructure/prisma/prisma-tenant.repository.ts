@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
 import { TenantRepository } from "../../domain/repositories/tenant.repository";
 import { Tenant } from "../../domain/entities/tenant.entity";
-import { Plan } from "@prisma/client";
+import { Plan, Prisma } from "@prisma/client";
 
 @Injectable()
 export class PrismaTenantRepository implements TenantRepository {
@@ -33,8 +33,8 @@ export class PrismaTenantRepository implements TenantRepository {
     );
   }
 
-  async create(name: string, plan: Plan = Plan.FREE): Promise<Tenant> {
-    const tenant = await this.prisma.tenant.create({
+  async create(tx: Prisma.TransactionClient, name: string, plan: Plan = Plan.FREE): Promise<Tenant> {
+    const tenant = await tx.tenant.create({
       data: { name, plan },
     });
     return tenant;

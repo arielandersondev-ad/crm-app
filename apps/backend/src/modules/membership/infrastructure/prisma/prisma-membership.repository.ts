@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { MembershipRepository } from "../../domain/repositories/membership.repository";
 import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
-import { UserRole } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 
 @Injectable()
 export class PrismaMembershipRepository implements MembershipRepository {
   constructor(private readonly prisma: PrismaService) {}
   
-  async create(userId: string, tenantId: string, role: UserRole) {
+  async create(db: PrismaService | Prisma.TransactionClient, userId: string, tenantId: string, role: UserRole) {
     try {
-      return this.prisma.membership.create({
+      return db.membership.create({
         data: {
           userId,
           tenantId,
