@@ -55,7 +55,7 @@ export function LoginForm() {
         />
 
         {errors.email && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {errors.email.message}
           </p>
         )}
@@ -77,14 +77,14 @@ export function LoginForm() {
         />
 
         {errors.password && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {errors.password.message}
           </p>
         )}
       </div>
 
       {loginMutation.isError && (
-        <p className="text-sm text-red-500">
+        <p className="text-sm text-destructive">
           Credenciales incorrectas
         </p>
       )}

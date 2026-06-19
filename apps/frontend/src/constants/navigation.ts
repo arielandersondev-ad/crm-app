@@ -37,7 +37,7 @@ export const navigation = [
   },
   {
     label: "Agenda",
-    href: "/agenda",
+    href: "/dashboard/agenda",
     icon: Calendar,
   },
   {

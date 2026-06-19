@@ -12,7 +12,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Nombre Completo</label>
-          <label className="text-sm text-red-300">requerido</label>
+          <label className="text-sm text-muted-foreground">requerido</label>
         </div>
 
         <input
@@ -22,7 +22,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
         />
 
         {errors?.fullName && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.fullName.message}
           </p>
         )}
@@ -31,7 +31,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Email</label>
-          <label className="text-sm text-red-300">requerido</label>
+          <label className="text-sm text-muted-foreground">requerido</label>
         </div>
 
         <input
@@ -41,7 +41,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
         />
 
         {errors?.email && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.email.message}
           </p>
         )}
@@ -50,7 +50,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Teléfono</label>
-          <label className="text-sm text-red-300">requerido</label>
+          <label className="text-sm text-muted-foreground">requerido</label>
         </div>
 
         <input
@@ -59,7 +59,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
         />
 
         {errors?.phone && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.phone.message}
           </p>
         )}
@@ -67,7 +67,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Número de Documento</label>
-          <label className="text-sm text-green-300">opcional</label>
+          <label className="text-sm text-muted-foreground">opcional</label>
         </div>
         <input
           {...register("documentNumber")}
@@ -75,7 +75,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
           placeholder="DNI, CI, etc."
         />
         {errors?.documentNumber && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.documentNumber.message}
           </p>
         )}
@@ -83,7 +83,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Fecha de Nacimiento</label>
-          <label className="text-sm text-green-300">opcional</label>
+          <label className="text-sm text-muted-foreground">opcional</label>
         </div>
         <input
           {...register("birthDate")}
@@ -91,7 +91,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
           className="w-full border rounded-md p-2"
         />
         {errors?.birthDate && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.birthDate.message}
           </p>
         )}
@@ -99,14 +99,14 @@ export function ClientForm({ register, errors }: ClientFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Dirección</label>
-          <label className="text-sm text-green-300">opcional</label>
+          <label className="text-sm text-muted-foreground">opcional</label>
         </div>
         <input
           {...register("address")}
           className="w-full border rounded-md p-2"
         />
         {errors?.address && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.address.message}
           </p>
         )}
@@ -114,14 +114,14 @@ export function ClientForm({ register, errors }: ClientFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Notas</label>
-          <label className="text-sm text-green-300">opcional</label>
+          <label className="text-sm text-muted-foreground">opcional</label>
         </div>
         <input
           {...register("notes")}
           className="w-full border rounded-md p-2"
         />
         {errors?.notes && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.notes.message}
           </p>
         )}

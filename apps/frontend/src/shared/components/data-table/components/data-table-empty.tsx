@@ -13,7 +13,7 @@ export function DataTableEmpty({ message }: Props) {
         {message}
       </h3>
 
-      <p className="mt-2 text-sm text-gray-500">
+      <p className="mt-2 text-sm text-muted-foreground">
         Intenta cambiar los filtros.
       </p>
     </div>

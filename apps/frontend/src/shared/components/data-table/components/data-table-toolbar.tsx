@@ -23,7 +23,7 @@ export function DataTableToolbar({ searchTerm, onSearch, columns, visibleColumns
     <div
       className="
         border-b
-        bg-white
+        bg-background
         p-4
       "
     >

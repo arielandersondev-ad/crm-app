@@ -1,18 +1,18 @@
 const styles = {
   success:
-    'bg-green-100 text-green-700',
+    'bg-success/10 text-success',
 
   danger:
-    'bg-red-100 text-red-700',
+    'bg-destructive/10 text-destructive',
 
   warning:
-    'bg-yellow-100 text-yellow-700',
+    'bg-warning/10 text-warning',
 
   info:
-    'bg-blue-100 text-blue-700',
+    'bg-primary/10 text-primary',
 
   neutral:
-    'bg-gray-100 text-gray-700',
+    'bg-muted text-muted-foreground',
 };
 
 interface Props {

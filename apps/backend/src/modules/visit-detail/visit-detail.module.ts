@@ -29,6 +29,8 @@ import { FindVisitDetailUseCase } from "./application/find-detail-by-visit.use-c
       useClass: PrismaVisitDetailRepository,
     }
   ],
-
+  exports: [
+    VisitDetailRepository,
+  ]
 })
 export class VisitDetailModule {}

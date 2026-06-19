@@ -199,7 +199,7 @@ export function DynamicTable<
         overflow-hidden
         rounded-xl
         border
-        bg-white
+        bg-background
         shadow-sm
         ${className}
       `}
@@ -230,7 +230,7 @@ export function DynamicTable<
         <table className="w-full">
           <thead
             className={`
-              bg-gray-50
+              bg-muted
               ${
                 stickyHeader
                   ? 'sticky top-0 z-10'
@@ -262,7 +262,7 @@ export function DynamicTable<
                       font-semibold
                       uppercase
                       tracking-wide
-                      text-gray-600
+                      text-muted-foreground
                       ${
                         column.sortable !==
                         false
@@ -331,7 +331,7 @@ export function DynamicTable<
                     className={`
                       border-t
                       transition-colors
-                      hover:bg-slate-50
+                      hover:bg-muted
                       ${
                         onRowClick
                           ? 'cursor-pointer'
@@ -399,7 +399,7 @@ export function DynamicTable<
             <span
               className="
                 text-sm
-                text-gray-500
+                text-muted-foreground
               "
             >
               {

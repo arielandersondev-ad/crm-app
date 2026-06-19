@@ -1,0 +1,17 @@
+import { api } from "@/infrastructure/api/axios";
+import { ENDPOINTS } from "../api/endpoints";
+import { CitaType, CreateCitaDto } from "../types/cita.dto";
+
+export class AgendaService {
+  async createAgenda(data: CreateCitaDto): Promise<CitaType>{
+    const response = await api.post<CitaType>(ENDPOINTS.CREATE,data)
+    return response.data
+  }
+  async getAgenda():Promise<any[]>{
+    const response = await api.get(ENDPOINTS.GET.GET_AGENDA)
+    return response.data
+  }
+}
+
+
+export const agendaService = new AgendaService();

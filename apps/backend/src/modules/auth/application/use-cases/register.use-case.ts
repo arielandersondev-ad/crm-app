@@ -39,7 +39,7 @@ export class RegisterUseCase {
       tenant = await this.tenantRepo.create(tx, 'Mi empresa');
 
       Logger.log('4 Crear sucursal por defecto');
-      sucursal = await this.sucursalRepo.create(tx, 'Sucursal-Principal', '-', 0, 0, '', email, tenant.id);
+      sucursal = await this.sucursalRepo.create(tx, 'Sucursal-Principal', '-', 0, 0, '', email, 'America/La_Paz', tenant.id);
       
       Logger.log('5 Creando user');
       user = await this.userRepo.create(tx, email, hashedPassword, nombres, apellidos);

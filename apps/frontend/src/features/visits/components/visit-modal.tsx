@@ -60,9 +60,9 @@ export function VisitModal({ client, open, mode, visit, loading, onClose, onSubm
       >
         {/* Mensaje de error general */}
         {Object.keys(errors).length > 0 && (
-          <div className="p-3 bg-red-100 border border-red-300 rounded-md">
-            <p className="text-sm text-red-600 font-medium">Por favor corrige los errores:</p>
-            <ul className="text-xs text-red-500 mt-1 ml-4 list-disc">
+          <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-md">
+            <p className="text-sm text-destructive font-medium">Por favor corrige los errores:</p>
+            <ul className="text-xs text-destructive mt-1 ml-4 list-disc">
               {Object.entries(errors).map(([key, value]) => (
                 <li key={key}>{String(value?.message || `Error en ${key}`)}</li>
               ))}
@@ -89,7 +89,7 @@ export function VisitModal({ client, open, mode, visit, loading, onClose, onSubm
           <button 
             type="submit"
             disabled={loading}
-            className="bg-green-500 text-white px-4 py-2 rounded-md cursor-pointer"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-md cursor-pointer"
           >
             {loading ? "Guardando..." : mode === "create" ? "Crear" : "Actualizar"}
           </button>

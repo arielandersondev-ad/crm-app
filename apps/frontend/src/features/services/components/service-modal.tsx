@@ -65,7 +65,7 @@ export function ServiceModal({ open, mode, service, loading, onClose, onSubmit }
           <button 
             type="submit"
             disabled={loading}
-            className="bg-green-500 text-white px-4 py-2 rounded-md cursor-pointer"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-md cursor-pointer"
           >
             {loading ? "Guardando..." : mode === "create" ? "Crear" : "Actualizar"}
           </button>

@@ -9,5 +9,6 @@ export class Sucursal {
     public telefono: string | null,
     public correo: string | null,
     public isDefault: boolean = false,
+    public timezone: string = 'America/La_Paz',
   ) {}
 }

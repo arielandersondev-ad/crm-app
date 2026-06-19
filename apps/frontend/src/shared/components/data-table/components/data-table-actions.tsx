@@ -56,7 +56,7 @@ export function DataTableActions<T>({
               e.stopPropagation();
               action.onClick(row);
             }}
-            className="rounded-md border px-3 py-1 text-xs hover:bg-gray-100"
+            className="rounded-md border px-3 py-1 text-xs hover:bg-muted"
           >
             {action.icon}
             {action.label}
@@ -80,7 +80,7 @@ export function DataTableActions<T>({
           h-8
           w-8
           rounded-md
-          hover:bg-gray-100
+          hover:bg-muted
           flex
           items-center
           justify-center
@@ -99,7 +99,7 @@ export function DataTableActions<T>({
             min-w-[180px]
             rounded-lg
             border
-            bg-white
+            bg-popover
             shadow-lg
           "
         >
@@ -120,7 +120,7 @@ export function DataTableActions<T>({
                 py-2
                 text-left
                 text-sm
-                hover:bg-gray-50
+                hover:bg-accent
               "
             >
               {action.icon}

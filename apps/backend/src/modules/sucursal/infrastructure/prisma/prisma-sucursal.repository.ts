@@ -20,6 +20,7 @@ export class PrismaSucursalRepository implements SucursalRepository {
       sucursal.telefono,
       sucursal.correo,
       sucursal.isDefault,
+      sucursal.timezone,
     ));
   }
   async findById(id: string): Promise<Sucursal | null> {
@@ -40,6 +41,8 @@ export class PrismaSucursalRepository implements SucursalRepository {
       sucursal.longitude,
       sucursal.telefono,
       sucursal.correo,
+      sucursal.isDefault,
+      sucursal.timezone,
     );
   }
   async findByTenantId(tenantId: string): Promise<Sucursal[] | null> {
@@ -60,10 +63,12 @@ export class PrismaSucursalRepository implements SucursalRepository {
       sucursal.longitude,
       sucursal.telefono,
       sucursal.correo,
+      sucursal.isDefault,
+      sucursal.timezone,
     ));
   }
 
-  async create(db: PrismaService | Prisma.TransactionClient, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string, tenantId: string): Promise<Sucursal> {
+  async create(db: PrismaService | Prisma.TransactionClient, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string, timezone: string, tenantId: string): Promise<Sucursal> {
     const createdSucursal = await db.sucursal.create({
       data: {
         name,
@@ -72,6 +77,7 @@ export class PrismaSucursalRepository implements SucursalRepository {
         longitude,
         telefono,
         correo,
+        timezone,
         tenantId,
       }
     });
@@ -84,9 +90,11 @@ export class PrismaSucursalRepository implements SucursalRepository {
       createdSucursal.longitude,
       createdSucursal.telefono,
       createdSucursal.correo,
+      createdSucursal.isDefault,
+      createdSucursal.timezone,
     );
   }
-  async update(id: string, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string): Promise<Sucursal> {
+  async update(id: string, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string, timezone?: string): Promise<Sucursal> {
     
     try {
       const updatedSucursal = await this.prisma.sucursal.update({ 
@@ -100,6 +108,7 @@ export class PrismaSucursalRepository implements SucursalRepository {
           longitude,
           telefono,
           correo,
+          ...(timezone && { timezone }),
         }
       });
       return new Sucursal(
@@ -111,6 +120,8 @@ export class PrismaSucursalRepository implements SucursalRepository {
         updatedSucursal.longitude,
         updatedSucursal.telefono,
         updatedSucursal.correo,
+        updatedSucursal.isDefault,
+        updatedSucursal.timezone,
       );
     } catch (error) {
 
@@ -140,6 +151,8 @@ export class PrismaSucursalRepository implements SucursalRepository {
         deletedSucursal.longitude,
         deletedSucursal.telefono,
         deletedSucursal.correo,
+        deletedSucursal.isDefault,
+        deletedSucursal.timezone,
       );
     } catch (error) {
 

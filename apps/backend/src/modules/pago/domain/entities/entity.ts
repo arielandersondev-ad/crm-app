@@ -1,4 +1,4 @@
-import { PaymentMethod } from "@prisma/client";
+import { PaymentMethod, PaymentStatus } from "@prisma/client";
 
 export class PagoEntity {
   constructor(
@@ -10,6 +10,8 @@ export class PagoEntity {
     public readonly reference: string,
     public readonly notes: string,
     public readonly paidAt: Date,
+    public readonly status: PaymentStatus,
     public readonly createdAt: Date,
+    public readonly voidedAt: Date
   ){}
 }

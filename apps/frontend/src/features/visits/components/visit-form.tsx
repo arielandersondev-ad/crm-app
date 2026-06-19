@@ -1,7 +1,5 @@
 import { UseFormRegister, UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { VisitFormData } from "../schemas/visit.schema";
-import { EntitySelector, SearchableItem } from "@/shared/components/search-modal";
-import { useState } from "react";
 import { Client } from "@/features/clients/types/client";
 
 interface VisitFormProps {
@@ -12,17 +10,13 @@ interface VisitFormProps {
   watch: UseFormWatch<VisitFormData>;
   errors?: Record<string, any>;
 }
-export function VisitForm({ mode, client, register, setValue, watch, errors }: VisitFormProps) {
-  //const selectedServiceId = watch("serviceId");
-  //const selectedUserId = watch("userId");
-  const [selectedService, setSelectedService] = useState<SearchableItem>();
-
+export function VisitForm({ mode, client, register }: VisitFormProps) {
   return (
     <div className="space-y-4">
       <div>
         <div className="flex flex-col md:flex-row justify-center gap-2">
-          <label className="block mb-1 text-gray-400">VISITA PARA</label>
-          <label className="text-sm text-gray-500">{client?.fullName?.toUpperCase() || '-'} </label>
+          <label className="block mb-1 text-muted-foreground">VISITA PARA</label>
+          <label className="text-sm text-muted-foreground">{client?.fullName?.toUpperCase() || '-'} </label>
           <input
             type="hidden"
             value={client?.id || ''}

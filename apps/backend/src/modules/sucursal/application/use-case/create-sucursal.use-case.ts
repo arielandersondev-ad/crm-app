@@ -18,6 +18,6 @@ export class CreateSucursalUseCase {
     if (!validTenantId) {
       throw new Error('El tenantId no existe');
     }
-    return this.sucursalRepository.create(this.prisma, dto.name, dto.direccion, dto.latitude, dto.longitude, dto.telefono, dto.correo, dto.tenantId);
+    return this.sucursalRepository.create(this.prisma, dto.name, dto.direccion, dto.latitude, dto.longitude, dto.telefono, dto.correo, dto.timezone || 'America/La_Paz', dto.tenantId);
   }
 }

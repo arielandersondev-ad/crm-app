@@ -11,6 +11,7 @@ import { ServiceModule } from './modules/service/service.module';
 import { VisitaModule } from './modules/visitas/visita-module';
 import { VisitDetailModule } from './modules/visit-detail/visit-detail.module';
 import { PagoModule } from './modules/pago/pago.module';
+import { CitaModule } from './modules/cita/cita.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PagoModule } from './modules/pago/pago.module';
     ServiceModule,
     VisitaModule,
     PagoModule,
+    CitaModule,
   ],       
   controllers: [],
   providers: [],

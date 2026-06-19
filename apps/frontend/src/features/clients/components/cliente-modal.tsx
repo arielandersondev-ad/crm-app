@@ -86,7 +86,7 @@ export function ClientModal({ open, mode, client, loading, onClose, onSubmit }: 
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 rounded-md bg-primary text-white"
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
           >
             {loading  ? "Guardando..."  : mode === "create" ? "Crear" : "Guardar"}
           </button>

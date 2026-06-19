@@ -34,7 +34,7 @@ export function SearchModal<T extends SearchableItem>({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-lg">
-      <div className="bg-white rounded-lg w-full max-w-lg p-4">
+      <div className="bg-background rounded-lg w-full max-w-lg p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">
             {title}
@@ -60,7 +60,7 @@ export function SearchModal<T extends SearchableItem>({
             <button
               key={item.id}
               type="button"
-              className="w-full border rounded-md p-3 text-left hover:bg-gray-100"
+              className="w-full border rounded-md p-3 text-left hover:bg-muted"
               onClick={() => {
                 onSelect(item);
                 onClose();
@@ -71,7 +71,7 @@ export function SearchModal<T extends SearchableItem>({
               </div>
 
               {item.description && (
-                <div className="text-sm text-gray-500">
+                <div className={ item.description==='inactivo'?`text-sm text-destructive`:`text-sm text-success`}>
                   {item.description}
                 </div>
               )}

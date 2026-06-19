@@ -20,7 +20,9 @@ export class PrismaPagoRepository implements PagoRepository {
       pagoCreado.reference,
       pagoCreado.notes,
       pagoCreado.paidAt,
-      pagoCreado.createdAt
+      pagoCreado.status,
+      pagoCreado.createdAt,
+      pagoCreado.voidedAt,
     )
   }
   async update (data: Partial<PagoEntity> & {id: string}): Promise<PagoEntity> {
@@ -39,7 +41,9 @@ export class PrismaPagoRepository implements PagoRepository {
       pagoActualizado.reference,
       pagoActualizado.notes,
       pagoActualizado.paidAt,
-      pagoActualizado.createdAt
+      pagoActualizado.status,
+      pagoActualizado.createdAt,
+      pagoActualizado.voidedAt
     )
   }
   async findAll(): Promise<PagoEntity[]> {
@@ -53,7 +57,9 @@ export class PrismaPagoRepository implements PagoRepository {
       pago.reference,
       pago.notes,
       pago.paidAt,
-      pago.createdAt
+      pago.status,
+      pago.createdAt,
+      pago.voidedAt,
     ))
   }
   async findById(id: string): Promise<PagoEntity> {
@@ -71,13 +77,15 @@ export class PrismaPagoRepository implements PagoRepository {
       pagoObtenido.reference,
       pagoObtenido.notes,
       pagoObtenido.paidAt,
-      pagoObtenido.createdAt
+      pagoObtenido.status,
+      pagoObtenido.createdAt,
+      pagoObtenido.voidedAt,
     )
   }
   async findByVisitId(visitId: string): Promise<PagoEntity[]> {
     const pagoObtenido = await this.prisma.payment.findMany({
       where: {
-        id: visitId
+        visitId
       }
     })
     return pagoObtenido.map((pago) => new PagoEntity(
@@ -89,7 +97,57 @@ export class PrismaPagoRepository implements PagoRepository {
       pago.reference,
       pago.notes,
       pago.paidAt,
-      pago.createdAt
+      pago.status,
+      pago.createdAt,
+      pago.voidedAt,
     ))
+  }
+  async desactivar(id: string): Promise<PagoEntity> {
+    const pagoDescartado = await this.prisma.payment.update({
+      where: {
+        id
+      },
+      data: {
+        status: 'VOIDED',
+        voidedAt: new Date()
+      }
+    })
+    return new PagoEntity(
+      pagoDescartado.id,
+      pagoDescartado.visitId,
+      pagoDescartado.sucursalId,
+      pagoDescartado.amount.toNumber(),
+      pagoDescartado.method,
+      pagoDescartado.reference,
+      pagoDescartado.notes,
+      pagoDescartado.paidAt,
+      pagoDescartado.status,
+      pagoDescartado.createdAt,
+      pagoDescartado.voidedAt,
+    )
+  }
+  async activar(id: string): Promise<PagoEntity> {
+    const pagoDescartado = await this.prisma.payment.update({
+      where: {
+        id
+      },
+      data: {
+        status: 'ACTIVE',
+        voidedAt: null
+      }
+    })
+    return new PagoEntity(
+      pagoDescartado.id,
+      pagoDescartado.visitId,
+      pagoDescartado.sucursalId,
+      pagoDescartado.amount.toNumber(),
+      pagoDescartado.method,
+      pagoDescartado.reference,
+      pagoDescartado.notes,
+      pagoDescartado.paidAt,
+      pagoDescartado.status,
+      pagoDescartado.createdAt,
+      pagoDescartado.voidedAt,
+    )
   }
 }

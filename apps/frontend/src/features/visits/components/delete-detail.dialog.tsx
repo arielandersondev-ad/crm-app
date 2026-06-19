@@ -37,7 +37,7 @@ export function DeleteDetailDialog({ open, loading, detailName, onClose, onConfi
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className="px-4 py-2 rounded-md bg-destructive text-white"
+            className="px-4 py-2 rounded-md bg-destructive text-destructive-foreground"
           >
             Eliminar
           </button>

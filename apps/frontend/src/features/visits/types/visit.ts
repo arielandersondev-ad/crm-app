@@ -63,3 +63,36 @@ export interface UpdateVisitDetailDto {
   quantity?: number;
   notes?: string;
 }
+
+export interface Payment {
+  id: string;
+  visitId: string;
+  sucursalId: string;
+  amount: number;
+  method: 'CASH' | 'QR' | 'TRANSFER' | 'CARD';
+  reference?: string;
+  notes?: string;
+  createdAt: Date;
+  paidAt: Date;
+  status?: 'ACTIVE' | 'VOIDED'
+  voidedAt?: Date
+}
+
+export interface CreatePaymentDto {
+  visitId: string;
+  amount: number;
+  method: Payment['method'];
+  reference?: string;
+  notes?: string;
+}
+export interface UpdatePaymentDto {
+  id: string
+  visitId: string;
+  amount: number;
+  method: Payment['method'];
+  reference?: string;
+  notes?: string;
+  paidAt: Date
+  status?: 'ACTIVE' | 'VOIDED'
+  voidedAt?: Date
+}

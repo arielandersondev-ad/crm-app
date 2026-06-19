@@ -14,5 +14,15 @@ export const ENDPOINTS = {
     CREATE: '/visit-detail/create',
     BULK_CREATE: '/visit-detail/bulk-create',
     REMOVE: '/visit-detail/delete',
+  },
+  VISIT_PAYMENT: {
+    GET: {
+      FIND_ALL: "/pago/allByVisitId/:visitId",
+      SUMARY: "/pago/sumary/:visitId"
+    },
+    CREATE: '/pago/create',
+    UPDATE: '/pago/update/:id',
+    ACTIVAR: '/pago/activate/:id',
+    DESACTIVAR: '/pago/void/:id',
   }
 }

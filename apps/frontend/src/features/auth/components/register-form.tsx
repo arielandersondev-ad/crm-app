@@ -59,7 +59,7 @@ export function RegisterForm() {
         />
 
         {errors.nombres && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {errors.nombres.message}
           </p>
         )}
@@ -80,7 +80,7 @@ export function RegisterForm() {
         />
 
         {errors.apellidos && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {errors.apellidos.message}
           </p>
         )}
@@ -101,7 +101,7 @@ export function RegisterForm() {
         />
 
         {errors.email && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {errors.email.message}
           </p>
         )}
@@ -123,7 +123,7 @@ export function RegisterForm() {
         />
 
         {errors.password && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {errors.password.message}
           </p>
         )}
@@ -144,14 +144,14 @@ export function RegisterForm() {
         />
 
         {errors.confirmPassword && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {errors.confirmPassword.message}
           </p>
         )}
       </div>
 
       {registerMutation.isError && (
-        <p className="text-sm text-red-500">
+        <p className="text-sm text-destructive">
           Invalid registration credentials
         </p>
       )}

@@ -62,6 +62,11 @@ enum PaymentMethod {
   OTHER
 }
 
+enum PaymentStatus {
+  ACTIVE
+  VOIDED
+}
+
 //_______________________________________
 
 model Tenant {
@@ -144,6 +149,7 @@ model Sucursal {
   direccion String?
   telefono  String?
   correo    String?
+  timezone  String @default("America/La_Paz")
 
   isDefault Boolean @default(false)
   isActive  Boolean @default(true)
@@ -372,6 +378,10 @@ model Payment {
   reference String?
 
   notes String?
+
+  status PaymentStatus @default(ACTIVE)
+
+  voidedAt DateTime?
 
   paidAt DateTime @default(now())
 

@@ -1,5 +1,5 @@
 import { PaymentMethod } from "@prisma/client"
-import { IsNotEmpty, IsOptional, IsString } from "class-validator"
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class CreatePagoDto {
   
@@ -7,11 +7,10 @@ export class CreatePagoDto {
   @IsNotEmpty()
   visitId: string
   
-  @IsString()
-  @IsNotEmpty()
-  sucursalId: string
+  @IsOptional()
+  sucursalId: string | null
   
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
   amount: number
   

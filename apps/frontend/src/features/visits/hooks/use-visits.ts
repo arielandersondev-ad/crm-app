@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { visitService } from "../services/visit.service";
 import { visitDetailService } from "../services/visit-detail.service";
-import { useAuthStore } from "@/stores/auth.store";
+import { visitPaymentService } from "../services/visit-payment.service";
 
 export function useVisits() {
   return useQuery({
@@ -94,4 +94,68 @@ export function useDeleteVisitDetail(visitId: string) {
       });
     },
   });
+}
+
+export function usePaymentVisit(visitId: string) {
+  return useQuery({
+    queryKey: ["visit-payments",visitId],
+    queryFn: () => visitPaymentService.getPayments(visitId),
+    enabled: !!visitId
+  })
+}
+
+export function useCreatePayment(visitId: string) {
+  const queryService = useQueryClient()
+  return useMutation({
+    mutationFn: visitPaymentService.createPayment,
+    onSuccess: () => {
+      queryService.invalidateQueries({
+        queryKey: ['visit-payments',visitId]
+      })
+    }
+  })
+}
+
+export function useUpdatePayment(visitId: string) {
+  const queryService = useQueryClient()
+  return useMutation({
+    mutationFn: visitPaymentService.updatePayment,
+    onSuccess: () => {
+      queryService.invalidateQueries({
+        queryKey: ['visit-payments',visitId]
+      })
+    }
+  })
+}
+
+export function useActivarPayment(visitId: string) {
+  const queryService = useQueryClient()
+  return useMutation({
+    mutationFn: visitPaymentService.activarPayment,
+    onSuccess: () => {
+      queryService.invalidateQueries({
+        queryKey: ['visit-payments',visitId]
+      })
+    }
+  })
+}
+
+export function useDesactivarPayment(visitId: string) {
+  const queryService = useQueryClient()
+  return useMutation({
+    mutationFn: visitPaymentService.desactivarPayment,
+    onSuccess: () => {
+      queryService.invalidateQueries({
+        queryKey: ['visit-payments',visitId]
+      })
+    }
+  })
+}
+
+export function useSumary(visitId: string){
+  return useQuery({
+    queryKey: ["visit-payments",visitId],
+    queryFn: () => visitPaymentService.sumary(visitId),
+    enabled: !!visitId
+  })
 }

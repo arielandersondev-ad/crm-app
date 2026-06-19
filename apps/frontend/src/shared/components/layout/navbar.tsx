@@ -7,6 +7,7 @@ import { useUIStore } from "@/stores/ui.store";
 import { TenantSelector } from "./tenant-selector";
 import { BranchSelector } from "./branch-selector";
 import { UserMenu } from "./user-menu";
+import { ModeToggle } from "../ui/mode-toggle";
 
 export function Navbar() {
   const toggleSidebar = useUIStore(
@@ -25,7 +26,10 @@ export function Navbar() {
         <BranchSelector />
       </div>
 
-      <UserMenu />
+      <div className="flex items-center gap-2">
+        <ModeToggle />
+        <UserMenu />
+      </div>
     </header>
   );
 }

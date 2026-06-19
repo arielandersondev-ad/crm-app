@@ -24,4 +24,8 @@ export class UpdateSucursalDto {
   @IsOptional()
   @IsString()
   correo: string;
+
+  @IsOptional()
+  @IsString()
+  timezone?: string;
 }

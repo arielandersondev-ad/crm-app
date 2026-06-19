@@ -16,10 +16,10 @@ export function DataTableAvatar({ value }: Props) {
         className="
           flex h-9 w-9 items-center justify-center
           rounded-full
-          bg-blue-100
+          bg-primary/10
           text-xs
           font-semibold
-          text-blue-700
+          text-primary
         "
       >
         {initials}

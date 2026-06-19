@@ -34,4 +34,8 @@ export class CreateSucursalDto {
   @IsOptional()
   @IsEmail()
   correo?: string;
+
+  @IsOptional()
+  @IsString()
+  timezone?: string;
 }

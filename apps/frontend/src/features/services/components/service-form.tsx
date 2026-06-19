@@ -12,7 +12,7 @@ export function ServiceForm({ register, errors }: ServiceFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Nombre</label>
-          <label className="text-sm text-red-300">requerido</label>
+          <label className="text-sm text-muted-foreground">requerido</label>
         </div>
 
         <input
@@ -22,7 +22,7 @@ export function ServiceForm({ register, errors }: ServiceFormProps) {
         />
 
         {errors?.name && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.name.message}
           </p>
         )}
@@ -30,7 +30,7 @@ export function ServiceForm({ register, errors }: ServiceFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Descripcion</label>
-          <label className="text-sm text-red-300">requerido</label>
+          <label className="text-sm text-muted-foreground">requerido</label>
         </div>
 
         <input
@@ -40,7 +40,7 @@ export function ServiceForm({ register, errors }: ServiceFormProps) {
         />
 
         {errors?.description && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.description.message}
           </p>
         )}
@@ -48,7 +48,7 @@ export function ServiceForm({ register, errors }: ServiceFormProps) {
       <div>
         <div className="flex flex-col md:flex-row justify-between">
           <label className="block mb-1">Precio</label>
-          <label className="text-sm text-red-300">requerido</label>
+          <label className="text-sm text-muted-foreground">requerido</label>
         </div>
 
         <input
@@ -59,7 +59,7 @@ export function ServiceForm({ register, errors }: ServiceFormProps) {
         />
 
         {errors?.basePrice && (
-          <p className="text-red-500 text-sm">
+          <p className="text-destructive text-sm">
             {errors.basePrice.message}
           </p>
         )}

@@ -36,7 +36,7 @@ export function DeleteClientDialog({ open, loading, clientName, onClose, onConfi
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className="px-4 py-2 rounded-md bg-destructive text-white"
+            className="px-4 py-2 rounded-md bg-destructive text-destructive-foreground"
           >
             Eliminar
           </button>
