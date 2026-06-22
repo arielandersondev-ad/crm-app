@@ -1,7 +1,7 @@
 export interface Client {
   id: string;
   //tenantId: string;
-  type: string;
+  type?: string;
   fullName: string;
   phone?: string;
   email?: string;
@@ -9,9 +9,9 @@ export interface Client {
   birthDate?: string;
   address?: string;
   notes?: string;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 export interface CreateClientDto {
   type?: string;

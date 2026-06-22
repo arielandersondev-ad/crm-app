@@ -7,16 +7,19 @@ import { Modal } from "@/shared/components/modal";
 import { VisitForm } from "./visit-form";
 import { Client } from "@/features/clients/types/client";
 import { toDateTimeLocal } from "@/constants/format";
-
+export interface ClientContext{
+  id: string
+  fullName: string
+}
 interface VisitModalProps {
-  client?: Client;
+  client?: ClientContext;
   open: boolean;
   mode: "create" | "edit";
   visit?: Visit;
   loading?: boolean;
 
   onClose: () => void;
-  onSubmit: ( values: VisitFormData ) => Promise<void> | void;
+  onSubmit: ( values: Omit<VisitFormData,'startedAt'|'completedAt'> ) => Promise<void> | void;
 }
 export function VisitModal({ client, open, mode, visit, loading, onClose, onSubmit }: VisitModalProps) {
   const resolver = zodResolver(VISIT_SCHEMA);
@@ -42,6 +45,7 @@ export function VisitModal({ client, open, mode, visit, loading, onClose, onSubm
     reset({
       clientId: client?.id || ''
     });
+    console.log('[VisitModal] reset form en create mode con client:', { id: client?.id, nombre: client?.fullName });
   }, [mode, visit, client, reset]);
   
   return(
@@ -53,15 +57,19 @@ export function VisitModal({ client, open, mode, visit, loading, onClose, onSubm
     >
       <form
         onSubmit={handleSubmit(
-          (data) => onSubmit(data),
-          (errors) => console.error('Errores de formulario:', errors)
+          (data) => {
+            console.log('[VisitModal] Form válido, datos a enviar:', data);
+            console.log('[VisitModal] userId:', data.userId, data.userId === undefined ? '(undefined! → schema validation fail)' : '(ok)');
+            onSubmit(data);
+          },
+          (errors) => console.error('[VisitModal] Errores de formulario:', errors)
         )}
         className="space-y-6"
       >
         {/* Mensaje de error general */}
         {Object.keys(errors).length > 0 && (
           <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-md">
-            <p className="text-sm text-destructive font-medium">Por favor corrige los errores:</p>
+            <p className="text-sm text-destructive font-medium">Por favor corrige los errores en visit modal:</p>
             <ul className="text-xs text-destructive mt-1 ml-4 list-disc">
               {Object.entries(errors).map(([key, value]) => (
                 <li key={key}>{String(value?.message || `Error en ${key}`)}</li>

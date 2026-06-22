@@ -16,6 +16,7 @@ import { DeleteClientDialog } from "../components/delete-cliente-dialog";
 import { toast } from "sonner";
 import { VisitModal } from "@/features/visits/components/visit-modal";
 import { useCreateVisit, useVisits } from "@/features/visits/hooks/use-visits";
+import { VisitFormData } from "@/features/visits/schemas/visit.schema";
 
 export function ClientsPage() {
   const { data: clients, isLoading, isError } = useClients();
@@ -73,7 +74,7 @@ export function ClientsPage() {
           clients={clients}
           onEdit={(client) => setEditingClient(client)}
           onDelete={(client) => setDeleteClient(client.id)}
-          onVisit={(client) => setIsVisitOpen(client)}
+          onVisit={(client) => setIsVisitOpen({id:client.id,fullName:client.fullName})}
         />
       )}
       <ClientModal
@@ -107,7 +108,6 @@ export function ClientsPage() {
         open={!!deleteClient}
         onClose={() => setDeleteClient('')}
         onConfirm={async () => {
-          console.log('Confirm delete: ', deleteClient);
           if (!deleteClient) return;
             await deleteClientMutation.mutateAsync( deleteClient );
             toast.success('Cliente eliminado correctamente');
@@ -122,7 +122,13 @@ export function ClientsPage() {
         onClose={() => setIsVisitOpen(null)}
         onSubmit={async (data) => {
           if (!isVisitOpen) return;
-          await createVisitMutation.mutateAsync(data);
+          await createVisitMutation.mutateAsync({
+            clientId: data.clientId,
+            userId: data.userId,
+            appointmentId: data.appointmentId,
+            status: data.status,
+            notes: data.notes
+          });
           toast.success('Visita creada correctamente');
           setIsVisitOpen(null);
         }}

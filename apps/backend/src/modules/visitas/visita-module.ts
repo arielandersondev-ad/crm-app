@@ -7,8 +7,12 @@ import { FindAllVisitUseCase } from "./application/find-all.use-case";
 import { VisitRepository } from "./domain/repositories/visit.repository";
 import { PrismaVisitaRepository } from "./infrastructure/prisma/prisma-visita.repository";
 import { DeleteVisitUseCase } from "./application/delete-visit.use-case";
+import { CitaModule } from "../cita/cita.module";
 
 @Module({
+  imports: [
+    CitaModule,
+  ],
   controllers: [
     VisitController,
   ],

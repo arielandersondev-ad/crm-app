@@ -31,7 +31,7 @@ export const EDIT_VISIT_SCHEMA = z.object({
   notes: z.string().optional(),
 });
 export const VISIT_SCHEMA = z.object({
-  clientId: z.string().optional(),
+  clientId: z.string(),
   userId: z.string().optional(),
   appointmentId: z.string().optional(),
   startedAt: z.string().optional(),

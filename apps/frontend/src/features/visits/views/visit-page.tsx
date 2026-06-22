@@ -118,7 +118,7 @@ export function VisitPage() {
         mode='create'
         visit={undefined}
         onClose={() => setCreateOpen(false)}
-        onSubmit={async (data) => console.log('submit', data)} 
+        onSubmit={async (data) => console.log('submit de VisitModal en Visit Page', data)} 
       />
 
       {/* Modal de detalle para editar */}
@@ -128,7 +128,6 @@ export function VisitPage() {
           visit={editingOpen}
           onClose={() => setEditingOpen(null)}
           onSubmit={async (data) => {
-            console.log('Actualizando a: ', data);
             await updateVisitMutation.mutateAsync({
               ...data,
               id: editingOpen.id,

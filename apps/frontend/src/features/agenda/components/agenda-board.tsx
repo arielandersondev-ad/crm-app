@@ -7,9 +7,12 @@ import { AgendaHeader } from './agenda-header'
 import { AgendaDiaView } from './agenda-dia-view'
 import { AgendaMesView } from './agenada-mes-view'
 import { AgendaSemanaView } from './agenada-semana-view'
-import { AgendaResponse } from '../types/interfaces'
-
-export function AgendaBoard({data,}: {  data?: AgendaResponse}) {
+import { AgendaResponse, Details } from '../types/interfaces'
+interface AgendaBoardProps{
+  data?: AgendaResponse
+  onSelected: (cita: Details)=> void
+}
+export function AgendaBoard({data, onSelected}: AgendaBoardProps) {
   const agendaData = data?.appointments ?? []
   const [vista, setVista] = useState('Día')
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -135,15 +138,33 @@ export function AgendaBoard({data,}: {  data?: AgendaResponse}) {
         />
 
         {vista === 'Día' && (
-          <AgendaDiaView appointments={citasDelDia} />
-        )}
+          <AgendaDiaView 
+            appointments={citasDelDia} 
+            onSelected={(cita)=>{
+              console.log('[AgendaBoard → DiaView] Cita recibida:', { id: cita.id, cliente: cita.clientFullName, hora: cita.hora });
+              onSelected(cita);
+            }}
+            />
+          )}
 
         {vista === 'Semana' && (
-          <AgendaSemanaView week={semanaAgrupada} />
-        )}
+          <AgendaSemanaView 
+            week={semanaAgrupada} 
+            onSelected={(cita)=>{
+              console.log('[AgendaBoard → SemanaView] Cita recibida:', { id: cita.id, cliente: cita.clientFullName, hora: cita.hora });
+              onSelected(cita);
+            }}
+            />
+          )}
 
         {vista === 'Mes' && (
-          <AgendaMesView weeks={mesAgrupado} />
+          <AgendaMesView 
+            weeks={mesAgrupado} 
+            onSelected={(cita)=>{
+              console.log('[AgendaBoard → MesView] Cita recibida:', { id: cita.id, cliente: cita.clientFullName, hora: cita.hora });
+              onSelected(cita);
+            }}
+          />
         )}
       </Card>
 

@@ -9,9 +9,10 @@ interface WeekDay {
 
 interface Props {
   week: WeekDay[]
+  onSelected: (c:any)=>void
 }
 
-export function AgendaSemanaView({ week }: Props) {
+export function AgendaSemanaView({ week, onSelected }: Props) {
 
   return (
     <div className="p-4">
@@ -54,6 +55,7 @@ export function AgendaSemanaView({ week }: Props) {
                   <div
                     key={cita.id}
                     className="mb-2 rounded border p-2"
+                    onClick={()=>onSelected(cita)}
                   >
                     {cita.hora} - {cita.clientFullName}
                   </div>

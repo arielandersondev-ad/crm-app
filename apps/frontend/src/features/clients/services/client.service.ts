@@ -22,9 +22,6 @@ class ClientService {
   async updateClient(client: UpdateClientDto) {
     try {
       const { id, ...rest } = client;
-
-      console.log("PATCH BODY", rest);
-
       const response = await api.patch<Client>(
         ENDPOINTS.UPDATE.replace(":id", id),
         rest
@@ -32,19 +29,15 @@ class ClientService {
 
       return response.data;
     } catch (error: any) {
-      console.log("ERROR RESPONSE");
-      console.log(error.response?.data);
+      console.error("ERROR RESPONSE");
+      console.error(error.response?.data);
 
       throw error;
     }
   }
   
   async deleteClient(id: string) {
-    console.log('Serivice delete: ', id);
     const response = await api.delete<Client>(ENDPOINTS.REMOVE.replace(":id", id));
-    console.log(ENDPOINTS.REMOVE.replace(":id", id) );
-    console.log('response: ', response);
-
     return response.data;
   }
 }

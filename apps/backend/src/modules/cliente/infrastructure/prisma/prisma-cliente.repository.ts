@@ -127,7 +127,6 @@ export class PrismaClienteRepository implements ClienteRepository {
     };
   }
   async update (id: string, tenantId: string, fullname: string, email: string, phone: string, documentNumber: string, birthday?: string, address?: string, notes?: string, isActive?: boolean): Promise<Cliente> {
-    //console.log({ birthday, type: typeof birthday });
     const clienteUpdated = await this.prisma.client.update({
       where: {
         id: id,

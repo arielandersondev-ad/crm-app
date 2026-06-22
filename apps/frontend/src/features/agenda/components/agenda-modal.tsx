@@ -70,7 +70,7 @@ export function AgendaModal({ open,mode,loading, currenCLient ,onClose, onSubmit
         {/* Mensaje de error general */}
         {Object.keys(errors).length > 0 && (
           <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-md">
-            <p className="text-sm text-destructive font-medium">Por favor corrige los errores:</p>
+            <p className="text-sm text-destructive font-medium">Por favor corrige los errores en agenda modal:</p>
             <ul className="text-xs text-destructive mt-1 ml-4 list-disc">
               {Object.entries(errors).map(([key, value]) => (
                 <li key={key}>{String(value?.message || `Error en ${key}`)}</li>

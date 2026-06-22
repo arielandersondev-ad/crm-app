@@ -28,9 +28,7 @@ class VisitPaymentService {
     return response.data
   }
   async sumary(visitId:string){
-    console.log('sumary in service: ',visitId)
     const response = await api.get(ENDPOINTS.VISIT_PAYMENT.GET.SUMARY.replace(':visitId',visitId))
-    console.log('post res: ',response.data)
     return response.data
   }
 }
