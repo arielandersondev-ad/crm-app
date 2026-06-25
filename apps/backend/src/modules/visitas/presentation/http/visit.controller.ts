@@ -31,7 +31,6 @@ export class VisitController {
     @CurrentUser('sub') userId: string,
     @Body() createVisitDto: CreateVisitDto,
   ) {
-    console.log(userId);
     return this.createVisitUseCase.execute(createVisitDto, tenantId, sucursalId, userId);
   }
 

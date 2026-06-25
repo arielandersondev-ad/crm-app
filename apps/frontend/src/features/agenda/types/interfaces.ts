@@ -1,5 +1,6 @@
 export interface Details{
   id:string,
+  clientId: string,
   status:any,
   scheduledAt:string,
   hora:string,

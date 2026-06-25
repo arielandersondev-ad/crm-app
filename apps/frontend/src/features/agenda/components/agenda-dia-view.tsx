@@ -6,6 +6,7 @@ import { StatusBadge } from '@/shared/components/status-badge'
 import { cn } from '@/shared/utils/utils'
 
 import { Details } from '../types/interfaces'
+import { Button } from '@/shared/components/ui/button'
 
 const horas = [
   '09:00',
@@ -28,9 +29,10 @@ const tipoColor: Record<string, string> = {
 
 interface Props {
   appointments: Details[]
+  onSelected: (c:any)=>void
 }
 
-export function AgendaDiaView({ appointments }: Props) {
+export function AgendaDiaView({ appointments,onSelected }: Props) {
   return (
     <div className="divide-y divide-border">
       {horas.map((hora) => {
@@ -51,6 +53,10 @@ export function AgendaDiaView({ appointments }: Props) {
                 enHora.map((c) => (
                   <div
                     key={c.id}
+                    onClick={()=>{
+                      console.log('[AgendaDiaView] onClick → onSelected con:', { id: c.id, cliente: c.clientFullName, hora: c.hora, status: c.status, citaCompleta: c });
+                      onSelected(c);
+                    }}
                     className={cn(
                       'rounded-md border border-l-4 border-border bg-secondary/40 p-3',
                       tipoColor[c.status] ?? 'border-l-primary',

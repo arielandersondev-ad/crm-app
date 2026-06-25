@@ -10,3 +10,10 @@ export class User {
     public readonly updatedAt: Date,
   ) {}
 }
+export class UserSucursal {
+  constructor(
+    public readonly id: string,
+    public readonly userId: string,
+    public readonly sucursalId: string,
+  ) {}
+}

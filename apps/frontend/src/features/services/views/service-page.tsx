@@ -91,7 +91,6 @@ export function ServicePage() {
         open={!!deleteService}
         onClose={() => setDeleteService('')}
         onConfirm={async () => {
-          console.log('Confirm delete: ', deleteService);
           if (!deleteService) return;
           await deleteServiceMutation.mutateAsync(
             deleteService

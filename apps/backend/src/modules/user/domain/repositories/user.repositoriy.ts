@@ -8,6 +8,9 @@ export abstract class UserRepository {
   abstract findById(id: string): Promise<User>;
   abstract findByEmail(email: string): Promise<User>;
   abstract create(db: PrismaService | Prisma.TransactionClient, email: string, password: string, firstName: string, lastName: string): Promise<User>;
-  abstract update(id: string, email?: string, password?: string, firstName?: string, lastName?: string): Promise<User>;
+  abstract update(db: PrismaService | Prisma.TransactionClient,id: string, email?: string, password?: string, firstName?: string, lastName?: string): Promise<User>;
   abstract delete(id: string): Promise<User>;
+  abstract deactivate(id: string): Promise<User>;
+  abstract activate(id: string): Promise<User>;
+  abstract findByTenant(tenantId: string): Promise<any[]>
 }

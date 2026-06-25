@@ -10,9 +10,10 @@ interface MonthWeek {
 
 interface Props {
   weeks: MonthWeek[]
+  onSelected: (c:any)=>void
 }
 
-export function AgendaMesView({weeks}: Props) {
+export function AgendaMesView({weeks, onSelected}: Props) {
   return (
     <div className="space-y-4 p-4">
       <Accordion
@@ -51,6 +52,7 @@ export function AgendaMesView({weeks}: Props) {
                     <div
                       key={cita.id}
                       className="rounded border p-2"
+                      onClick={()=>onSelected(cita)}
                     >
                       <div className="font-medium">
                         {cita.clientFullName}

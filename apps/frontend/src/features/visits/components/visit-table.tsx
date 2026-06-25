@@ -54,7 +54,6 @@ export function VisitTables({ visits, onEdit, onDelete }: VisitTableProps) {
     {
       label: "Editar",
       onClick: (visit: Visit) => {
-        console.log("editar", visit);
         onEdit?.(visit);
       },
     },
@@ -62,7 +61,6 @@ export function VisitTables({ visits, onEdit, onDelete }: VisitTableProps) {
       label: "Eliminar",
       onClick: (visit: Visit) => {
         onDelete?.(visit);
-        console.log("eliminar", visit);
       },
     },
   ];

@@ -24,6 +24,9 @@ import { SucursalModule } from "../sucursal/sucursal.module";
       provide: CitaRepository,
       useClass: PrismaCitaRepository
     }
+  ],
+  exports: [
+    CitaRepository,
   ]
 })
 export class CitaModule{}

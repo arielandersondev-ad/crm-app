@@ -8,9 +8,7 @@ class ServiceService {
     return response.data;
   }
   async createService(data: CreateServiceDto): Promise<Service> {
-    console.log('request create service: ',data);
     const response = await api.post<Service>(ENDPOINTS.CREATE, data);
-    console.log('response create service: ',response.data);
     return response.data;
   }
   async updateService(data: UpdateServiceDto): Promise<Service> {

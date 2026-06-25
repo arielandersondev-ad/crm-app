@@ -24,6 +24,7 @@ export class FindAgendaUseCase{
           minute: '2-digit',
           timeZone: timezone
         }),
+        clientId: appointment.clientId,
         clientFullName: appointment.client.fullName,
         userName: appointment.user
           ? `${appointment.user.firstName} ${appointment.user.lastName}`

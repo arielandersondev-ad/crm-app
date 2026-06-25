@@ -36,14 +36,12 @@ export function ClientsTable({ clients, onEdit, onDelete, onVisit }: ClientsTabl
     label: "Editar",
     onClick: (client: Client) => {
       onEdit?.(client);
-      console.log("editar", client);
     },
   },
   {
     label: "Eliminar",
     onClick: (client: Client) => {
       onDelete?.(client);
-      console.log("eliminar", client);
     },
     variant: "danger",
   },
@@ -51,14 +49,12 @@ export function ClientsTable({ clients, onEdit, onDelete, onVisit }: ClientsTabl
     label: "Visita",
     onClick: (client: Client) => {
       onVisit?.(client);
-      console.log("llegaron datos: ", client);
     },
     variant: "primary",
   },
   {
     label: "Detalles",
     onClick: (client: Client) => {
-      console.log("detalles", client);
     },
     variant: "neutral",
   },

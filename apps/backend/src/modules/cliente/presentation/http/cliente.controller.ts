@@ -62,7 +62,6 @@ export class ClienteController {
     @CurrentUser('tenantId') tenantId: string,
     @Param('id', ParseUUIDPipe) id: string
   ) {
-    console.log('Controller delete: ', id);
     return this.deleteUseCase.execute(tenantId, id);
   }
   @Get(':id')

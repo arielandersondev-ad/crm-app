@@ -37,7 +37,10 @@ export interface VisitDetail {
   notes?: string;
   createdAt: Date;
 }
-
+export interface CreateVisitDto {
+  clientId?: string;
+  appointmentId?: string;
+}
 export interface CreateVisitDetailDto {
   visitId: string;
   serviceId: string;

@@ -15,7 +15,7 @@ export function useLogin() {
     mutationFn: authService.login,
 
     onSuccess: (data) => {
-      console.log("[DEV] LOGIN SUCCESS", data);
+      //console.info("[DEV] LOGIN SUCCESS", data);
       setUser(data.user);
       setTenant(data.tenant);
       setBranch(data.sucursal);

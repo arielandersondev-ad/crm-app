@@ -49,15 +49,49 @@ export class PrismaMembershipRepository implements MembershipRepository {
       throw error;
     }
   }
-  async update(id: string, userId: string, tenantId: string, role: UserRole) {
+  async findByTenantId(tenantId: string) {
     try {
-      return this.prisma.membership.update({
+      return this.prisma.membership.findMany({
+        where: { tenantId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+              isActive: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+  async update(db: PrismaService | Prisma.TransactionClient,id: string, userId: string, tenantId: string, role: UserRole) {
+    try {
+      return db.membership.update({
         where: {
           id,
         },
         data: {
           userId,
           tenantId,
+          role: role as UserRole,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+  async updateRolByUser(db: PrismaService | Prisma.TransactionClient, userId: string, tenantId: string, role: UserRole) {
+    try {
+      return db.membership.update({
+        where: {
+          userId_tenantId:{userId,tenantId},
+        },
+        data: {
           role: role as UserRole,
         },
       });

@@ -34,14 +34,12 @@ export function ServiceTable({ services, onDelete, onEdit }: ServiceTableProps) 
       label: "Editar",
       onClick: (service: Service) => {
         onEdit?.(service);
-        console.log("editar", service);
       },
     },
     {
       label: "Eliminar",
       onClick: (service: Service) => {
         onDelete?.(service);
-        console.log("eliminar", service);
       },
       variant: "danger",
     },

@@ -1,18 +1,20 @@
 import { api } from "@/infrastructure/api/axios";
-import { CreateVisitDetailDto, UpdateVisitDetailDto, Visit } from "../types/visit";
+import { CreateVisitDto, UpdateVisitDetailDto, Visit } from "../types/visit";
 import { ENDPOINTS } from "../api/endpoints";
 
 class VisitService {
   async getVisits(): Promise<Visit[]> {
-    const response = await api.get<Visit[]>(ENDPOINTS.GET.FIND_ALL);
+    const response = await api.get<Visit[]>(ENDPOINTS.GET.FIND_ALL_COMPLETE);
     return response.data;
   }
   async getVisitForm(): Promise<any[]> {
     const response = await api.get<any[]>(ENDPOINTS.GET.FIND_ALL_FOR_FORM);
     return response.data;
   }
-  async createVisit(data: CreateVisitDetailDto): Promise<Visit> {
+  async createVisit(data: CreateVisitDto): Promise<Visit> {
+    console.log('[VisitService] Enviando POST /visitas/create con body:', data);
     const response = await api.post<Visit>(ENDPOINTS.CREATE, data);
+    console.log('[VisitService] Respuesta del servidor:', response.data);
     return response.data;
   }
   async updateVisit( data: UpdateVisitDetailDto): Promise<Visit> {

@@ -14,7 +14,6 @@ export class CreateSucursalUseCase {
   async execute(dto: CreateSucursalDto) {
 
     const validTenantId = await this.tenantRepository.findOne(dto.tenantId);
-    //console.log(validTenantId);
     if (!validTenantId) {
       throw new Error('El tenantId no existe');
     }

@@ -15,8 +15,6 @@ export function AuthTest() {
       email: "test@mail.com",
       password: "test",
     })
-    console.log("Login Test")
-
   }
   return (
     <div className="space-y-4">

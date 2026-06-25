@@ -24,14 +24,14 @@ export type EditDetailValues = z.infer<typeof EditDetailSchema>;
 
 export const EDIT_VISIT_SCHEMA = z.object({
   clientId: z.string(),
-  userId: z.string(),
+  userId: z.string().optional(),
   startedAt: z.string().optional(),
   completedAt: z.string().optional(),
   status: z.string(),
   notes: z.string().optional(),
 });
 export const VISIT_SCHEMA = z.object({
-  clientId: z.string().optional(),
+  clientId: z.string(),
   userId: z.string().optional(),
   appointmentId: z.string().optional(),
   startedAt: z.string().optional(),

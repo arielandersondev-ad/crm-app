@@ -1,12 +1,10 @@
 import {
   Home,
   Users,
-  PawPrint,
   Calendar,
   Package,
-  ShoppingCart,
-  Settings,
   Disc,
+  ShieldUser,
 } from "lucide-react";
 
 export const navigation = [
@@ -31,28 +29,13 @@ export const navigation = [
     icon: Disc,
    },
   {
-    label: "Mascotas",
-    href: "/mascotas",
-    icon: PawPrint,
-  },
-  {
     label: "Agenda",
     href: "/dashboard/agenda",
     icon: Calendar,
   },
   {
-    label: "Ventas",
-    href: "/ventas",
-    icon: ShoppingCart,
-  },
-  {
-    label: "Inventario",
-    href: "/inventario",
-    icon: Package,
-  },
-  {
-    label: "Configuración",
-    href: "/configuracion",
-    icon: Settings,
+    label: "Usuarios",
+    href: "/dashboard/usuarios",
+    icon: ShieldUser,
   },
 ];
