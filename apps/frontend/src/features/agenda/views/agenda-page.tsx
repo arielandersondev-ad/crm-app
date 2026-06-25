@@ -12,6 +12,9 @@ import { AppointmentDetailModal } from "../components/agenda-detalles-modal";
 import { Details } from "../types/interfaces";
 import { ClientContext, VisitModal } from "@/features/visits/components/visit-modal";
 import { useCreateVisit } from "@/features/visits/hooks/use-visits";
+import { useAuthStore } from "@/stores/auth.store";
+import { EmptyState } from "@/shared/components/empty-state";
+import { LoadingState } from "@/shared/components/loading-state";
 
 export function AgendaPage() {
   // Estados de control
@@ -24,8 +27,12 @@ export function AgendaPage() {
 
   //hooks
   const createAgendaMutation = useCreateAgenda()
-  const {data: agenda} = useGetAgenda('2')
+  const branch = useAuthStore((state) => state.branch)
+  const {data: agenda, isLoading, isError} = useGetAgenda(branch?.id ?? '')
   const createVisitMutation= useCreateVisit()
+console.log('agenda de useGetAgenda: ',agenda)
+  if (isLoading) return <LoadingState />
+  if (isError) return <EmptyState title="Error al cargar la agenda" />
 
   return(
     <PageContainer>
@@ -45,6 +52,12 @@ export function AgendaPage() {
         }
       />
       {/* Renderizado de la agenda */}
+      {!agenda?.appointments?.length ? (
+        <EmptyState
+          title="No hay citas"
+          description="No se encontraron citas para esta sucursal."
+        />
+      ) : (
       <AgendaBoard
         data={agenda}
         onSelected={(cita)=>{
@@ -58,6 +71,7 @@ export function AgendaPage() {
           console.log('[AgendaPage] seteados: citaSelected, clienteSelect, detailAgendaOpen=true');
         }}
       />
+      )}
       {/* Modal para crear visitas */}
       <AgendaModal 
         open={createOpen}

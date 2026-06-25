@@ -4,6 +4,6 @@ export const ENDPOINTS = {
     GET_AGENDA: '/cita/agenda'
   },
   CREATE: '/cita/create',
-  UPDATE: '/cliente/update/:id',
-  REMOVE: '/cliente/delete/:id',
+  UPDATE: '/cita/update/:id',
+  REMOVE: '/cita/delete/:id',
 } as const

@@ -1,18 +1,22 @@
 import { Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { RegisterUseCase } from "../../application/use-cases/register.use-case";
+import { RegisterTenantUserUseCase } from "../../application/use-cases/register-tenant-user.use-case";
 import { LoginUseCase } from "../../application/use-cases/login.use-case";
 import { GetMeUseCase } from "../../application/use-cases/get-me.use-case";
 import { LoginRequestDto } from "../dto/login.dto";
 import { RegisterRequestDto } from "../dto/register.dto";
+import { RegisterTenantUserDto } from "../dto/register-tenant-user.dto";
 import { JwtAuthGuard } from "../../infrastructure/security/jwt-auth.guard";
 import { JwtPayload } from "../../infrastructure/service/jwt-payload.interface";
 import { Response } from "express";
 import { RefreshTokenUseCase } from "../../application/use-cases/refresh-token.use-case";
+import { CurrentUser } from "../../../../common/decorators/current-user.decorator";
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly registerUseCase: RegisterUseCase, 
+    private readonly registerTenantUserUseCase: RegisterTenantUserUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly getMeUseCase: GetMeUseCase,
     private readonly refreshUseCase: RefreshTokenUseCase,
@@ -46,6 +50,24 @@ export class AuthController {
       tenant: result.tenant,
       sucursal: result.sucursal,
     };
+  }
+
+  @Post('tenant-user')
+  @UseGuards(JwtAuthGuard)
+  async registerTenantUser(
+    @Body() dto: RegisterTenantUserDto,
+    @CurrentUser('tenantId') tenantId: string,
+    @CurrentUser('sucursalId') sucursalId: string,
+  ) {
+    return this.registerTenantUserUseCase.execute(
+      dto.email,
+      dto.password,
+      dto.firstName,
+      dto.lastName,
+      dto.role,
+      tenantId,
+      sucursalId,
+    );
   }
 
   @Post('logout')

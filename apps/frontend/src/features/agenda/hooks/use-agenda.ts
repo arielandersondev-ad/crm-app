@@ -17,7 +17,7 @@ export function useCreateAgenda(){
 
 export function useGetAgenda(sucursalId: string){
   return useQuery<AgendaResponse>({
-    queryKey:['sucursalId',sucursalId],
+    queryKey:['agenda', sucursalId],
     queryFn: () => agendaService.getAgenda(),
     enabled: !!sucursalId
   })

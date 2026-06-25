@@ -11,10 +11,10 @@ export interface CitaType{
 }
 export interface CreateCitaDto{
   clientId: string
-  shceduledAt: Date
+  scheduledAt: Date
 }
 export interface UpdateCitaDto{
   id: string
   clientId: string
-  shceduledAt: Date
+  scheduledAt: Date
 }

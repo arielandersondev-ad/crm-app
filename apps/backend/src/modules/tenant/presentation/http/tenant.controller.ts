@@ -1,13 +1,15 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "../../../auth/infrastructure/security/jwt-auth.guard";
 import { CreateTenantDto } from "../dto/create-tenant.dto";
 import { UpdateTenantDto } from "../dto/update-tenant.dto";
-import { CreateTenantUseCase } from "../../aplication/use-cases/create-tenant.use-case";
-import { FindAllTenantsUseCase } from "../../aplication/use-cases/find-all-tenants.use-case";
-import { FindByIdTenantUseCase } from "../../aplication/use-cases/find-by-Id-tenant.use-case";
-import { UpdateTenantUseCase } from "../../aplication/use-cases/update-tenant.use-case";
-import { DeleteTenantUseCase } from "../../aplication/use-cases/delete-tenant.use-case";
+import { CreateTenantUseCase } from "../../application/use-cases/create-tenant.use-case";
+import { FindAllTenantsUseCase } from "../../application/use-cases/find-all-tenants.use-case";
+import { FindByIdTenantUseCase } from "../../application/use-cases/find-by-id-tenant.use-case";
+import { UpdateTenantUseCase } from "../../application/use-cases/update-tenant.use-case";
+import { DeleteTenantUseCase } from "../../application/use-cases/delete-tenant.use-case";
 
 @Controller('tenant')
+@UseGuards(JwtAuthGuard)
 export class TenantController {
   constructor(
     private readonly createTenantUseCase: CreateTenantUseCase,

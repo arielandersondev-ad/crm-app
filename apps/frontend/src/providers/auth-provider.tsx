@@ -23,7 +23,7 @@ export function AuthProvider({
 
         setUser(session.user);
         setTenant(session.tenant);
-        setBranch(session.branch);
+        setBranch(session.sucursal ?? session.branch);
       } catch {
         logout()
       } finally {

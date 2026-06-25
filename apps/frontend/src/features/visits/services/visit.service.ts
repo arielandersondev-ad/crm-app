@@ -4,7 +4,7 @@ import { ENDPOINTS } from "../api/endpoints";
 
 class VisitService {
   async getVisits(): Promise<Visit[]> {
-    const response = await api.get<Visit[]>(ENDPOINTS.GET.FIND_ALL);
+    const response = await api.get<Visit[]>(ENDPOINTS.GET.FIND_ALL_COMPLETE);
     return response.data;
   }
   async getVisitForm(): Promise<any[]> {

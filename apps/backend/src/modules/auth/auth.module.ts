@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { AuthController } from "./presentation/http/auth.controller";
 import { RegisterUseCase } from "./application/use-cases/register.use-case";
+import { RegisterTenantUserUseCase } from "./application/use-cases/register-tenant-user.use-case";
 import { UserModule } from "../user/user.module";
 import { TenantModule } from "../tenant/tenant.module";
 import { MembershipModule } from "../membership/membership.module";
@@ -26,6 +27,7 @@ import { RefreshTokenUseCase } from "./application/use-cases/refresh-token.use-c
   ],
   providers: [
     RegisterUseCase,
+    RegisterTenantUserUseCase,
     LoginUseCase,
     GetMeUseCase,
     JwtTokenService,

@@ -11,8 +11,8 @@ export class FindAllBySucursalIdUseCase {
     if (!sucursalId) throw new Error('Sucursal ID is requerido')
     if (!tenantId) throw new Error('Tenant ID is requerido')
     if (status === 'complete') {
-      return this.visitRepo.findAllBySucursalId(tenantId, sucursalId);
+      return this.visitRepo.findAllBySucursalIdComplete(tenantId, sucursalId);
     }
-    return this.visitRepo.findAllBySucursalIdComplete(tenantId, sucursalId);
+    return this.visitRepo.findAllBySucursalId(tenantId, sucursalId);
   }
 }

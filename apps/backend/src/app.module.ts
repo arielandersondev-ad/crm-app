@@ -12,6 +12,7 @@ import { VisitaModule } from './modules/visitas/visita-module';
 import { VisitDetailModule } from './modules/visit-detail/visit-detail.module';
 import { PagoModule } from './modules/pago/pago.module';
 import { CitaModule } from './modules/cita/cita.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CitaModule } from './modules/cita/cita.module';
     VisitaModule,
     PagoModule,
     CitaModule,
+    DashboardModule,
   ],       
   controllers: [],
   providers: [],

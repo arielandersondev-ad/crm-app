@@ -4,8 +4,8 @@ import { DeleteUserDto } from "../../presentation/dto/delete-user.dto";
 @Injectable()
 export class DeleteUserUseCase {
   constructor(private readonly userRepository: UserRepository) {}
-  async execute(dto: DeleteUserDto) {
-    if (!dto.id || dto.id.trim() === '') {throw new Error('El ID es requerido')}
-    return this.userRepository.delete(dto.id);
+  async execute(id: string) {
+    if (!id || id.trim() === '') {throw new Error('El ID es requerido')}
+    return this.userRepository.delete(id);
   }
 }

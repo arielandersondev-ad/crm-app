@@ -5,6 +5,7 @@ import { PrismaMembershipRepository } from "./infrastructure/prisma/prisma-membe
 import { CreateMembershipUseCase } from "./application/use-case/create-membership.use-case";
 import { FindByUserIdUseCase } from "./application/use-case/find-by-userid.use-case";
 import { FindByIdUseCase } from "./application/use-case/find-by-id.use-case";
+import { FindByTenantUseCase } from "./application/use-case/find-by-tenant.use-case";
 import { FindAllUseCase } from "./application/use-case/find-all.use-case";
 import { UpdateMembershipUseCase } from "./application/use-case/update-membership.use-case";
 import { DeleteMembershipUseCase } from "./application/use-case/delete-membership.use-case";
@@ -21,6 +22,7 @@ import { DeleteMembershipUseCase } from "./application/use-case/delete-membershi
     CreateMembershipUseCase,
     FindByUserIdUseCase,
     FindByIdUseCase,
+    FindByTenantUseCase,
     FindAllUseCase,
     UpdateMembershipUseCase,
     DeleteMembershipUseCase,
@@ -29,6 +31,7 @@ import { DeleteMembershipUseCase } from "./application/use-case/delete-membershi
     CreateMembershipUseCase,
     FindByUserIdUseCase,
     FindByIdUseCase,
+    FindByTenantUseCase,
     FindAllUseCase,
     UpdateMembershipUseCase,
     DeleteMembershipUseCase,

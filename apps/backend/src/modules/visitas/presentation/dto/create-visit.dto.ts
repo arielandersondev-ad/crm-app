@@ -2,7 +2,7 @@ import { IsDateString, IsNotEmpty, IsOptional, IsString } from "class-validator"
 
 export class CreateVisitDto {
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   clientId: string;
 
