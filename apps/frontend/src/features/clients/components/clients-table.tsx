@@ -46,7 +46,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onVisit }: ClientsTabl
     variant: "danger",
   },
   {
-    label: "Visita",
+    label: "Consulta",
     onClick: (client: Client) => {
       onVisit?.(client);
     },

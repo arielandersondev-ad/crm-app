@@ -61,8 +61,8 @@ export function ClientModal({ open, mode, client, loading, onClose, onSubmit }: 
     <Modal
       open={open}
       onClose={onClose}
-      title={ mode === "create" ? "Nuevo Cliente" : "Editar Cliente" }
-      description={ mode === "create" ? "Crea un nuevo cliente" : "Edita los detalles del cliente"}
+      title={ mode === "create" ? "Nuevo Paciente" : "Editar Paciente" }
+      description={ mode === "create" ? "Registrar nuevo paciente" : "Editar datos del paciente"}
     >
       <form
         onSubmit={handleSubmit(onSubmit)}

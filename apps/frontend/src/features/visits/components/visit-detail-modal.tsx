@@ -235,7 +235,7 @@ export function VisitDetailModal({ open, onClose, visit, onSubmit, loading }: Vi
         {/* Header del Modal */}
         <div className="flex justify-between items-start border-b pb-4">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold">Editar Visita</h2>
+            <h2 className="text-xl font-bold">Editar Consulta</h2>
           </div>
           <p className="text-sm text-muted-foreground">ID: {visit.id.slice(0, 8)}</p>
         </div>

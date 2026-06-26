@@ -44,8 +44,8 @@ export function ClientsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Clientes"
-        description="Gestión de clientes"
+        title="Pacientes"
+        description="Gestión de pacientes"
         actions={
           <div className="flex gap-2 items-center justify-center align-center">
 
@@ -58,7 +58,7 @@ export function ClientsPage() {
               className="gap-2"
             >
               <Plus className="size-4" />
-              Nuevo cliente
+              Nuevo paciente
             </Button>
           </div>
         }
@@ -66,8 +66,8 @@ export function ClientsPage() {
 
       {!clients?.length ? (
         <EmptyState
-          title="No hay clientes registrados"
-          description="Crea tu primer cliente."
+          title="No hay pacientes registrados"
+          description="Registra tu primer paciente."
         />
       ) : (
         <ClientsTable 
@@ -83,7 +83,7 @@ export function ClientsPage() {
         onClose={() => setIsCreateOpen(false)}
         onSubmit={async (data) => {
           await createClientMutation.mutateAsync(data);
-          toast.success('Cliente creado correctamente');
+          toast.success('Paciente registrado correctamente');
           setIsCreateOpen(false);
         }}
         loading={createClientMutation.isPending}
@@ -99,7 +99,7 @@ export function ClientsPage() {
             id: editingClient.id,
             ...data,
           });
-          toast.success('Cliente actualizado correctamente');
+          toast.success('Paciente actualizado correctamente');
           setEditingClient(null);
         }}
         loading={updateClientMutation.isPending}
@@ -110,7 +110,7 @@ export function ClientsPage() {
         onConfirm={async () => {
           if (!deleteClient) return;
             await deleteClientMutation.mutateAsync( deleteClient );
-            toast.success('Cliente eliminado correctamente');
+            toast.success('Paciente eliminado correctamente');
             setDeleteClient('');
         }}
         loading={deleteClientMutation.isPending}
@@ -129,7 +129,7 @@ export function ClientsPage() {
             status: data.status,
             notes: data.notes
           });
-          toast.success('Visita creada correctamente');
+          toast.success('Consulta creada correctamente');
           setIsVisitOpen(null);
         }}
       />

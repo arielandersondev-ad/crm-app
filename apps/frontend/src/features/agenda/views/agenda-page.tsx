@@ -37,8 +37,8 @@ console.log('agenda de useGetAgenda: ',agenda)
   return(
     <PageContainer>
       <PageHeader
-        title="Agenda"
-        description="Visualice y Administre su Agenda de citas"
+        title="Agenda / Controles"
+        description="Visualice y administre las citas y controles"
         actions={
           <div className="flex gap-2 items-center">
             <Button
@@ -46,7 +46,7 @@ console.log('agenda de useGetAgenda: ',agenda)
               className="gap-2"
             >
               <Plus className="size-4"/>
-              Agendar
+              Nueva cita
             </Button>
           </div>
         }
@@ -113,7 +113,7 @@ console.log('agenda de useGetAgenda: ',agenda)
               appointmentId: citaSelected.id,
             });
             console.log('[AgendaPage] mutateAsync exitoso:', result);
-            toast.success('Visita creada correctamente');
+            toast.success('Consulta creada correctamente');
             setVisitModalOpen(false);
           } catch (error) {
             console.error('[AgendaPage] mutateAsync falló:', error);

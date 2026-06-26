@@ -48,9 +48,9 @@ export function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Clientes"
+          title="Total Pacientes"
           value={stats?.totalClients.toLocaleString() ?? "0"}
           icon={Users}
           loading={isLoading}
@@ -62,17 +62,19 @@ export function DashboardPage() {
           loading={isLoading}
         />
         <StatCard
-          title="Visitas Hoy"
+          title="Consultas Hoy"
           value={stats?.todayVisits.toLocaleString() ?? "0"}
           icon={Stethoscope}
           loading={isLoading}
         />
+        {/* Comentado: Ingresos no aplica al dominio clínico
         <StatCard
           title="Ingresos Hoy"
           value={`$${stats?.todayRevenue.toLocaleString() ?? "0"}`}
           icon={DollarSign}
           loading={isLoading}
         />
+        */}
         <StatCard
           title="Citas Pendientes"
           value={stats?.pendingAppointments.toLocaleString() ?? "0"}

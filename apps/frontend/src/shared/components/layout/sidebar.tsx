@@ -21,7 +21,7 @@ export function Sidebar() {
       `}
     >
       <div className="flex h-16 items-center px-4 font-bold">
-        {sidebarOpen ? "Alto's System" : "AS"}
+        {sidebarOpen ? "Sistema Oftalmológico" : "SO"}
       </div>
 
       <nav className="space-y-1 p-2">

@@ -52,8 +52,8 @@ export function VisitModal({ client, open, mode, visit, loading, onClose, onSubm
     <Modal
       open={open}
       onClose={onClose}
-      title={mode === "create" ? "Crear visita" : "Editar visita"}
-      description={mode === "create" ? "Ingrese los detalles de la visita" : "Actualice los detalles de la visita"}
+      title={mode === "create" ? "Nueva consulta" : "Editar consulta"}
+      description={mode === "create" ? "Ingrese los detalles de la consulta" : "Actualice los detalles de la consulta"}
     >
       <form
         onSubmit={handleSubmit(

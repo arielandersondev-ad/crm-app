@@ -37,8 +37,8 @@ export function UsersPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Usuarios"
-        description="Gestión de usuarios del tenant"
+        title="Personal"
+        description="Gestión del personal de la clínica"
         actions={
           <div className="flex gap-2 items-center">
             <Button

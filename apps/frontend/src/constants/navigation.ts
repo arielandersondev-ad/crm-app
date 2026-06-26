@@ -3,7 +3,7 @@ import {
   Users,
   Calendar,
   Package,
-  Disc,
+  Stethoscope,
   ShieldUser,
 } from "lucide-react";
 
@@ -14,7 +14,7 @@ export const navigation = [
     icon: Home,
   },
   {
-    label: "Clientes",
+    label: "Pacientes",
     href: "/dashboard/clientes",
     icon: Users,
   },
@@ -24,17 +24,17 @@ export const navigation = [
     icon: Package,
   },
   {
-    label: "Visitas",
+    label: "Consultas",
     href: "/dashboard/visitas",
-    icon: Disc,
+    icon: Stethoscope,
    },
   {
-    label: "Agenda",
+    label: "Agenda / Controles",
     href: "/dashboard/agenda",
     icon: Calendar,
   },
   {
-    label: "Usuarios",
+    label: "Personal",
     href: "/dashboard/usuarios",
     icon: ShieldUser,
   },

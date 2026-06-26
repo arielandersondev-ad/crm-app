@@ -24,7 +24,7 @@ export function VisitDetailHeader({ visit, onEditClick }: VisitDetailHeaderProps
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b">
       <div>
         <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-2xl font-bold">Detalles de la Visita</h1>
+          <h1 className="text-2xl font-bold">Detalles de la Consulta</h1>
           <Badge variant={'secondary'}>
             {visit.status}
           </Badge>
@@ -36,7 +36,7 @@ export function VisitDetailHeader({ visit, onEditClick }: VisitDetailHeaderProps
 
       {onEditClick && (
         <Button onClick={onEditClick}>
-          Editar Visita
+          Editar Consulta
         </Button>
       )}
     </div>

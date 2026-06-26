@@ -25,7 +25,7 @@ export function AppointmentDetailModal({open, mode, loading, details, onVisit, o
       <form>
         <div className="space-y-4 grid grid-cols-2 gap-2">
           <div>
-            <label className="block mb-1 text-muted-foreground">CLiente</label>
+            <label className="block mb-1 text-muted-foreground">Paciente</label>
             <input 
               disabled={!isEditing} 
               readOnly 
@@ -66,16 +66,16 @@ export function AppointmentDetailModal({open, mode, loading, details, onVisit, o
             />
           </div>
             <div>
-              <label className="block mb-1 text-muted-foreground">Visita asociada</label>
+              <label className="block mb-1 text-muted-foreground">Consulta asociada</label>
               {!hasVisit ? (
                 <Button
                   type="button"
                   onClick={() => {
-                    console.log('[AppointmentDetailModal] "Crear Visita" clic. details:', { id: details?.id, cliente: details?.clientFullName, hora: details?.hora, status: details?.status });
+                    console.log('[AppointmentDetailModal] "Crear Consulta" clic. details:', { id: details?.id, cliente: details?.clientFullName, hora: details?.hora, status: details?.status });
                     onVisit();
                   }}
                 >
-                  Crear Visita
+                  Crear Consulta
                 </Button>
               ):( 
                 <input 

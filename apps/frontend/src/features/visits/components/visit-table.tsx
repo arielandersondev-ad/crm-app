@@ -25,7 +25,7 @@ export function VisitTables({ visits, onEdit, onDelete }: VisitTableProps) {
     },
     {
       key: 'client.fullName',
-      label: 'Cliente',
+      label: 'Paciente',
       searchable: true,
       sortable: true,
     },

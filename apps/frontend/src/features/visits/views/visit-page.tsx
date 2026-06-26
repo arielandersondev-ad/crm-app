@@ -28,8 +28,8 @@ export function VisitPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Visitas"
-        description="Administre las visitas de sus clientes"
+        title="Consultas"
+        description="Historial de consultas de pacientes"
         actions={
           <div className="flex gap-2 items-center">
             <Button
@@ -37,7 +37,7 @@ export function VisitPage() {
               className="gap-2"
             >
               <Plus className="size-4"/>
-              Nueva visita
+              Nueva consulta
             </Button>
           </div>
         }
@@ -45,8 +45,8 @@ export function VisitPage() {
 
       {!visits?.length ? (
         <EmptyState 
-          title="No hay visitas" 
-          description="Cree una nueva visita para comenzar" 
+          title="No hay consultas registradas" 
+          description="Registre una nueva consulta para comenzar" 
         />
       ) : (
         <VisitTables 
@@ -76,7 +76,7 @@ export function VisitPage() {
               ...data,
               id: editingOpen.id,
             });
-            toast.success('Visita actualizada correctamente');
+            toast.success('Consulta actualizada correctamente');
             setEditingOpen(null);
           }}
           loading={updateVisitMutation.isPending}

@@ -14,12 +14,12 @@ export function DeleteClientDialog({ open, loading, clientName, onClose, onConfi
     <Modal
       open={open}
       onClose={onClose}
-      title="Eliminar cliente"
+      title="Eliminar paciente"
       description="Esta acción no se puede deshacer."
     >
       <div className="space-y-6">
         <p>
-          ¿Desea eliminar el cliente{" "}
+          ¿Desea eliminar al paciente{" "}
           <strong>{clientName}</strong>?
         </p>
 

@@ -36,7 +36,7 @@ export function RegisterPage() {
               </div>
 
               <span className="font-semibold">
-                Alto's System
+                Sistema Oftalmológico
               </span>
             </div>
           </div>
