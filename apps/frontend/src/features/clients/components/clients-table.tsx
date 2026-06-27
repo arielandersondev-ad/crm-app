@@ -2,6 +2,7 @@
 import { DynamicTable } from "@/shared/components/data-table/dynamic-table";
 import type { Client } from "../types/client";
 import { ActionButton, ColumnConfig } from "@/shared/components/data-table/types";
+import { useRouter } from "next/navigation";
 
 interface ClientsTableProps {
   clients: Client[];
@@ -11,6 +12,7 @@ interface ClientsTableProps {
 }
 
 export function ClientsTable({ clients, onEdit, onDelete, onVisit }: ClientsTableProps) {
+  const router = useRouter();
   const columns: ColumnConfig<Client>[] = [
     {
       key: 'fullName',
@@ -28,6 +30,13 @@ export function ClientsTable({ clients, onEdit, onDelete, onVisit }: ClientsTabl
       key: 'phone',
       label: 'Teléfono',
       searchable: true,
+      render: (value) => value ?? '-',
+    },
+    {
+      key: 'documentNumber',
+      label: 'Documento',
+      searchable: true,
+      sortable: true,
       render: (value) => value ?? '-',
     },
   ];
@@ -55,6 +64,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onVisit }: ClientsTabl
   {
     label: "Detalles",
     onClick: (client: Client) => {
+      router.push(`/dashboard/clientes/${client.id}`);
     },
     variant: "neutral",
   },

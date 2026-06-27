@@ -65,7 +65,7 @@ console.log('agenda de useGetAgenda: ',agenda)
           setCitaSelected(cita)
           setDetailAgendaOpen(true)
           setClienteSelect({
-            id: cita.id,
+            id: cita.clientId,
             fullName: cita.clientFullName
           })
           console.log('[AgendaPage] seteados: citaSelected, clienteSelect, detailAgendaOpen=true');
@@ -110,6 +110,7 @@ console.log('agenda de useGetAgenda: ',agenda)
           }
           try {
             const result = await createVisitMutation.mutateAsync({
+              clientId: data.clientId,
               appointmentId: citaSelected.id,
             });
             console.log('[AgendaPage] mutateAsync exitoso:', result);

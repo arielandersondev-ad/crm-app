@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { ClientForm } from "./cliente-form";
-import type { Client, CreateClientDto } from "../types/client";
+import type { Client } from "../types/client";
+import type { PatientProfile } from "../types/patient-profile";
 import { Modal } from "@/shared/components/modal";
 import  { zodResolver } from "@hookform/resolvers/zod";
 import { ClientSchema, ClientFormData } from "../schemas/client.schema";
 
-// Función para formatear fecha ISO a YYYY-MM-DD
 const formatDateForInput = (dateString: string | null | undefined): string => {
   if (!dateString) return "";
   const date = new Date(dateString);
@@ -21,13 +21,14 @@ interface ClientModalProps {
   open: boolean;
   mode: "create" | "edit";
   client?: Client;
+  patientProfile?: PatientProfile | null;
   loading?: boolean;
 
   onClose: () => void;
   onSubmit: ( values: ClientFormData ) => Promise<void> | void;
 }
 
-export function ClientModal({ open, mode, client, loading, onClose, onSubmit }: ClientModalProps) {
+export function ClientModal({ open, mode, client, patientProfile, loading, onClose, onSubmit }: ClientModalProps) {
   const resolver = zodResolver(ClientSchema);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ClientFormData>( { resolver } );
 
@@ -42,6 +43,10 @@ export function ClientModal({ open, mode, client, loading, onClose, onSubmit }: 
         birthDate: formatDateForInput(client.birthDate),
         address: client.address ?? "",
         notes: client.notes ?? "",
+        antecedentes: patientProfile?.antecedentes ?? "",
+        alergias: patientProfile?.alergias ?? "",
+        contactoEmergencia: patientProfile?.contactoEmergencia ?? "",
+        observaciones: patientProfile?.observaciones ?? "",
       });
       return;
     }
@@ -54,8 +59,12 @@ export function ClientModal({ open, mode, client, loading, onClose, onSubmit }: 
       birthDate: "",
       address: "",
       notes: "",
+      antecedentes: "",
+      alergias: "",
+      contactoEmergencia: "",
+      observaciones: "",
     });
-  }, [mode, client, reset]);
+  }, [mode, client, patientProfile, reset]);
 
   return (
     <Modal

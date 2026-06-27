@@ -7,6 +7,7 @@ import { UpdateCitaDto } from "../dto/update-cita.dto";
 import { UpdateCitaUseCase } from "../../application/use-cases/update-cita.use-case";
 import { FindAllBySucursalUseCase } from "../../application/use-cases/find-all-by-sucursal.use-case";
 import { FindAgendaUseCase } from "../../application/use-cases/find-agenda.use-case";
+import { FindByClientIdUseCase } from "../../application/use-cases/find-by-client-id.use-case";
 
 @Controller('cita')
 @UseGuards(JwtAuthGuard)
@@ -16,6 +17,7 @@ export class CitaController{
     private readonly updateCitaUseCase: UpdateCitaUseCase,
     private readonly findAllBySucursalUseCase: FindAllBySucursalUseCase,
     private readonly findAgendaUseCase: FindAgendaUseCase,
+    private readonly findByClientIdUseCase: FindByClientIdUseCase,
   ){}
 
   @Post('create')
@@ -46,6 +48,13 @@ export class CitaController{
   ){
     return this.findAllBySucursalUseCase.execute(tenantId, sucursalId)
   }
+  @Get('client/:clientId')
+  async findByClientId(
+    @Param('clientId') clientId: string,
+  ){
+    return this.findByClientIdUseCase.execute(clientId)
+  }
+
   @Get('agenda')
   async findAgenda(
     @CurrentUser('sucursalId') sucursalId: string,

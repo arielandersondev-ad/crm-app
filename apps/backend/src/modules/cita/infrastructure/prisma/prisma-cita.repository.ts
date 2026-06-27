@@ -121,6 +121,27 @@ export class PrismaCitaRepository implements CitaRepository {
       cita.updatedAt,
     )
   }
+  async findByClientId(clientId: string): Promise<CitaEntity[]>{
+    const citas = await this.prisma.appointment.findMany({
+      where: { clientId },
+      orderBy: { scheduledAt: 'desc' },
+      include: {
+        user: { select: { firstName: true, lastName: true } },
+      },
+    })
+    return citas.map((cita) => new CitaEntity(
+      cita.id,
+      cita.tenantId,
+      cita.sucursalId,
+      cita.clientId,
+      cita.userId,
+      cita.scheduledAt,
+      cita.status,
+      cita.createdAt,
+      cita.updatedAt,
+    ))
+  }
+
   async getAgenda(tenantId: string, sucursalId: string): Promise<any[]>{
     const citas = await this.prisma.appointment.findMany({
       where:{
@@ -129,6 +150,7 @@ export class PrismaCitaRepository implements CitaRepository {
       },
       select:{
         id: true,
+        clientId: true,
         status: true,
         scheduledAt: true,
         client: {

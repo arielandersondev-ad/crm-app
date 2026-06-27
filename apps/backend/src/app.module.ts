@@ -13,6 +13,9 @@ import { VisitDetailModule } from './modules/visit-detail/visit-detail.module';
 import { PagoModule } from './modules/pago/pago.module';
 import { CitaModule } from './modules/cita/cita.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { PatientProfileModule } from './modules/patient-profile/patient-profile.module';
+import { ConsultationModule } from './modules/consultation/consultation.module';
+import { RefractionModule } from './modules/refraction/refraction.module';
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     PagoModule,
     CitaModule,
     DashboardModule,
+    PatientProfileModule,
+    ConsultationModule,
+    RefractionModule,
   ],       
   controllers: [],
   providers: [],

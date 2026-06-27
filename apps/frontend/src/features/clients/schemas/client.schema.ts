@@ -14,6 +14,12 @@ export const ClientSchema = z.object({
   address: z.string().optional(),
 
   notes: z.string().optional(),
+
+  // Antecedentes clínicos (PatientProfile)
+  antecedentes: z.string().optional(),
+  alergias: z.string().optional(),
+  contactoEmergencia: z.string().optional(),
+  observaciones: z.string().optional(),
 });
 
 export type ClientFormData =

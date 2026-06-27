@@ -54,6 +54,30 @@ export class PrismaVisitaRepository implements VisitRepository {
       visit.updatedAt,
     ))
   }
+  async findAllByClientId(clientId: string): Promise<VisitEntity[]> {
+    const prismaResult = await this.prisma.visit.findMany({
+      where: { clientId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true } },
+      },
+    })
+    return prismaResult.map((visit) => new VisitEntity(
+      visit.id,
+      visit.tenantId,
+      visit.sucursalId,
+      visit.clientId,
+      visit.userId,
+      visit.appointmentId,
+      visit.status as any,
+      visit.notes,
+      visit.startedAt?.toISOString(),
+      visit.completedAt?.toISOString(),
+      visit.createdAt,
+      visit.updatedAt,
+    ))
+  }
+
   async findAllBySucursalIdComplete(tenantId: string, sucursalId: string): Promise<any[]> {
     const prismaResult = await this.prisma.visit.findMany({
       where: {
