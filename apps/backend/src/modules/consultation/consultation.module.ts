@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConsultationController } from "./presentation/http/consultation.controller";
 import { CreateConsultationUseCase } from "./application/use-cases/create-consultation.use-case";
+import { StartConsultationUseCase } from "./application/use-cases/start-consultation.use-case";
 import { UpdateConsultationUseCase } from "./application/use-cases/update-consultation.use-case";
 import { DeleteConsultationUseCase } from "./application/use-cases/delete-consultation.use-case";
 import { GetConsultationDetailUseCase } from "./application/use-cases/get-consultation-detail.use-case";
@@ -14,6 +15,7 @@ import { CitaModule } from "../cita/cita.module";
   controllers: [ConsultationController],
   providers: [
     CreateConsultationUseCase,
+    StartConsultationUseCase,
     UpdateConsultationUseCase,
     DeleteConsultationUseCase,
     GetConsultationDetailUseCase,
@@ -23,5 +25,6 @@ import { CitaModule } from "../cita/cita.module";
       useClass: PrismaConsultationRepository,
     },
   ],
+
 })
 export class ConsultationModule {}

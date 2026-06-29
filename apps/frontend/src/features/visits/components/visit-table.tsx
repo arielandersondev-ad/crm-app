@@ -7,9 +7,10 @@ interface VisitTableProps {
   visits: Visit[];
   onEdit?: (visit: Visit) => void;
   onDelete?: (visit: Visit) => void;
+  canEdit?: boolean;
 }
 
-export function VisitTables({ visits, onEdit, onDelete }: VisitTableProps) {
+export function VisitTables({ visits, onEdit, onDelete, canEdit = true }: VisitTableProps) {
   const columns: ColumnConfig<Visit>[] = [
     {
       key: 'status',
@@ -50,20 +51,23 @@ export function VisitTables({ visits, onEdit, onDelete }: VisitTableProps) {
       sortable: true,
     },
   ];
-  const actions: ActionButton<Visit>[] = [
-    {
+  const actions: ActionButton<Visit>[] = [];
+  if (canEdit) {
+    actions.push({
       label: "Editar",
       onClick: (visit: Visit) => {
         onEdit?.(visit);
       },
-    },
-    {
-      label: "Eliminar",
-      onClick: (visit: Visit) => {
-        onDelete?.(visit);
-      },
-    },
-  ];
+    });
+    if (onDelete) {
+      actions.push({
+        label: "Eliminar",
+        onClick: (visit: Visit) => {
+          onDelete?.(visit);
+        },
+      });
+    }
+  }
   return (
     <DynamicTable
       data={visits}

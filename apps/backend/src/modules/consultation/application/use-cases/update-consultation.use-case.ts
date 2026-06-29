@@ -19,32 +19,55 @@ export class UpdateConsultationUseCase {
       throw new NotFoundException("Consulta no encontrada");
     }
 
-    // Solo DRAFT puede editarse
-    if (existing.status !== ConsultationStatus.DRAFT) {
+    const isFinalizing = dto.status === ConsultationStatus.COMPLETED && existing.status === ConsultationStatus.DRAFT;
+
+    // Solo DRAFT puede editarse, excepto cuando se finaliza (DRAFT→COMPLETED)
+    if (!isFinalizing && existing.status !== ConsultationStatus.DRAFT) {
       throw new ForbiddenException("Solo se pueden editar consultas en estado borrador");
     }
 
     if (dto.nextControlAt) {
-      await this.citaRepo.create({
-        clientId: existing.clientId,
-        scheduledAt: new Date(dto.nextControlAt),
-        tenantId,
-        userId,
-        sucursalId,
-      });
+      const existingAppointments = await this.citaRepo.findByClientId(existing.clientId);
+      const nextDate = new Date(dto.nextControlAt);
+      const hasAppointment = existingAppointments.some(
+        (a) =>
+          a.scheduledAt.toDateString() === nextDate.toDateString() &&
+          a.status !== "CANCELLED" &&
+          a.status !== "NO_SHOW",
+      );
+
+      if (!hasAppointment) {
+        await this.citaRepo.create({
+          clientId: existing.clientId,
+          scheduledAt: nextDate,
+          tenantId,
+          userId,
+          sucursalId,
+        });
+      }
     }
 
     const updated = await this.repo.update(id, tenantId, dto);
+
+    // Si se finaliza la consulta, sincronizar la cita asociada a COMPLETED
+    if (isFinalizing && existing.appointmentId) {
+      await this.prisma.appointment.update({
+        where: { id: existing.appointmentId, tenantId, sucursalId },
+        data: { status: "COMPLETED" },
+      });
+    }
 
     // Registrar en AuditLog
     await this.prisma.auditLog.create({
       data: {
         tenantId,
         userId,
-        accion: "UPDATE_CONSULTATION",
+        accion: isFinalizing ? "COMPLETE_CONSULTATION" : "UPDATE_CONSULTATION",
         entidad: "Consultation",
         entidadId: id,
-        detalle: `Editada consulta para paciente ${existing.clientId}`,
+        detalle: isFinalizing
+          ? `Consulta finalizada para paciente ${existing.clientId}`
+          : `Editada consulta para paciente ${existing.clientId}`,
       },
     });
 

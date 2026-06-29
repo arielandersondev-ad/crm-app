@@ -61,7 +61,8 @@ export function UserPage() {
         mode="create"
         onClose={() => setIsCreateOpen(false)}
         onSubmit={async (data) => {
-          await createUserMutation.mutateAsync(data);
+          const { id, sucursalId, ...payload } = data;
+          await createUserMutation.mutateAsync(payload);
           toast.success('Usuario creado correctamente');
           setIsCreateOpen(false);
         }}

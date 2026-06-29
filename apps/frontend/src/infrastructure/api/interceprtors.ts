@@ -1,4 +1,6 @@
+import { toast } from "sonner"
 import { api } from "./axios"
+import { useAuthStore } from "@/stores/auth.store"
 
 export function setupInterceptors () {
   api.interceptors.request.use(
@@ -9,6 +11,30 @@ export function setupInterceptors () {
   )
   api.interceptors.response.use(
     (response) => response,
-    (error) => Promise.reject(error)
+    (error) => {
+      if (error.response) {
+        const { status, data } = error.response
+
+        if (status === 401) {
+          useAuthStore.getState().logout()
+          /* if (typeof window !== "undefined") {
+            window.location.href = "/login"
+          } */
+        } else if (status === 403) {
+          toast.error(data?.message || "Acceso denegado: no tienes permisos para esta acción")
+        } else if (status >= 500) {
+          toast.error("Error del servidor. Intente nuevamente.")
+        } else if (status >= 400) {
+          const message = data?.message
+          if (typeof message === "string") {
+            toast.error(message)
+          } else if (Array.isArray(message)) {
+            toast.error(message[0])
+          }
+        }
+      }
+
+      return Promise.reject(error)
+    }
   )
 }

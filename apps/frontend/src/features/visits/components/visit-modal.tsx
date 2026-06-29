@@ -45,7 +45,7 @@ export function VisitModal({ client, open, mode, visit, loading, onClose, onSubm
     reset({
       clientId: client?.id || ''
     });
-    console.log('[VisitModal] reset form en create mode con client:', { id: client?.id, nombre: client?.fullName });
+    //console.log('[VisitModal] reset form en create mode con client:', { id: client?.id, nombre: client?.fullName });
   }, [mode, visit, client, reset]);
   
   return(

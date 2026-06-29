@@ -15,6 +15,10 @@ import { Badge } from "@/shared/components/ui/badge";
 import { ArrowLeft, Calendar, ClipboardList, FileText, MapPin, Phone, Mail, Plus, Stethoscope, Eye } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
+import { useAuthStore } from "@/stores/auth.store";
+import { useDownloadClinicalSummary } from "@/features/reports/hooks/use-reports";
+
+const CLINICAL_ROLES = ["ADMIN", "OWNER", "EMPLOYEE"];
 
 function formatDate(dateString: string | null | undefined): string {
   if (!dateString) return "-";
@@ -87,9 +91,13 @@ export function PatientDetailView() {
   const { data: profile, isLoading: profileLoading } = usePatientProfile(clientId);
   const { data: appointments, isLoading: appointmentsLoading } = usePatientAppointments(clientId);
   const { data: consultations, isLoading: consultationsLoading } = usePatientConsultations(clientId);
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canEditClinical = userRole && CLINICAL_ROLES.includes(userRole);
+
   const createConsultationMutation = useCreateConsultation();
   const updateConsultationMutation = useUpdateConsultation();
   const upsertRefractionMutation = useUpsertRefraction();
+  const downloadSummaryMutation = useDownloadClinicalSummary();
 
   if (clientLoading) return <LoadingState />;
 
@@ -107,7 +115,7 @@ export function PatientDetailView() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" onClick={() => router.push("/dashboard/clientes")}>
+          <Button variant="outline" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="size-4" />
           </Button>
           <div>
@@ -170,10 +178,12 @@ export function PatientDetailView() {
               <p className="text-sm text-muted-foreground">
                 {consultations?.length ?? 0} consulta(s) registrada(s)
               </p>
-              <Button onClick={() => { setConsultationTarget(null); setConsultationMode("create"); }} className="gap-2">
-                <Plus className="size-4" />
-                Nueva consulta
-              </Button>
+              {canEditClinical && (
+                <Button onClick={() => { setConsultationTarget(null); setConsultationMode("create"); }} className="gap-2">
+                  <Plus className="size-4" />
+                  Nueva consulta
+                </Button>
+              )}
             </div>
 
             {consultationsLoading ? (
@@ -284,8 +294,23 @@ export function PatientDetailView() {
         clientId={clientId}
         clientName={client?.fullName}
         loading={createConsultationMutation.isPending || updateConsultationMutation.isPending}
+        canEdit={canEditClinical}
         onClose={() => { setConsultationMode(null); setConsultationTarget(null); }}
         onEdit={() => setConsultationMode("edit")}
+        onFinalize={async () => {
+          if (!consultationTarget) return;
+          await updateConsultationMutation.mutateAsync({
+            id: consultationTarget.id,
+            dto: { status: "COMPLETED" },
+          });
+          toast.success("Consulta finalizada");
+          setConsultationMode(null);
+          setConsultationTarget(null);
+        }}
+        onPrintSummary={async () => {
+          if (!consultationTarget) return;
+          await downloadSummaryMutation.mutateAsync(consultationTarget.id);
+        }}
         onSubmit={async (data) => {
           if (consultationMode === "create") {
             const consultation = await createConsultationMutation.mutateAsync({

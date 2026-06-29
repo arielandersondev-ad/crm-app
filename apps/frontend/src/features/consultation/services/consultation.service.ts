@@ -31,6 +31,11 @@ class ConsultationService {
     const response = await api.patch(ENDPOINTS.UPSERT_REFRACTION.replace(":id", consultationId), dto);
     return response.data;
   }
+
+  async startFromAppointment(appointmentId: string): Promise<Consultation> {
+    const response = await api.post(ENDPOINTS.START_FROM_APPOINTMENT.replace(":appointmentId", appointmentId));
+    return response.data;
+  }
 }
 
 export const consultationService = new ConsultationService();

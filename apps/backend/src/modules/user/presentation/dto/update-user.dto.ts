@@ -5,7 +5,6 @@ export class UpdateUserDto {
   
   id: string;
   email?: string;
-  password?: string;
   firstName?: string;
   lastName?: string;
   isActive?: boolean;
@@ -17,10 +16,6 @@ export class UpdateUserSucursalMembershipDto {
   
   @IsString()
   email?: string;
-
-  @IsString()
-  @IsOptional()
-  password?: string;
 
   @IsString()
   firstName?: string;

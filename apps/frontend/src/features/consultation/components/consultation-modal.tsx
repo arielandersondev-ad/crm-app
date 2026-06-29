@@ -15,7 +15,10 @@ interface ConsultationModalProps {
   loading?: boolean;
   onClose: () => void;
   onEdit?: () => void;
+  onFinalize?: () => void;
+  onPrintSummary?: () => void;
   onSubmit: (values: ConsultationFormData) => Promise<void> | void;
+  canEdit?: boolean;
 }
 
 export function ConsultationModal({
@@ -26,8 +29,11 @@ export function ConsultationModal({
   clientName,
   loading,
   onClose,
-  onEdit,
+  onEdit = () => {},
+  onFinalize,
+  onPrintSummary,
   onSubmit,
+  canEdit = true,
 }: ConsultationModalProps) {
   const resolver = zodResolver(ConsultationSchema);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ConsultationFormData>({ resolver });
@@ -120,13 +126,33 @@ export function ConsultationModal({
             >
               Cerrar
             </button>
-            <button
-              type="button"
-              onClick={onEdit}
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
-            >
-              Editar
-            </button>
+            {consultation?.status === "COMPLETED" && (
+              <button
+                type="button"
+                onClick={onPrintSummary}
+                className="px-4 py-2 rounded-md bg-blue-600 text-white"
+              >
+                Imprimir Resumen
+              </button>
+            )}
+            {canEdit && consultation?.status === "DRAFT" && (
+              <button
+                type="button"
+                onClick={onFinalize}
+                className="px-4 py-2 rounded-md bg-green-600 text-white"
+              >
+                Finalizar consulta
+              </button>
+            )}
+            {canEdit && (
+              <button
+                type="button"
+                onClick={onEdit}
+                className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
+              >
+                Editar
+              </button>
+            )}
           </div>
         )}
       </form>

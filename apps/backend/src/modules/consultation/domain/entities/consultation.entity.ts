@@ -11,6 +11,7 @@ export class ConsultationEntity {
     public readonly clientId: string,
     public readonly userId: string,
     public readonly visitId: string | null,
+    public readonly appointmentId: string | null,
     public readonly consultationDate: Date,
     public readonly status: ConsultationStatus,
     public readonly motivo: string,

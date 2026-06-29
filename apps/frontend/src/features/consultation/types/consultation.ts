@@ -28,6 +28,7 @@ export interface Consultation {
   clientId: string;
   userId: string;
   visitId: string | null;
+  appointmentId: string | null;
   consultationDate: string;
   status: ConsultationStatus;
   motivo: string;
@@ -43,6 +44,7 @@ export interface Consultation {
 export interface CreateConsultationDto {
   clientId: string;
   visitId?: string;
+  appointmentId?: string;
   consultationDate?: string;
   motivo: string;
   diagnostico?: string;

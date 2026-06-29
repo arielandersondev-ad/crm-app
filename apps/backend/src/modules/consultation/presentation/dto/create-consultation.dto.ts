@@ -10,6 +10,10 @@ export class CreateConsultationDto {
   visitId?: string;
 
   @IsOptional()
+  @IsUUID()
+  appointmentId?: string;
+
+  @IsOptional()
   @IsDateString()
   consultationDate?: string;
 

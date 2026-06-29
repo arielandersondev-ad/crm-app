@@ -86,7 +86,8 @@ export function ClientsPage() {
         mode="create"
         onClose={() => setIsCreateOpen(false)}
         onSubmit={async (data) => {
-          const client = await createClientMutation.mutateAsync(data);
+          const {antecedentes, alergias, contactoEmergencia, observaciones, ...clientData} = data
+          const client = await createClientMutation.mutateAsync(clientData);
           const hasClinicalData = data.antecedentes || data.alergias || data.contactoEmergencia || data.observaciones;
           if (hasClinicalData) {
             await createPatientProfileMutation.mutateAsync({

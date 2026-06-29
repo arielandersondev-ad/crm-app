@@ -36,6 +36,7 @@ export function useUpdateConsultation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["consultation"] });
       queryClient.invalidateQueries({ queryKey: ["patient-consultations"] });
+      queryClient.invalidateQueries({ queryKey: ["agenda"] });
     },
   });
 }
@@ -46,6 +47,17 @@ export function useDeleteConsultation() {
     mutationFn: (id: string) => consultationService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["patient-consultations"] });
+    },
+  });
+}
+
+export function useStartConsultation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (appointmentId: string) => consultationService.startFromAppointment(appointmentId),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["patient-consultations", data.clientId] });
+      queryClient.invalidateQueries({ queryKey: ["agenda"] });
     },
   });
 }

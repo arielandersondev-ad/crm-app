@@ -1,10 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
 import { DashboardRepository, DashboardStats } from "../../domain/repositories/dashboard.repository";
+import { ReportRepository } from "../../../reports/domain/repositories/report.repository";
 
 @Injectable()
 export class PrismaDashboardRepository extends DashboardRepository {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reportRepo: ReportRepository,
+  ) {
     super();
   }
 
@@ -15,7 +19,7 @@ export class PrismaDashboardRepository extends DashboardRepository {
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
 
-    const [totalClients, todayAppointments, todayVisits, todayRevenue, pendingAppointments] =
+    const [totalClients, todayAppointments, pendingAppointments, clinical] =
       await Promise.all([
         this.prisma.client.count({
           where: { tenantId, isActive: true },
@@ -29,36 +33,21 @@ export class PrismaDashboardRepository extends DashboardRepository {
           },
         }),
 
-        this.prisma.visit.count({
-          where: {
-            sucursalId,
-            startedAt: { gte: todayStart, lte: todayEnd },
-          },
-        }),
-
-        this.prisma.payment.aggregate({
-          _sum: { amount: true },
-          where: {
-            sucursalId,
-            paidAt: { gte: todayStart, lte: todayEnd },
-            status: "ACTIVE",
-          },
-        }),
-
         this.prisma.appointment.count({
           where: {
             sucursalId,
             status: "PENDING",
           },
         }),
+
+        this.reportRepo.getDashboardMetrics(tenantId, sucursalId),
       ]);
 
     return {
       totalClients,
       todayAppointments,
-      todayVisits,
-      todayRevenue: Number(todayRevenue._sum.amount ?? 0),
       pendingAppointments,
+      ...clinical,
     };
   }
 }

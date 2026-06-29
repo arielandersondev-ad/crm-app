@@ -12,10 +12,22 @@ export const UserSchema = z.object({
 export const EditUserSchema = z.object({
   id: z.string(),
   email: z.string().email(),
-  password: z.string().optional(),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   role: z.string().min(1),
   sucursalId: z.string().min(1),
 });
 export type UserFormData = z.infer<typeof UserSchema>;
+
+export const ChangePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Contraseña actual es requerida"),
+    newPassword: z.string().min(8, "La nueva contraseña debe tener al menos 8 caracteres"),
+    confirmPassword: z.string().min(8, "Confirmar contraseña es requerido"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
+
+export type ChangePasswordFormData = z.infer<typeof ChangePasswordSchema>;

@@ -16,6 +16,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PatientProfileModule } from './modules/patient-profile/patient-profile.module';
 import { ConsultationModule } from './modules/consultation/consultation.module';
 import { RefractionModule } from './modules/refraction/refraction.module';
+import { ReportModule } from './modules/reports/report.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { RefractionModule } from './modules/refraction/refraction.module';
     PatientProfileModule,
     ConsultationModule,
     RefractionModule,
+    ReportModule,
   ],       
   controllers: [],
   providers: [],

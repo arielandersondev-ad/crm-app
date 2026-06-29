@@ -5,9 +5,17 @@ import {
   Package,
   Stethoscope,
   ShieldUser,
+  FileText,
 } from "lucide-react";
 
-export const navigation = [
+export interface NavItem {
+  label: string;
+  href: string;
+  icon: any;
+  roles?: string[];
+}
+
+export const navigation: NavItem[] = [
   {
     label: "Dashboard",
     href: "/dashboard",
@@ -34,8 +42,15 @@ export const navigation = [
     icon: Calendar,
   },
   {
+    label: "Reportes",
+    href: "/dashboard/reportes",
+    icon: FileText,
+    roles: ["ADMIN", "OWNER", "EMPLOYEE", "MANAGER"],
+  },
+  {
     label: "Personal",
     href: "/dashboard/usuarios",
     icon: ShieldUser,
+    roles: ["ADMIN", "OWNER"],
   },
 ];

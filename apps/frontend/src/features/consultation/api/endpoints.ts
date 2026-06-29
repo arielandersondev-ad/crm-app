@@ -5,4 +5,5 @@ export const ENDPOINTS = {
   GET_BY_ID: "/consultation/:id",
   GET_BY_CLIENT: "/consultation/client/:clientId",
   UPSERT_REFRACTION: "/consultation/:id/refraction",
+  START_FROM_APPOINTMENT: "/consultation/start-from-appointment/:appointmentId",
 } as const;

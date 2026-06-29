@@ -1,9 +1,10 @@
 export interface DashboardStats {
   totalClients: number;
   todayAppointments: number;
-  todayVisits: number;
-  todayRevenue: number;
   pendingAppointments: number;
+  todayConsultations: number;
+  totalConsultations: number;
+  upcomingControls: number;
 }
 
 export abstract class DashboardRepository {

@@ -284,6 +284,8 @@ model Appointment {
 
   visit Visit?
 
+  consultation Consultation?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -435,6 +437,7 @@ model Consultation {
   clientId          String             @db.Uuid
   userId            String             @db.Uuid
   visitId           String?            @unique @db.Uuid
+  appointmentId     String?            @unique @db.Uuid
 
   consultationDate  DateTime           @default(now())
   status            ConsultationStatus @default(DRAFT)
@@ -447,15 +450,19 @@ model Consultation {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
-  tenant Tenant          @relation(fields: [tenantId], references: [id])
-  client Client          @relation(fields: [clientId], references: [id])
-  user   User            @relation(fields: [userId], references: [id])
-  visit  Visit?          @relation(fields: [visitId], references: [id])
-  refraction Refraction?
+  tenant      Tenant          @relation(fields: [tenantId], references: [id])
+  client      Client          @relation(fields: [clientId], references: [id])
+  user        User            @relation(fields: [userId], references: [id])
+  visit       Visit?          @relation(fields: [visitId], references: [id])
+  appointment Appointment?   @relation(fields: [appointmentId], references: [id])
+  refraction  Refraction?
 
   @@index([tenantId])
   @@index([clientId])
   @@index([userId])
+  @@index([tenantId, consultationDate])
+  @@index([tenantId, userId, consultationDate])
+  @@index([tenantId, clientId, consultationDate])
 }
 
 model Refraction {

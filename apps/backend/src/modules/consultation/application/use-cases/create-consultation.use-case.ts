@@ -3,12 +3,14 @@ import { ConsultationRepository } from "../../domain/repositories/consultation.r
 import { ConsultationEntity } from "../../domain/entities/consultation.entity";
 import { CreateConsultationDto } from "../../presentation/dto/create-consultation.dto";
 import { CitaRepository } from "../../../cita/domain/repositories/cita.repository";
+import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
 
 @Injectable()
 export class CreateConsultationUseCase {
   constructor(
     private readonly repo: ConsultationRepository,
     private readonly citaRepo: CitaRepository,
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(dto: CreateConsultationDto, tenantId: string, userId: string, sucursalId: string): Promise<ConsultationEntity> {
@@ -24,6 +26,19 @@ export class CreateConsultationUseCase {
       });
     }
 
-    return this.repo.create({ ...dto, tenantId, userId });
+    const consultation = await this.repo.create({ ...dto, tenantId, userId });
+
+    await this.prisma.auditLog.create({
+      data: {
+        tenantId,
+        userId,
+        accion: "CREATE_CONSULTATION",
+        entidad: "Consultation",
+        entidadId: consultation.id,
+        detalle: `Creada consulta para paciente ${dto.clientId}`,
+      },
+    });
+
+    return consultation;
   }
 }

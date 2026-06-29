@@ -14,9 +14,10 @@ interface UserModalProps {
   loading?: boolean;
   onClose: () => void;
   onSubmit: (values: UserFormData) => Promise<void> | void;
+  onOpenChangePassword?: () => void;
 }
 
-export function UserModal({ open, mode, user, loading, onClose, onSubmit }: UserModalProps) {
+export function UserModal({ open, mode, user, loading, onClose, onSubmit, onOpenChangePassword }: UserModalProps) {
   const { data: sucursales, isLoading, error } = useGetSucursales();
   
   const resolver = zodResolver(UserSchema);
@@ -36,7 +37,6 @@ export function UserModal({ open, mode, user, loading, onClose, onSubmit }: User
       return;
     }
     reset({
-      id: "",
       email: "",
       password: "",
       firstName: "",
@@ -73,6 +73,15 @@ export function UserModal({ open, mode, user, loading, onClose, onSubmit }: User
           errors={errors} 
         />
         <div className="flex justify-end gap-2">
+          {mode === "edit" && onOpenChangePassword && (
+            <button
+              type="button"
+              onClick={onOpenChangePassword}
+              className="px-4 py-2 border rounded-md text-sm"
+            >
+              Cambiar Contraseña
+            </button>
+          )}
           <button
             type="button"
             disabled={loading}

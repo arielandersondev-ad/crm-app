@@ -13,6 +13,9 @@ import { Visit } from "../types/visit";
 import { VisitModal } from "../components/visit-modal";
 import { VisitDetailModal } from "../components/visit-detail-modal";
 import { toast } from "sonner";
+import { useAuthStore } from "@/stores/auth.store";
+
+const CLINICAL_ROLES = ["ADMIN", "OWNER", "EMPLOYEE"];
 
 export function VisitPage() {
   const { data: visits, isLoading, error } = useVisits();
@@ -20,6 +23,9 @@ export function VisitPage() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editingOpen, setEditingOpen] = useState<Visit | null>(null);
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canEditClinical = userRole && CLINICAL_ROLES.includes(userRole);
+
   const [deleteVisit, setDeleteVisit] = useState<string | null>(null);
 
   if (isLoading) return <LoadingState />
@@ -32,13 +38,15 @@ export function VisitPage() {
         description="Historial de consultas de pacientes"
         actions={
           <div className="flex gap-2 items-center">
-            <Button
-              onClick={() => setCreateOpen(true)}
-              className="gap-2"
-            >
-              <Plus className="size-4"/>
-              Nueva consulta
-            </Button>
+            {canEditClinical && (
+              <Button
+                onClick={() => setCreateOpen(true)}
+                className="gap-2"
+              >
+                <Plus className="size-4"/>
+                Nueva consulta
+              </Button>
+            )}
           </div>
         }
       />
@@ -53,6 +61,7 @@ export function VisitPage() {
           visits={visits}
           onEdit={(visit) => setEditingOpen(visit)}
           onDelete={(visit) => setDeleteVisit(visit.id)}
+          canEdit={canEditClinical}
         />
       )}
 

@@ -164,7 +164,10 @@ export class PrismaCitaRepository implements CitaRepository {
             lastName:true
           }
         },
-        visit: true
+        visit: true,
+        consultation: {
+          select: { id: true, status: true },
+        }
       }
     })
     return citas

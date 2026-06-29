@@ -5,7 +5,7 @@ export interface CitaType{
   clientId: string,
   userId: string,
   scheduledAt: Date,
-  status: 'OPEN' | 'COMPLETED' | 'CANCELLED'
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW'
   createdAt: Date,
   updatedAt: Date  
 }
@@ -14,7 +14,7 @@ export interface CreateCitaDto{
   scheduledAt: Date
 }
 export interface UpdateCitaDto{
-  id: string
   clientId: string
-  scheduledAt: Date
+  scheduledAt: string
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW'
 }
