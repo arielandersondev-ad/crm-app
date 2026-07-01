@@ -16,6 +16,7 @@ import { MembershipModule } from "../membership/membership.module";
 import { SucursalModule } from "../sucursal/sucursal.module";
 import { UpdateUserSucursalMembershipUseCase } from "./application/use-cases/update-user-sucursal-membership.use-case";
 import { ChangeIsActiveUseCase } from "./application/use-cases/change-is-activate.use-case";
+import { ChangePasswordUseCase } from "./application/use-cases/change-password.use-case";
 
 @Module({
   imports:[
@@ -42,6 +43,7 @@ import { ChangeIsActiveUseCase } from "./application/use-cases/change-is-activat
     CreateUserSucursalUseCase,
     UpdateUserSucursalMembershipUseCase,
     ChangeIsActiveUseCase,
+    ChangePasswordUseCase,
   ],
   exports: [
     FindByEmailUseCase,

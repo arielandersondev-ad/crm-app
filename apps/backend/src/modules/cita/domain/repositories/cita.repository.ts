@@ -6,5 +6,6 @@ export abstract class CitaRepository{
   abstract findAllBySucursal(sucursalId: string, tenantId: string): Promise<CitaEntity[]>
   abstract findById(id:string,sucursalId: string, tenantId: string): Promise<CitaEntity>
   abstract softDelete(id: string, tenantId: string, sucursalId: string): Promise<CitaEntity>
+  abstract findByClientId(clientId: string): Promise<CitaEntity[]>
   abstract getAgenda(tenantId: string, sucursalId: string)
 }

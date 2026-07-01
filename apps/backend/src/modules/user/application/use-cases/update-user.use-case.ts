@@ -12,6 +12,6 @@ export class UpdateUserUseCase {
 
   async execute(dto: UpdateUserDto) {
     if (!dto.id || dto.id.trim() === '') {throw new Error('El ID es requerido')}
-    return this.userRepo.update(this.prisma, dto.email, dto.password, dto.firstName, dto.lastName);
+    return this.userRepo.update(this.prisma, dto.id, dto.email, undefined, dto.firstName, dto.lastName);
   }
 }

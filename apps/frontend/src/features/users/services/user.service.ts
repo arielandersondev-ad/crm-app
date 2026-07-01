@@ -1,6 +1,6 @@
 import { api } from "@/infrastructure/api/axios";
 import { ENDPOINTS } from "../api/endpoints";
-import type { TenantUser, CreateTenantUserDto, Sucursal, UpdateUserRoleSucursalDto } from "../types/user";
+import type { TenantUser, CreateTenantUserDto, Sucursal, UpdateUserRoleSucursalDto, ChangePasswordDto } from "../types/user";
 import { User } from "@/shared/types/user";
 
 class UserService {
@@ -35,6 +35,11 @@ class UserService {
 
   async removeUser(id: string): Promise<any> {
     const response = await api.delete(ENDPOINTS.REMOVE.replace(':id', id));
+    return response.data;
+  }
+
+  async changePassword(dto: ChangePasswordDto): Promise<any> {
+    const response = await api.patch(ENDPOINTS.CHANGE_PASSWORD, dto);
     return response.data;
   }
 }

@@ -30,6 +30,7 @@ export class FindAgendaUseCase{
           ? `${appointment.user.firstName} ${appointment.user.lastName}`
           : null,
         visit: appointment.visit,
+        consultation: appointment.consultation,
       })),
     };
   }

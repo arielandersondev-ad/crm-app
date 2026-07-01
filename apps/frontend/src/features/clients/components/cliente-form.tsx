@@ -126,6 +126,47 @@ export function ClientForm({ register, errors }: ClientFormProps) {
           </p>
         )}
       </div>
+
+      <h3 className="font-semibold pt-4 border-t">Antecedentes Clínicos</h3>
+
+      <div>
+        <label className="block mb-1">Antecedentes médicos</label>
+        <textarea
+          {...register("antecedentes")}
+          className="w-full border rounded-md p-2"
+          rows={3}
+          placeholder="Enfermedades previas, cirugías, tratamientos..."
+        />
+      </div>
+
+      <div>
+        <label className="block mb-1">Alergias</label>
+        <textarea
+          {...register("alergias")}
+          className="w-full border rounded-md p-2"
+          rows={2}
+          placeholder="Alergias a medicamentos, látex, etc."
+        />
+      </div>
+
+      <div>
+        <label className="block mb-1">Contacto de emergencia</label>
+        <input
+          {...register("contactoEmergencia")}
+          className="w-full border rounded-md p-2"
+          placeholder="Nombre y teléfono"
+        />
+      </div>
+
+      <div>
+        <label className="block mb-1">Observaciones</label>
+        <textarea
+          {...register("observaciones")}
+          className="w-full border rounded-md p-2"
+          rows={2}
+          placeholder="Información adicional relevante"
+        />
+      </div>
     </div>
   );
 }

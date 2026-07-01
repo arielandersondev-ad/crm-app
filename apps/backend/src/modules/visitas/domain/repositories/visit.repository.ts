@@ -9,5 +9,6 @@ export abstract class VisitRepository {
   abstract create(tenantId: string, sucursalId: string, userId: string, data: CreateVisitDto): Promise<VisitEntity>;
   abstract update(tenantId: string, sucursalId: string, id: string, userId: string, data: UpdateVisitDto): Promise<VisitEntity>;
   abstract softDelete(tenantId: string, id: string, sucursalId: string): Promise<void>;
+  abstract findAllByClientId(clientId: string): Promise<VisitEntity[]>;
   abstract findAllBySucursalIdComplete(tenantId: string, sucursalId: string): Promise<any[]>;
 }

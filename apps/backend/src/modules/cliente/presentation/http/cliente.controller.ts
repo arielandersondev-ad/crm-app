@@ -44,9 +44,10 @@ export class ClienteController {
   @Post('create')
   async create(
     @CurrentUser('tenantId') tenantId: string,
+    @CurrentUser('sub') userId: string,
     @Body() dto: CreateClienteDto
   ) {
-    return this.createUseCase.execute(tenantId, dto);
+    return this.createUseCase.execute(tenantId, userId, dto);
   }
   @Patch('update/:id')
   async update(

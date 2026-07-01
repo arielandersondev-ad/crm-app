@@ -57,8 +57,8 @@ export function AgendaModal({ open,mode,loading, currenCLient ,onClose, onSubmit
         setCLientSelect(undefined);
         onClose();
       }}
-      title={mode==='create' ? 'Agendar Cita' : 'Editar Cita'}
-      description={mode === "create" ? "Para quien es la Cita ?" : "Actualice los detalles de la Cita"}
+      title={mode==='create' ? 'Nueva cita' : 'Editar cita'}
+      description={mode === "create" ? "Seleccione el paciente" : "Actualice los detalles de la cita"}
     >
       <form
         onSubmit={handleSubmit(
@@ -85,7 +85,7 @@ export function AgendaModal({ open,mode,loading, currenCLient ,onClose, onSubmit
             className="bg-primary text-primary-foreground"
             >
             <Search/>
-            Buscar Cliente
+            Buscar Paciente
           </Button>
         }
         <AgendaForm
@@ -117,7 +117,7 @@ export function AgendaModal({ open,mode,loading, currenCLient ,onClose, onSubmit
         </div>
       </form>
       <SearchModal
-        title="Seleccionar un Usuario"
+        title="Seleccionar un Paciente"
         open= {showSelectorCLient}
         items={clientsOptions}
         onClose={()=>setShowSelectorCLient(false)}

@@ -5,6 +5,7 @@ import { PageHeader } from "@/shared/components/page-header";
 import { EmptyState } from "@/shared/components/empty-state";
 
 import { useClients, useCreateClient, useDeleteClient, useUpdateClient } from "../hooks/use-clients";
+import { usePatientProfile, useCreatePatientProfile, useUpdatePatientProfile } from "../hooks/use-patient-profile";
 import { ClientsTable } from "../components/clients-table";
 import { LoadingState } from "@/shared/components/loading-state";
 import { Button } from "@/shared/components/ui/button";
@@ -16,7 +17,6 @@ import { DeleteClientDialog } from "../components/delete-cliente-dialog";
 import { toast } from "sonner";
 import { VisitModal } from "@/features/visits/components/visit-modal";
 import { useCreateVisit, useVisits } from "@/features/visits/hooks/use-visits";
-import { VisitFormData } from "@/features/visits/schemas/visit.schema";
 
 export function ClientsPage() {
   const { data: clients, isLoading, isError } = useClients();
@@ -25,18 +25,22 @@ export function ClientsPage() {
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
   const createVisitMutation = useCreateVisit();
+  const createPatientProfileMutation = useCreatePatientProfile();
+  const updatePatientProfileMutation = useUpdatePatientProfile();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isVisitOpen, setIsVisitOpen] = useState<Client | null>(null);
   const [deleteClient, setDeleteClient] = useState('');
   const [editingClient, setEditingClient] = useState<Client | null>(null);
 
+  const { data: editingPatientProfile } = usePatientProfile(editingClient?.id);
+
   if (isLoading) return <LoadingState />
 
   if (isError) {
     return (
       <EmptyState
-        title="Error al cargar clientes"
+        title="Error al cargar pacientes"
       />
     );
   }
@@ -44,8 +48,8 @@ export function ClientsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Clientes"
-        description="Gestión de clientes"
+        title="Pacientes"
+        description="Gestión de pacientes"
         actions={
           <div className="flex gap-2 items-center justify-center align-center">
 
@@ -58,7 +62,7 @@ export function ClientsPage() {
               className="gap-2"
             >
               <Plus className="size-4" />
-              Nuevo cliente
+              Nuevo paciente
             </Button>
           </div>
         }
@@ -66,8 +70,8 @@ export function ClientsPage() {
 
       {!clients?.length ? (
         <EmptyState
-          title="No hay clientes registrados"
-          description="Crea tu primer cliente."
+          title="No hay pacientes registrados"
+          description="Registra tu primer paciente."
         />
       ) : (
         <ClientsTable 
@@ -82,16 +86,28 @@ export function ClientsPage() {
         mode="create"
         onClose={() => setIsCreateOpen(false)}
         onSubmit={async (data) => {
-          await createClientMutation.mutateAsync(data);
-          toast.success('Cliente creado correctamente');
+          const {antecedentes, alergias, contactoEmergencia, observaciones, ...clientData} = data
+          const client = await createClientMutation.mutateAsync(clientData);
+          const hasClinicalData = data.antecedentes || data.alergias || data.contactoEmergencia || data.observaciones;
+          if (hasClinicalData) {
+            await createPatientProfileMutation.mutateAsync({
+              clientId: client.id,
+              antecedentes: data.antecedentes,
+              alergias: data.alergias,
+              contactoEmergencia: data.contactoEmergencia,
+              observaciones: data.observaciones,
+            });
+          }
+          toast.success('Paciente registrado correctamente');
           setIsCreateOpen(false);
         }}
-        loading={createClientMutation.isPending}
+        loading={createClientMutation.isPending || createPatientProfileMutation.isPending}
       />
      <ClientModal
         open={!!editingClient}
         mode="edit"
         client={editingClient || undefined}
+        patientProfile={editingPatientProfile}
         onClose={() => setEditingClient(null)}
         onSubmit={async (data) => {
           if (!editingClient) return;
@@ -99,10 +115,28 @@ export function ClientsPage() {
             id: editingClient.id,
             ...data,
           });
-          toast.success('Cliente actualizado correctamente');
+          const hasClinicalData = data.antecedentes || data.alergias || data.contactoEmergencia || data.observaciones;
+          if (hasClinicalData && editingPatientProfile) {
+            await updatePatientProfileMutation.mutateAsync({
+              clientId: editingClient.id,
+              antecedentes: data.antecedentes,
+              alergias: data.alergias,
+              contactoEmergencia: data.contactoEmergencia,
+              observaciones: data.observaciones,
+            });
+          } else if (hasClinicalData && !editingPatientProfile) {
+            await createPatientProfileMutation.mutateAsync({
+              clientId: editingClient.id,
+              antecedentes: data.antecedentes,
+              alergias: data.alergias,
+              contactoEmergencia: data.contactoEmergencia,
+              observaciones: data.observaciones,
+            });
+          }
+          toast.success('Paciente actualizado correctamente');
           setEditingClient(null);
         }}
-        loading={updateClientMutation.isPending}
+        loading={updateClientMutation.isPending || updatePatientProfileMutation.isPending}
       />
       <DeleteClientDialog
         open={!!deleteClient}
@@ -110,7 +144,7 @@ export function ClientsPage() {
         onConfirm={async () => {
           if (!deleteClient) return;
             await deleteClientMutation.mutateAsync( deleteClient );
-            toast.success('Cliente eliminado correctamente');
+            toast.success('Paciente eliminado correctamente');
             setDeleteClient('');
         }}
         loading={deleteClientMutation.isPending}
@@ -129,7 +163,7 @@ export function ClientsPage() {
             status: data.status,
             notes: data.notes
           });
-          toast.success('Visita creada correctamente');
+          toast.success('Consulta creada correctamente');
           setIsVisitOpen(null);
         }}
       />

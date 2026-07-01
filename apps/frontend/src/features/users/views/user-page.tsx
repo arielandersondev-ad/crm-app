@@ -31,8 +31,8 @@ export function UserPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Usuarios"
-        description="Gestión de usuarios del tenant"
+        title="Personal"
+        description="Gestión del personal de la clínica"
         actions={
           <div className="flex gap-2 items-center">
             <Button
@@ -61,7 +61,8 @@ export function UserPage() {
         mode="create"
         onClose={() => setIsCreateOpen(false)}
         onSubmit={async (data) => {
-          await createUserMutation.mutateAsync(data);
+          const { id, sucursalId, ...payload } = data;
+          await createUserMutation.mutateAsync(payload);
           toast.success('Usuario creado correctamente');
           setIsCreateOpen(false);
         }}

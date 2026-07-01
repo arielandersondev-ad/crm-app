@@ -6,7 +6,8 @@ export interface Details{
   hora:string,
   clientFullName: string,
   userName: string,
-  visit:any
+  visit:any,
+  consultation: { id: string; status: string } | null
 }
 export interface AgendaResponse {
   timezone?: string

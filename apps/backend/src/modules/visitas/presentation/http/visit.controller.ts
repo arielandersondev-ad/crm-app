@@ -6,6 +6,7 @@ import { CreateVisitUseCase } from "../../application/create-visit.use-case";
 import { CurrentUser } from "../../../../common/decorators/current-user.decorator";
 import { CreateVisitDto } from "../dto/create-visit.dto";
 import { DeleteVisitUseCase } from "../../application/delete-visit.use-case";
+import { FindByClientIdUseCase } from "../../application/find-by-client-id.use-case";
 import { UpdateVisitDto } from "../dto/update-visit.dto";
 
 @Controller('visitas')
@@ -16,7 +17,15 @@ export class VisitController {
     private readonly updateVisitUseCase: UpdateVisitUseCase,
     private readonly createVisitUseCase: CreateVisitUseCase,
     private readonly deleteVisitUseCase: DeleteVisitUseCase,
+    private readonly findByClientIdUseCase: FindByClientIdUseCase,
   ) {}
+  @Get('client/:clientId')
+  findByClientId(
+    @Param('clientId') clientId: string,
+  ) {
+    return this.findByClientIdUseCase.execute(clientId);
+  }
+
   @Get('all')
   findAllBySucursalId(
     @CurrentUser('tenantId') tenantId: string,

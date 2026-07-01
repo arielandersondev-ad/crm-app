@@ -3,9 +3,10 @@ import { api } from "@/infrastructure/api/axios";
 export interface DashboardStats {
   totalClients: number;
   todayAppointments: number;
-  todayVisits: number;
-  todayRevenue: number;
   pendingAppointments: number;
+  todayConsultations: number;
+  totalConsultations: number;
+  upcomingControls: number;
 }
 
 class DashboardService {

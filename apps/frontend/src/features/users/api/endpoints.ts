@@ -6,5 +6,6 @@ export const ENDPOINTS = {
   UPDATE: '/users/update/:id',
   REMOVE: '/users/delete/:id',
   ACTIVATE: '/users/activate/:id',
-  DEACTIVATE: '/users/deactivate/:id'
+  DEACTIVATE: '/users/deactivate/:id',
+  CHANGE_PASSWORD: '/users/change-password',
 } as const

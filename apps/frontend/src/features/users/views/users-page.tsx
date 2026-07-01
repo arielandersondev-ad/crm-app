@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { UsersTable } from "../components/users-table";
 import { TenantUser } from "../types/user";
 import { DeleteUserDialog } from "../components/delete-user-dialog";
+import { ChangePasswordModal } from "../components/change-password-modal";
 
 export function UsersPage() {
   const { data: users, isLoading, error } = useUsers();
@@ -25,6 +26,7 @@ export function UsersPage() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [deleteUser, setDeleteUser] = useState<TenantUser | null | any>(null);
 
   if (isLoading) return <LoadingState />
@@ -37,8 +39,8 @@ export function UsersPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Usuarios"
-        description="Gestión de usuarios del tenant"
+        title="Personal"
+        description="Gestión del personal de la clínica"
         actions={
           <div className="flex gap-2 items-center">
             <Button
@@ -79,7 +81,8 @@ export function UsersPage() {
         mode="create"
         onClose={() => setIsCreateOpen(false)}
         onSubmit={async (data) => {
-          await createUserMutation.mutateAsync(data);
+          const { id, sucursalId, ...payload } = data;
+          await createUserMutation.mutateAsync(payload);
           toast.success('Usuario creado correctamente');
           setIsCreateOpen(false);
         }}
@@ -97,6 +100,14 @@ export function UsersPage() {
           setIsCreateOpen(false);
         }}
         loading={createUserMutation.isPending}
+        onOpenChangePassword={() => {
+          setIsEditOpen(false);
+          setIsPasswordOpen(true);
+        }}
+      />
+      <ChangePasswordModal
+        open={isPasswordOpen}
+        onClose={() => setIsPasswordOpen(false)}
       />
       <DeleteUserDialog
         open={!!deleteUser}

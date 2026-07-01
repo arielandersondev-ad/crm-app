@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 
 import { Sidebar } from "./sidebar";
 import { Navbar } from "./navbar";
+import { ChatWidget } from "../chat-widget/chat-widget";
 
 interface AppShellProps {
   children: ReactNode;
@@ -19,6 +20,7 @@ export function AppShell({ children }: AppShellProps) {
           {children}
         </main>
       </div>
+      <ChatWidget />
     </div>
   );
 }

@@ -19,6 +19,8 @@ import { Sucursal } from "../../../sucursal/domain/entities/sucursal.entity";
 import { CreateUserSucursalUseCase } from "../../application/use-cases/create-user-sucursal.use-case";
 import { UpdateUserSucursalMembershipUseCase } from "../../application/use-cases/update-user-sucursal-membership.use-case";
 import { ChangeIsActiveUseCase } from "../../application/use-cases/change-is-activate.use-case";
+import { ChangePasswordUseCase } from "../../application/use-cases/change-password.use-case";
+import { ChangePasswordDto } from "../dto/change-password.dto";
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -34,6 +36,7 @@ export class UserController {
     private readonly createUserSucursalUseCase: CreateUserSucursalUseCase,
     private readonly updateUserSucursalMembershipUseCase: UpdateUserSucursalMembershipUseCase,
     private readonly changeIsActiveUseCase: ChangeIsActiveUseCase,
+    private readonly changePasswordUseCase: ChangePasswordUseCase,
   ) {}
   @Get('byTenantId')
   async findByTenantId(
@@ -79,6 +82,12 @@ export class UserController {
   @Patch('activate/:id')
   async activate(@Param('id') id:string) {
     return this.changeIsActiveUseCase.execute(id, 'activate');
+  }
+  @Patch('change-password')
+  async changePassword(
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.changePasswordUseCase.execute(dto);
   }
   @Patch()
   async update(@Body() dto: UpdateUserDto) {

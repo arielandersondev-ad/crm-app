@@ -66,3 +66,10 @@ export function useDeactivateUser() {
     },
   });
 }
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: userService.changePassword,
+    mutationKey: ["changePassword"],
+  });
+}

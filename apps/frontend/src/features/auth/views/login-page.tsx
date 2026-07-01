@@ -47,13 +47,13 @@ export function LoginPage() {
           </div>
 
           <span className="text-lg font-semibold">
-            Alto's System
+            Sistema Oftalmológico
           </span>
         </div>
 
         <div className="relative space-y-6">
           <h1 className="max-w-md text-balance text-3xl font-semibold leading-tight tracking-tight">
-            La plataforma para gestionar visitas.
+            Plataforma para la gestión oftalmológica.
           </h1>
 
           <ul className="space-y-3 text-sm text-muted-foreground">
@@ -62,7 +62,7 @@ export function LoginPage() {
                 <Users className="size-4" />
               </span>
 
-              Clientes, mascotas y expedientes en un solo lugar
+              Pacientes, historial clínico y consultas en un solo lugar
             </li>
 
             <li className="flex items-center gap-3">
@@ -70,7 +70,7 @@ export function LoginPage() {
                 <Activity className="size-4" />
               </span>
 
-              Agenda, inventario y ventas conectados
+              Agenda de citas, controles y seguimiento
             </li>
 
             <li className="flex items-center gap-3">
@@ -84,7 +84,7 @@ export function LoginPage() {
         </div>
 
         <p className="relative text-xs text-muted-foreground">
-          © 2026 Alto's System. Todos los derechos reservados.
+          © 2026 Sistema Oftalmológico. Todos los derechos reservados.
         </p>
       </section>
 
@@ -98,7 +98,7 @@ export function LoginPage() {
               </div>
 
               <span className="font-semibold">
-                Alto's System
+                Sistema Oftalmológico
               </span>
             </div>
           </div>
