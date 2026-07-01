@@ -72,6 +72,7 @@ enum PaymentStatus {
 model Tenant {
   id   String @id @default(uuid()) @db.Uuid
   name String
+  slug String? @unique
   plan Plan   @default(FREE)
 
   businessType BusinessType @default(GENERIC)
@@ -91,6 +92,10 @@ model Tenant {
   services     Service[]
   appointments Appointment[]
   visits       Visit[]
+
+  faqs       FAQ[]
+  botConfigs BotConfig[]
+  chatLogs   ChatLog[]
 }
 
 model User {
@@ -115,6 +120,8 @@ model User {
   sucursales   UserSucursal[]
   appointments Appointment[]
   visits       Visit[]
+  
+  chatLogs   ChatLog[]
 }
 
 model Membership {
@@ -506,6 +513,84 @@ model Refraction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+
+
+
+enum FAQCategory {
+  GENERAL
+  HORARIOS
+  SERVICIOS
+  PRECIOS
+  CONTACTO
+  EMERGENCIAS
+  CITAS
+}
+
+model FAQ {
+  id        String       @id @default(uuid()) @db.Uuid
+  tenantId  String       @db.Uuid
+  question  String
+  answer    String
+  category  FAQCategory  @default(GENERAL)
+  embedding Json?
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, isActive])
+}
+
+model BotConfig {
+  id                 String  @id @default(uuid()) @db.Uuid
+  tenantId           String  @unique @db.Uuid
+  botName            String  @default("Asistente Virtual")
+  welcomeMessage     String  @default("¡Hola! Soy el asistente virtual. ¿En qué puedo ayudarte?")
+  disclaimer         String  @default("⚠️ Este asistente no realiza diagnósticos médicos ni reemplaza la consulta con un profesional de la salud.")
+  fallbackMessage    String  @default("No encontré una respuesta exacta. Por favor, contáctanos al teléfono o correo de la clínica.")
+  similarityThreshold Float @default(0.75)
+  mode               String  @default("FAQ_ONLY")
+  modelProvider      String  @default("huggingface")
+  embeddingModel     String  @default("Xenova/all-MiniLM-L6-v2")
+  maxTokens          Int     @default(150)
+  temperature        Float   @default(0.2)
+  isActive           Boolean @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model ChatLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId     String   @db.Uuid
+  userId       String?  @db.Uuid
+  question     String
+  answer       String
+  source       String   // "FAQ" | "AI" | "Fallback"
+  intent       String?  // "faq" | "generated" | "fallback"
+  confidence   Float?
+  responseTime Int?     // ms
+  modelName    String?
+  usedAI       Boolean  @default(false)
+  resolved     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, createdAt])
+}
+
+
+
+
+
+
+
 
 // NOTA: VisualMeasurement fue reemplazado por Refraction.
 // VisualMeasurement modela una medición individual por ojo, pero el dominio

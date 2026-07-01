@@ -17,6 +17,7 @@ import { PatientProfileModule } from './modules/patient-profile/patient-profile.
 import { ConsultationModule } from './modules/consultation/consultation.module';
 import { RefractionModule } from './modules/refraction/refraction.module';
 import { ReportModule } from './modules/reports/report.module';
+import { ChatbotModule } from './modules/chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ReportModule } from './modules/reports/report.module';
     ConsultationModule,
     RefractionModule,
     ReportModule,
+    ChatbotModule,
   ],       
   controllers: [],
   providers: [],

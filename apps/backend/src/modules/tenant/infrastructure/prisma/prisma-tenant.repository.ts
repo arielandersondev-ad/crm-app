@@ -13,6 +13,7 @@ export class PrismaTenantRepository implements TenantRepository {
     return tenants.map((tenant) => new Tenant(
       tenant.id,
       tenant.name,
+      tenant.slug,
       tenant.plan,
       tenant.createdAt,
       tenant.updatedAt,
@@ -27,23 +28,39 @@ export class PrismaTenantRepository implements TenantRepository {
     return new Tenant(
       tenant.id,
       tenant.name,
+      tenant.slug,
       tenant.plan,
       tenant.createdAt,
       tenant.updatedAt,
     );
   }
 
-  async create(tx: Prisma.TransactionClient, name: string, plan: Plan = Plan.FREE): Promise<Tenant> {
+  async findBySlug(slug: string): Promise<Tenant | null> {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { slug },
+    });
+    if (!tenant) return null;
+    return new Tenant(
+      tenant.id,
+      tenant.name,
+      tenant.slug,
+      tenant.plan,
+      tenant.createdAt,
+      tenant.updatedAt,
+    );
+  }
+
+  async create(tx: Prisma.TransactionClient, name: string, plan: Plan = Plan.FREE, slug?: string): Promise<Tenant> {
     const tenant = await tx.tenant.create({
-      data: { name, plan },
+      data: { name, plan, slug },
     });
     return tenant;
   }
 
-  async update(id: string, name?: string, plan?: Plan): Promise<Tenant> {
+  async update(id: string, name?: string, plan?: Plan, slug?: string): Promise<Tenant> {
     const tenant = await this.prisma.tenant.update({
       where: { id },
-      data: { name, plan },
+      data: { name, plan, slug },
     });
     return tenant;
   }
