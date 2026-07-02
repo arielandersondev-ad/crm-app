@@ -275,9 +275,10 @@ model BranchService {
 }
 
 model Appointment {
-  id String @id @default(uuid()) @db.Uuid
+  id              String            @id @default(uuid()) @db.Uuid
+  appointmentCode String?            @unique
 
-  tenantId String @db.Uuid
+  tenantId       String            @db.Uuid
 
   sucursalId String @db.Uuid
 

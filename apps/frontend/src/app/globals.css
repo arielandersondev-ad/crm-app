@@ -139,7 +139,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
+  --background: oklch(93.705% 0.00011 271.152);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -257,4 +257,65 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.landing-background {
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+
+  background:
+    linear-gradient(
+      rgba(255,255,255,.03) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.03) 1px,
+      transparent 1px
+    ),
+    radial-gradient(
+      circle at bottom center,
+      rgba(170,255,245,.95) 0%,
+      rgba(120, 255, 235, 0.55) 28%,
+      rgba(70,255,220,.15) 80%,
+      transparent 90%
+    ),
+    #090b10;
+
+  background-size:
+      45px 45px,
+      45px 45px,
+      auto,
+      auto;
+}
+.login-background {
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+
+  background:
+    linear-gradient(
+      rgba(255,255,255,.03) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.03) 1px,
+      transparent 1px
+    ),
+    radial-gradient(
+      circle at top center,
+      rgba(170,255,245,.95) 0%,
+      rgba(120, 255, 235, 0.55) 8%,
+      rgba(70,255,220,.15) 50%,
+      transparent 100%
+    ),
+    #090b10;
+
+  background-size:
+      45px 45px,
+      45px 45px,
+      auto,
+      auto;
 }

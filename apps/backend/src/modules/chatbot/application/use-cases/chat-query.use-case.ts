@@ -4,6 +4,7 @@ import { BotConfigRepository } from "../../domain/repositories/bot-config.reposi
 import { ChatLogRepository } from "../../domain/repositories/chat-log.repository";
 import { AIProvider } from "../../domain/interfaces/ai-provider.interface";
 import { EmbeddingService } from "../../infrastructure/nlp/embedding.service";
+import { AppointmentStatusHandler } from "../handlers/appointment-status.handler";
 import type { ChatResponse } from "../../domain/interfaces/chatbot.interface";
 
 @Injectable()
@@ -13,11 +14,31 @@ export class ChatQueryUseCase {
     private readonly botConfigRepo: BotConfigRepository,
     private readonly chatLogRepo: ChatLogRepository,
     private readonly embeddingService: EmbeddingService,
+    private readonly appointmentStatusHandler: AppointmentStatusHandler,
     @Inject("AI_PROVIDER") private readonly aiProvider: AIProvider,
   ) {}
 
   async execute(question: string, tenantId: string, userId?: string): Promise<ChatResponse> {
     const start = Date.now();
+
+    // 1. Intentar handler de estado de cita
+    const appointmentResult = await this.appointmentStatusHandler.tryHandle(question, tenantId);
+    if (appointmentResult) {
+      await this.chatLogRepo.create({
+        tenantId,
+        userId,
+        question,
+        answer: appointmentResult.answer,
+        source: appointmentResult.source,
+        intent: "appointment-status",
+        confidence: appointmentResult.confidence,
+        responseTime: Date.now() - start,
+        usedAI: false,
+      });
+      return appointmentResult;
+    }
+
+    // 2. Flujo normal FAQ/AI
     const config = await this.botConfigRepo.findByTenant(tenantId);
 
     const queryEmbedding = await this.embeddingService.generate(question);

@@ -6,6 +6,11 @@ export interface ChatbotQueryResponse {
   confidence: number;
 }
 
+export interface ContactInfo {
+  question: string;
+  answer: string;
+}
+
 class ChatbotService {
   async query(question: string): Promise<ChatbotQueryResponse> {
     const res = await api.post<ChatbotQueryResponse>("/chatbot/query", { question });
@@ -17,6 +22,13 @@ class ChatbotService {
       question,
       tenantSlug,
     });
+    return res.data;
+  }
+
+  async getContact(tenantSlug: string): Promise<{ contact: ContactInfo | null }> {
+    const res = await api.get<{ contact: ContactInfo | null }>(
+      `/chatbot/public/contact/${tenantSlug}`,
+    );
     return res.data;
   }
 }

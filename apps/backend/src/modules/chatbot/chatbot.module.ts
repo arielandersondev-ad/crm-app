@@ -18,10 +18,12 @@ import { SimilarityService } from "./infrastructure/nlp/similarity.service";
 import { HuggingFaceService } from "./infrastructure/nlp/huggingface.service";
 import { PrismaService } from "../../common/infrastructure/database/prisma/prisma.service";
 import { TenantModule } from "../tenant/tenant.module";
+import { CitaModule } from "../cita/cita.module";
 import { ReindexFaqsUseCase } from "./application/use-cases/reindex-faqs.use-case";
+import { AppointmentStatusHandler } from "./application/handlers/appointment-status.handler";
 
 @Module({
-  imports: [TenantModule],
+  imports: [TenantModule, CitaModule],
   controllers: [ChatbotController],
   providers: [
     ChatQueryUseCase,
@@ -35,6 +37,7 @@ import { ReindexFaqsUseCase } from "./application/use-cases/reindex-faqs.use-cas
     SimilarityService,
     PrismaService,
     ReindexFaqsUseCase,
+    AppointmentStatusHandler,
     { provide: FaqRepository, useClass: PrismaFaqRepository },
     { provide: ChatLogRepository, useClass: PrismaChatLogRepository },
     { provide: BotConfigRepository, useClass: PrismaBotConfigRepository },
