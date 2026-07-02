@@ -201,6 +201,7 @@ export class PrismaCitaRepository implements CitaRepository {
         clientId: true,
         status: true,
         scheduledAt: true,
+        appointmentCode: true,
         client: {
           select: {
             fullName: true

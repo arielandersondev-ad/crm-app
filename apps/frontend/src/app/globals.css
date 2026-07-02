@@ -319,3 +319,61 @@
       auto,
       auto;
 }
+
+/* ---------- Landing Background ---------- */
+
+.landing-bg {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  background: #090b10;
+}
+
+/* Glow principal */
+.landing-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(177,255,244,.95) 0%,
+      rgba(120,255,230,.75) 18%,
+      rgba(90,255,220,.35) 35%,
+      rgba(50,255,210,.12) 50%,
+      transparent 70%
+    );
+
+  pointer-events: none;
+}
+
+/* Cuadrícula */
+.landing-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+
+  background-size: 44px 44px;
+
+  pointer-events: none;
+}
+@keyframes float {
+
+  0%,100%{
+    transform:translateY(0);
+  }
+
+  50%{
+    transform:translateY(-80px);
+  }
+
+}
+
+.pixel{
+  animation: float 20s ease-in-out infinite;
+}

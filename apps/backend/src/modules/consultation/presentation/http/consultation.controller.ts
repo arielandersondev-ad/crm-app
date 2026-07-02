@@ -9,6 +9,7 @@ import { UpdateConsultationUseCase } from "../../application/use-cases/update-co
 import { DeleteConsultationUseCase } from "../../application/use-cases/delete-consultation.use-case";
 import { GetConsultationDetailUseCase } from "../../application/use-cases/get-consultation-detail.use-case";
 import { GetPatientHistoryUseCase } from "../../application/use-cases/get-patient-history.use-case";
+import { FindAllConsultationsUseCase } from "../../application/use-cases/find-all-consultations.use-case";
 import { CreateConsultationDto } from "../dto/create-consultation.dto";
 import { UpdateConsultationDto } from "../dto/update-consultation.dto";
 
@@ -22,6 +23,7 @@ export class ConsultationController {
     private readonly deleteUseCase: DeleteConsultationUseCase,
     private readonly getDetailUseCase: GetConsultationDetailUseCase,
     private readonly getHistoryUseCase: GetPatientHistoryUseCase,
+    private readonly findAllUseCase: FindAllConsultationsUseCase,
   ) {}
 
   @Post()
@@ -65,6 +67,14 @@ export class ConsultationController {
     @CurrentUser("tenantId") tenantId: string,
   ) {
     return this.deleteUseCase.execute(id, tenantId);
+  }
+
+  @Get("list")
+  @Roles("ADMIN", "OWNER", "EMPLOYEE", "MANAGER")
+  async findAll(
+    @CurrentUser("tenantId") tenantId: string,
+  ) {
+    return this.findAllUseCase.execute(tenantId);
   }
 
   @Get(":id")

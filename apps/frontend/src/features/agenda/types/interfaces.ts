@@ -1,5 +1,6 @@
 export interface Details{
   id:string,
+  appointmentCode?: string,
   clientId: string,
   status:any,
   scheduledAt:string,

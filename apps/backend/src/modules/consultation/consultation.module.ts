@@ -6,6 +6,7 @@ import { UpdateConsultationUseCase } from "./application/use-cases/update-consul
 import { DeleteConsultationUseCase } from "./application/use-cases/delete-consultation.use-case";
 import { GetConsultationDetailUseCase } from "./application/use-cases/get-consultation-detail.use-case";
 import { GetPatientHistoryUseCase } from "./application/use-cases/get-patient-history.use-case";
+import { FindAllConsultationsUseCase } from "./application/use-cases/find-all-consultations.use-case";
 import { ConsultationRepository } from "./domain/repositories/consultation.repository";
 import { PrismaConsultationRepository } from "./infrastructure/prisma/prisma-consultation.repository";
 import { CitaModule } from "../cita/cita.module";
@@ -20,6 +21,7 @@ import { CitaModule } from "../cita/cita.module";
     DeleteConsultationUseCase,
     GetConsultationDetailUseCase,
     GetPatientHistoryUseCase,
+    FindAllConsultationsUseCase,
     {
       provide: ConsultationRepository,
       useClass: PrismaConsultationRepository,

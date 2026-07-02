@@ -21,7 +21,7 @@ export function ChatWidget({
     : "¡Hola! Soy el asistente virtual. ¿En qué puedo ayudarte?",
 }: ChatWidgetProps) {
   const { messages, isLoading, isOpen, sendMessage, toggleOpen, setIsOpen } =
-    useChatbot(tenantSlug, welcomeMessage);
+    useChatbot(mode, tenantSlug, welcomeMessage);
   const [input, setInput] = useState("");
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);

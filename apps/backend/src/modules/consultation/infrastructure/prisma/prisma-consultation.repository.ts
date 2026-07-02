@@ -80,6 +80,18 @@ export class PrismaConsultationRepository implements ConsultationRepository {
     return this.toEntity(result);
   }
 
+  async findAllByTenant(tenantId: string): Promise<any[]> {
+    return this.prisma.consultation.findMany({
+      where: { tenantId },
+      orderBy: { consultationDate: "desc" },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true } },
+        client: { select: { id: true, fullName: true } },
+        refraction: true,
+      },
+    });
+  }
+
   async findByClientId(clientId: string, tenantId: string): Promise<ConsultationEntity[]> {
     const results = await this.prisma.consultation.findMany({
       where: { clientId, tenantId },

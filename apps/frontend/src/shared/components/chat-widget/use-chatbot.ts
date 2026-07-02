@@ -10,7 +10,7 @@ export interface Message {
   timestamp: Date;
 }
 
-export function useChatbot(tenantSlug?: string, welcomeMessage?: string) {
+export function useChatbot(mode: "landing" | "crm" = "crm", tenantSlug?: string, welcomeMessage?: string) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -37,6 +37,17 @@ export function useChatbot(tenantSlug?: string, welcomeMessage?: string) {
       setIsLoading(true);
 
       try {
+        if (mode === "landing" && !tenantSlug) {
+          const errorMsg: Message = {
+            id: `msg-${idCounter.current++}`,
+            text: "⚠️ El asistente virtual no está configurado. Contacte al administrador.",
+            sender: "bot",
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, errorMsg]);
+          return;
+        }
+
         let res: ChatbotQueryResponse;
         if (tenantSlug) {
           res = await chatbotService.publicQuery(text, tenantSlug);
@@ -63,7 +74,7 @@ export function useChatbot(tenantSlug?: string, welcomeMessage?: string) {
         setIsLoading(false);
       }
     },
-    [isLoading, tenantSlug]
+    [isLoading, mode, tenantSlug]
   );
 
   const toggleOpen = useCallback(() => setIsOpen((prev) => !prev), []);

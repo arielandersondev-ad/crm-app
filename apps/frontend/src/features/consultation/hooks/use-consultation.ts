@@ -2,6 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { consultationService } from "../services/consultation.service";
 import type { CreateConsultationDto, UpdateConsultationDto, UpsertRefractionDto } from "../types/consultation";
 
+export function useAllConsultations() {
+  return useQuery({
+    queryKey: ["consultations"],
+    queryFn: () => consultationService.findAll(),
+  });
+}
+
 export function useConsultation(id: string | undefined) {
   return useQuery({
     queryKey: ["consultation", id],

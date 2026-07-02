@@ -7,6 +7,7 @@ import { LandingHero } from "@/shared/components/landing/landing-hero";
 import { LandingFeatures } from "@/shared/components/landing/landing-features";
 import { LandingFooter } from "@/shared/components/landing/landing-footer";
 import { ChatWidget } from "@/shared/components/chat-widget/chat-widget";
+import {BackgroundGrid} from "@/shared/components/landing/background-grid";
 
 export default function Home() {
   useEffect(() => {
@@ -22,9 +23,10 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col landing-background">
+    <div className="flex min-h-screen flex-col landing-bg">
+      <BackgroundGrid />
       <LandingNavbar />
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         <LandingHero />
         <LandingFeatures />
       </main>
