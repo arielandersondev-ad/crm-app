@@ -7,6 +7,7 @@ import {
   ShieldUser,
   FileText,
   HelpCircle,
+  Settings,
 } from "lucide-react";
 
 export interface NavItem {
@@ -52,6 +53,12 @@ export const navigation: NavItem[] = [
     href: "/dashboard/reportes",
     icon: FileText,
     roles: ["ADMIN", "OWNER", "EMPLOYEE", "MANAGER"],
+  },
+  {
+    label: "Configuración",
+    href: "/dashboard/configuracion",
+    icon: Settings,
+    roles: ["ADMIN", "OWNER"],
   },
   {
     label: "FAQ Chatbot",

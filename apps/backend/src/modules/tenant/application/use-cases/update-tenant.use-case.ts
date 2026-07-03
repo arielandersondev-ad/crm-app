@@ -16,6 +16,6 @@ export class UpdateTenantUseCase {
       throw new Error('Plan inválido');
     }
 
-    return this.tenantRepo.update(dto.id, dto.name, dto.plan);
+    return this.tenantRepo.update(dto.id, dto.name, dto.plan, undefined, dto.phone, dto.email, dto.whatsapp, dto.timezone);
   }
 }

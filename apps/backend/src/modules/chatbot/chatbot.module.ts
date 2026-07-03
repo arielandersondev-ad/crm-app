@@ -19,11 +19,17 @@ import { HuggingFaceService } from "./infrastructure/nlp/huggingface.service";
 import { PrismaService } from "../../common/infrastructure/database/prisma/prisma.service";
 import { TenantModule } from "../tenant/tenant.module";
 import { CitaModule } from "../cita/cita.module";
+import { GeneralConfigurationModule } from "../general-configuration/general-configuration.module";
+import { BranchScheduleModule } from "../branch-schedule/branch-schedule.module";
+import { SucursalModule } from "../sucursal/sucursal.module";
 import { ReindexFaqsUseCase } from "./application/use-cases/reindex-faqs.use-case";
 import { AppointmentStatusHandler } from "./application/handlers/appointment-status.handler";
+import { ScheduleHandler } from "./application/handlers/schedule.handler";
+import { GeneralConfigurationRepository } from "../general-configuration/domain/repositories/general-configuration.repository";
+import { BranchScheduleRepository } from "../branch-schedule/domain/repositories/branch-schedule.repository";
 
 @Module({
-  imports: [TenantModule, CitaModule],
+  imports: [TenantModule, CitaModule, GeneralConfigurationModule, BranchScheduleModule, SucursalModule],
   controllers: [ChatbotController],
   providers: [
     ChatQueryUseCase,
@@ -38,6 +44,7 @@ import { AppointmentStatusHandler } from "./application/handlers/appointment-sta
     PrismaService,
     ReindexFaqsUseCase,
     AppointmentStatusHandler,
+    ScheduleHandler,
     { provide: FaqRepository, useClass: PrismaFaqRepository },
     { provide: ChatLogRepository, useClass: PrismaChatLogRepository },
     { provide: BotConfigRepository, useClass: PrismaBotConfigRepository },

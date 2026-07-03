@@ -4,6 +4,7 @@ import { RolesGuard } from "../../../../common/guards/roles.guard";
 import { Roles } from "../../../../common/decorators/roles.decorator";
 import { CurrentUser } from "../../../../common/decorators/current-user.decorator";
 import { TenantRepository } from "../../../tenant/domain/repositories/tenant.repository";
+import { GeneralConfigurationRepository } from "../../../general-configuration/domain/repositories/general-configuration.repository";
 import { ChatQueryUseCase } from "../../application/use-cases/chat-query.use-case";
 import { CreateFaqUseCase } from "../../application/use-cases/create-faq.use-case";
 import { UpdateFaqUseCase } from "../../application/use-cases/update-faq.use-case";
@@ -32,11 +33,11 @@ export class ChatbotController {
     private readonly tenantRepo: TenantRepository,
     private readonly faqRepo: FaqRepository,
     private readonly reindexFaqsUseCase: ReindexFaqsUseCase,
+    private readonly generalConfigRepo: GeneralConfigurationRepository,
   ) {}
 
   @Post("query")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  //@Roles("ADMIN", "OWNER", "MANAGER")
   async query(
     @Body() dto: ChatQueryDto,
     @CurrentUser("tenantId") tenantId: string,
@@ -49,9 +50,6 @@ export class ChatbotController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "OWNER")
   async reindexFaqs(@CurrentUser("tenantId") tenantId: string) {
-    // 1. Buscar FAQs del tenant con embedding = null
-    // 2. Para cada una, generar embedding con EmbeddingService
-    // 3. Actualizar el registro
     return this.reindexFaqsUseCase.execute(tenantId);
   }
 
@@ -78,6 +76,30 @@ export class ChatbotController {
       contact: contactFaq
         ? { question: contactFaq.question, answer: contactFaq.answer }
         : null,
+    };
+  }
+
+  @Get("public/config/:tenantSlug")
+  async publicConfig(@Param("tenantSlug") tenantSlug: string) {
+    const tenant = await this.tenantRepo.findBySlug(tenantSlug);
+    if (!tenant) {
+      throw new NotFoundException("Tenant no encontrado");
+    }
+
+    const [generalConfig, botConfig] = await Promise.all([
+      this.generalConfigRepo.findByTenantId(tenant.id),
+      this.getBotConfigUseCase.execute(tenant.id),
+    ]);
+
+    return {
+      botName: generalConfig?.botName ?? (botConfig as any)?.botName ?? "Asistente Virtual",
+      welcomeMessage: generalConfig?.welcomeMessage ?? "¡Hola! Soy el asistente virtual. ¿En qué puedo ayudarte?",
+      disclaimer: generalConfig?.disclaimer ?? "",
+      contact: {
+        phone: tenant.phone,
+        email: tenant.email,
+        whatsapp: tenant.whatsapp,
+      },
     };
   }
 

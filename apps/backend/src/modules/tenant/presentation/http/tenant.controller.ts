@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../../auth/infrastructure/security/jwt-auth.guard";
+import { CurrentUser } from "../../../../common/decorators/current-user.decorator";
 import { CreateTenantDto } from "../dto/create-tenant.dto";
 import { UpdateTenantDto } from "../dto/update-tenant.dto";
 import { CreateTenantUseCase } from "../../application/use-cases/create-tenant.use-case";
@@ -22,6 +23,11 @@ export class TenantController {
   @Get()
   async findAll() {
     return this.findAllTenantsUseCase.execute();
+  }
+
+  @Get('me')
+  async findMe(@CurrentUser('tenantId') tenantId: string) {
+    return this.findByIdTenantUseCase.execute(tenantId);
   }
 
   @Get('byId')

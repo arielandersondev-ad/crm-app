@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useChatbot, Message } from "./use-chatbot";
-import { chatbotService, ContactInfo } from "./chatbot.service";
+import { chatbotService, ContactInfo, PublicConfig } from "./chatbot.service";
 import { MessageCircle, X, Send, Loader2, Phone } from "lucide-react";
 
 interface ChatWidgetProps {
@@ -15,11 +15,18 @@ interface ChatWidgetProps {
 export function ChatWidget({
   mode = "crm",
   tenantSlug,
-  botName = "Asistente Virtual",
-  welcomeMessage = mode === "landing"
-    ? "¡Hola! Soy el asistente virtual de la clínica. Consulta nuestros horarios, servicios y más."
-    : "¡Hola! Soy el asistente virtual. ¿En qué puedo ayudarte?",
+  botName: propBotName,
+  welcomeMessage: propWelcomeMessage,
 }: ChatWidgetProps) {
+  const [publicConfig, setPublicConfig] = useState<PublicConfig | null>(null);
+  const [configLoaded, setConfigLoaded] = useState(false);
+
+  const botName = publicConfig?.botName ?? propBotName ?? "Asistente Virtual";
+  const welcomeMessage = publicConfig?.welcomeMessage ?? propWelcomeMessage
+    ?? (mode === "landing"
+      ? "¡Hola! Soy el asistente virtual de la clínica. Consulta nuestros horarios, servicios y más."
+      : "¡Hola! Soy el asistente virtual. ¿En qué puedo ayudarte?");
+
   const { messages, isLoading, isOpen, sendMessage, toggleOpen, setIsOpen } =
     useChatbot(mode, tenantSlug, welcomeMessage);
   const [input, setInput] = useState("");
@@ -39,9 +46,18 @@ export function ChatWidget({
 
   useEffect(() => {
     if (mode === "landing" && tenantSlug) {
-      chatbotService.getContact(tenantSlug).then((res) => {
-        setContactInfo(res.contact);
-      }).catch(() => {});
+      chatbotService.getPublicConfig(tenantSlug).then((res) => {
+        setPublicConfig(res);
+        setConfigLoaded(true);
+        if (res.contact?.whatsapp || res.contact?.phone) {
+          setContactInfo({
+            question: "contacto",
+            answer: res.contact.whatsapp ?? res.contact.phone ?? "",
+          });
+        }
+      }).catch(() => {
+        setConfigLoaded(true);
+      });
     }
   }, [mode, tenantSlug]);
 
