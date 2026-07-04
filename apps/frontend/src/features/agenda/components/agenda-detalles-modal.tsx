@@ -32,7 +32,7 @@ export function AppointmentDetailModal({open, mode, loading, details, onStartCon
       open={open}
       onClose={onClose}
       title="Cita / Control"
-      description={details?.scheduledAt}
+      description={details?.scheduledAt || ""}
     >
       <form
         onSubmit={async (e) => {
@@ -122,7 +122,7 @@ export function AppointmentDetailModal({open, mode, loading, details, onStartCon
                 <input
                   disabled
                   className="w-full border rounded-md p-2"
-                  value={details.consultation.status}
+                  value={details?.consultation?.status || ""}
                 />
               )}
             </div>

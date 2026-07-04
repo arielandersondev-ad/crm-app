@@ -35,8 +35,9 @@ export function ConsultationModal({
   onSubmit,
   canEdit = true,
 }: ConsultationModalProps) {
-  const resolver = zodResolver(ConsultationSchema);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ConsultationFormData>({ resolver });
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<ConsultationFormData>({ 
+    resolver: zodResolver(ConsultationSchema) as any 
+  });
   const readOnly = mode === "view";
 
   useEffect(() => {
@@ -53,7 +54,14 @@ export function ConsultationModal({
         consultationDate: consultation.consultationDate
           ? new Date(consultation.consultationDate).toISOString().slice(0, 16)
           : "",
-        ...consultation.refraction,
+        ...(consultation.refraction
+          ? Object.fromEntries(
+              Object.entries(consultation.refraction).map(([key, value]) => [
+                key,
+                value ?? undefined,
+              ])
+            )
+          : {}),
       });
       return;
     }
