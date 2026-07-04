@@ -2,22 +2,35 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useChatbot, Message } from "./use-chatbot";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { chatbotService, ContactInfo, PublicConfig } from "./chatbot.service";
+import { MessageCircle, X, Send, Loader2, Phone } from "lucide-react";
 
 interface ChatWidgetProps {
+  mode?: "landing" | "crm";
   tenantSlug?: string;
   botName?: string;
   welcomeMessage?: string;
 }
 
 export function ChatWidget({
+  mode = "crm",
   tenantSlug,
-  botName = "Asistente Virtual",
-  welcomeMessage,
+  botName: propBotName,
+  welcomeMessage: propWelcomeMessage,
 }: ChatWidgetProps) {
+  const [publicConfig, setPublicConfig] = useState<PublicConfig | null>(null);
+  const [configLoaded, setConfigLoaded] = useState(false);
+
+  const botName = publicConfig?.botName ?? propBotName ?? "Asistente Virtual";
+  const welcomeMessage = publicConfig?.welcomeMessage ?? propWelcomeMessage
+    ?? (mode === "landing"
+      ? "¡Hola! Soy el asistente virtual de la clínica. Consulta nuestros horarios, servicios y más."
+      : "¡Hola! Soy el asistente virtual. ¿En qué puedo ayudarte?");
+
   const { messages, isLoading, isOpen, sendMessage, toggleOpen, setIsOpen } =
-    useChatbot(tenantSlug, welcomeMessage);
+    useChatbot(mode, tenantSlug, welcomeMessage);
   const [input, setInput] = useState("");
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -30,6 +43,23 @@ export function ChatWidget({
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (mode === "landing" && tenantSlug) {
+      chatbotService.getPublicConfig(tenantSlug).then((res) => {
+        setPublicConfig(res);
+        setConfigLoaded(true);
+        if (res.contact?.whatsapp || res.contact?.phone) {
+          setContactInfo({
+            question: "contacto",
+            answer: res.contact.whatsapp ?? res.contact.phone ?? "",
+          });
+        }
+      }).catch(() => {
+        setConfigLoaded(true);
+      });
+    }
+  }, [mode, tenantSlug]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,6 +101,22 @@ export function ChatWidget({
             )}
             <div ref={messagesEndRef} />
           </div>
+
+          {/* Contact + WhatsApp */}
+          {contactInfo && (
+            <div className="border-t px-4 py-2 space-y-1">
+              <p className="text-xs text-muted-foreground">{contactInfo.answer}</p>
+              <a
+                href={`https://wa.me/${extractPhone(contactInfo.answer)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-primary hover:underline"
+              >
+                <Phone className="size-4" />
+                Contactar por WhatsApp
+              </a>
+            </div>
+          )}
 
           {/* Input */}
           <form onSubmit={handleSubmit} className="border-t p-3 flex gap-2">
@@ -119,4 +165,9 @@ function ChatBubble({ message }: { message: Message }) {
       </div>
     </div>
   );
+}
+
+function extractPhone(text: string): string {
+  const match = text.match(/\d{7,15}/);
+  return match ? match[0] : "";
 }

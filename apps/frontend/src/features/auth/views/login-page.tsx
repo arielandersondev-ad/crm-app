@@ -28,7 +28,7 @@ export function LoginPage() {
     return null;
   }
   return (
-    <main className="grid min-h-screen lg:grid-cols-2">
+    <main className="grid min-h-screen lg:grid-cols-2 login-background ">
       {/* Brand Panel */}
       <section className="relative hidden flex-col justify-between overflow-hidden bg-sidebar p-10 lg:flex">
         <div
@@ -42,13 +42,14 @@ export function LoginPage() {
         />
 
         <div className="relative flex items-center gap-2.5">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
-            <Orbit className="size-5.5 text-primary" />
-          </div>
-
-          <span className="text-lg font-semibold">
-            Sistema Oftalmológico
-          </span>
+          <Link href="/" className="flex items-center gap-2 font-semibold text-lg">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
+              <Orbit className="size-5 text-primary" />
+            </div>
+            <span className="font-semibold">
+              Sistema Oftalmológico
+            </span>
+          </Link>
         </div>
 
         <div className="relative space-y-6">
@@ -93,13 +94,15 @@ export function LoginPage() {
         <div className="w-full max-w-sm space-y-8">
           <div className="space-y-2 lg:hidden">
             <div className="flex items-center gap-2.5">
-              <div className="flex size-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
-                <Orbit className="size-5 text-primary" />
-              </div>
 
-              <span className="font-semibold">
-                Sistema Oftalmológico
-              </span>
+              <Link href="/" className="flex items-center gap-2 font-semibold text-lg">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
+                  <Orbit className="size-5 text-primary" />
+                </div>
+                <span className="font-semibold">
+                  Sistema Oftalmológico
+                </span>
+              </Link>
             </div>
           </div>
 

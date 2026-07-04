@@ -7,6 +7,7 @@ import {
   ShieldUser,
   FileText,
   HelpCircle,
+  Settings,
 } from "lucide-react";
 
 export interface NavItem {
@@ -32,11 +33,16 @@ export const navigation: NavItem[] = [
     href: "/dashboard/servicios",
     icon: Package,
   },
-  {
-    label: "Consultas",
+  /* {
+    label: "Consultas (Visitas)",
     href: "/dashboard/visitas",
     icon: Stethoscope,
-   },
+   }, */
+  {
+    label: "Consultas Clínicas",
+    href: "/dashboard/consultas",
+    icon: Stethoscope,
+  },
   {
     label: "Agenda / Controles",
     href: "/dashboard/agenda",
@@ -47,6 +53,12 @@ export const navigation: NavItem[] = [
     href: "/dashboard/reportes",
     icon: FileText,
     roles: ["ADMIN", "OWNER", "EMPLOYEE", "MANAGER"],
+  },
+  {
+    label: "Configuración",
+    href: "/dashboard/configuracion",
+    icon: Settings,
+    roles: ["ADMIN", "OWNER"],
   },
   {
     label: "FAQ Chatbot",

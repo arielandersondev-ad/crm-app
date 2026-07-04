@@ -8,4 +8,5 @@ export abstract class ConsultationRepository {
   abstract softDelete(id: string, tenantId: string): Promise<void>;
   abstract findById(id: string, tenantId: string): Promise<ConsultationEntity | null>;
   abstract findByClientId(clientId: string, tenantId: string): Promise<ConsultationEntity[]>;
+  abstract findAllByTenant(tenantId: string): Promise<any[]>;
 }

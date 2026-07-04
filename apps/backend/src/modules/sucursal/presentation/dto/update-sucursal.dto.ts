@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class UpdateSucursalDto {
   @IsNotEmpty()
@@ -28,4 +28,16 @@ export class UpdateSucursalDto {
   @IsOptional()
   @IsString()
   timezone?: string;
+
+  @IsOptional()
+  @IsNumber()
+  avgConsultationMinutes?: number;
+
+  @IsOptional()
+  @IsNumber()
+  intervalBetweenAppointments?: number;
+
+  @IsOptional()
+  @IsNumber()
+  autoNoShowMinutes?: number;
 }

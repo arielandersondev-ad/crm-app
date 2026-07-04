@@ -13,4 +13,20 @@ export class UpdateTenantDto {
   @IsOptional()
   @IsEnum(Plan)
   plan?: Plan;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  whatsapp?: string;
+
+  @IsOptional()
+  @IsString()
+  timezone?: string;
 }

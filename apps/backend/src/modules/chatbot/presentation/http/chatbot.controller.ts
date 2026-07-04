@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Get, Patch, Delete, Param, UseGuards, NotFoundException } from "@nestjs/common";
+import { Body, Controller, Post, Get, Patch, Delete, Param, UseGuards, NotFoundException, Query } from "@nestjs/common";
 import { JwtAuthGuard } from "../../../auth/infrastructure/security/jwt-auth.guard";
 import { RolesGuard } from "../../../../common/guards/roles.guard";
 import { Roles } from "../../../../common/decorators/roles.decorator";
 import { CurrentUser } from "../../../../common/decorators/current-user.decorator";
 import { TenantRepository } from "../../../tenant/domain/repositories/tenant.repository";
+import { GeneralConfigurationRepository } from "../../../general-configuration/domain/repositories/general-configuration.repository";
 import { ChatQueryUseCase } from "../../application/use-cases/chat-query.use-case";
 import { CreateFaqUseCase } from "../../application/use-cases/create-faq.use-case";
 import { UpdateFaqUseCase } from "../../application/use-cases/update-faq.use-case";
@@ -17,6 +18,7 @@ import { CreateFaqDto } from "./dto/create-faq.dto";
 import { UpdateFaqDto } from "./dto/update-faq.dto";
 import { UpdateBotConfigDto } from "./dto/update-bot-config.dto";
 import { ReindexFaqsUseCase } from "../../application/use-cases/reindex-faqs.use-case";
+import { FaqRepository } from "../../domain/repositories/faq.repository";
 
 @Controller("chatbot")
 export class ChatbotController {
@@ -29,13 +31,13 @@ export class ChatbotController {
     private readonly getBotConfigUseCase: GetBotConfigUseCase,
     private readonly updateBotConfigUseCase: UpdateBotConfigUseCase,
     private readonly tenantRepo: TenantRepository,
-    
+    private readonly faqRepo: FaqRepository,
     private readonly reindexFaqsUseCase: ReindexFaqsUseCase,
+    private readonly generalConfigRepo: GeneralConfigurationRepository,
   ) {}
 
   @Post("query")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  //@Roles("ADMIN", "OWNER", "MANAGER")
   async query(
     @Body() dto: ChatQueryDto,
     @CurrentUser("tenantId") tenantId: string,
@@ -48,9 +50,6 @@ export class ChatbotController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "OWNER")
   async reindexFaqs(@CurrentUser("tenantId") tenantId: string) {
-    // 1. Buscar FAQs del tenant con embedding = null
-    // 2. Para cada una, generar embedding con EmbeddingService
-    // 3. Actualizar el registro
     return this.reindexFaqsUseCase.execute(tenantId);
   }
 
@@ -61,6 +60,47 @@ export class ChatbotController {
       throw new NotFoundException("Tenant no encontrado");
     }
     return this.chatQueryUseCase.execute(dto.question, tenant.id);
+  }
+
+  @Get("public/contact/:tenantSlug")
+  async publicContact(@Param("tenantSlug") tenantSlug: string) {
+    const tenant = await this.tenantRepo.findBySlug(tenantSlug);
+    if (!tenant) {
+      throw new NotFoundException("Tenant no encontrado");
+    }
+    const faqs = await this.faqRepo.findActiveByTenant(tenant.id);
+    const contactFaq = faqs.find(
+      (f) => f.category === "CONTACTO" || /contacto/i.test(f.question),
+    );
+    return {
+      contact: contactFaq
+        ? { question: contactFaq.question, answer: contactFaq.answer }
+        : null,
+    };
+  }
+
+  @Get("public/config/:tenantSlug")
+  async publicConfig(@Param("tenantSlug") tenantSlug: string) {
+    const tenant = await this.tenantRepo.findBySlug(tenantSlug);
+    if (!tenant) {
+      throw new NotFoundException("Tenant no encontrado");
+    }
+
+    const [generalConfig, botConfig] = await Promise.all([
+      this.generalConfigRepo.findByTenantId(tenant.id),
+      this.getBotConfigUseCase.execute(tenant.id),
+    ]);
+
+    return {
+      botName: generalConfig?.botName ?? (botConfig as any)?.botName ?? "Asistente Virtual",
+      welcomeMessage: generalConfig?.welcomeMessage ?? "¡Hola! Soy el asistente virtual. ¿En qué puedo ayudarte?",
+      disclaimer: generalConfig?.disclaimer ?? "",
+      contact: {
+        phone: tenant.phone,
+        email: tenant.email,
+        whatsapp: tenant.whatsapp,
+      },
+    };
   }
 
   @Get("faqs")

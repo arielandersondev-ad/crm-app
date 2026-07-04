@@ -20,7 +20,7 @@ export function AppShell({ children }: AppShellProps) {
           {children}
         </main>
       </div>
-      <ChatWidget />
+      <ChatWidget mode="crm" />
     </div>
   );
 }

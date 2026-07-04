@@ -43,6 +43,17 @@ export function AppointmentDetailModal({open, mode, loading, details, onStartCon
           onSubmit({ status: selectedStatus });
         }}
       >
+        {details?.appointmentCode && (
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-4 text-center">
+            <label className="block text-xs text-muted-foreground mb-1">Código de cita</label>
+            <span className="text-lg font-bold tracking-wider text-primary">
+              {details.appointmentCode}
+            </span>
+            <p className="text-xs text-muted-foreground mt-1">
+              Comparta este código al paciente para que consulte el estado de su cita
+            </p>
+          </div>
+        )}
         <div className="space-y-4 grid grid-cols-2 gap-2">
           <div>
             <label className="block mb-1 text-muted-foreground">Paciente</label>

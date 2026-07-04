@@ -18,6 +18,8 @@ import { ConsultationModule } from './modules/consultation/consultation.module';
 import { RefractionModule } from './modules/refraction/refraction.module';
 import { ReportModule } from './modules/reports/report.module';
 import { ChatbotModule } from './modules/chatbot/chatbot.module';
+import { GeneralConfigurationModule } from './modules/general-configuration/general-configuration.module';
+import { BranchScheduleModule } from './modules/branch-schedule/branch-schedule.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { ChatbotModule } from './modules/chatbot/chatbot.module';
     RefractionModule,
     ReportModule,
     ChatbotModule,
+    GeneralConfigurationModule,
+    BranchScheduleModule,
   ],       
   controllers: [],
   providers: [],

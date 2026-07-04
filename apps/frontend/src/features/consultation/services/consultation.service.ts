@@ -3,6 +3,11 @@ import type { Consultation, CreateConsultationDto, UpdateConsultationDto, Upsert
 import { ENDPOINTS } from "../api/endpoints";
 
 class ConsultationService {
+  async findAll(): Promise<any[]> {
+    const response = await api.get(ENDPOINTS.GET_ALL);
+    return response.data;
+  }
+
   async create(dto: CreateConsultationDto): Promise<Consultation> {
     const response = await api.post(ENDPOINTS.CREATE, dto);
     return response.data;

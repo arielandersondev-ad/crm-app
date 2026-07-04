@@ -8,6 +8,10 @@ export class UpdateSucursalUseCase {
     private readonly sucursalRepository: SucursalRepository,
   ) {}
   async execute(id: string, dto: UpdateSucursalDto) {
-    return this.sucursalRepository.update(id, dto.name, dto.direccion, dto.latitude, dto.longitude, dto.telefono, dto.correo, dto.timezone);
+    return this.sucursalRepository.update(
+      id, dto.name, dto.direccion, dto.latitude, dto.longitude,
+      dto.telefono, dto.correo, dto.timezone,
+      dto.avgConsultationMinutes, dto.intervalBetweenAppointments, dto.autoNoShowMinutes,
+    );
   }
 }

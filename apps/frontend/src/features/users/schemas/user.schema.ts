@@ -1,13 +1,12 @@
 import z from "zod";
 
-export const UserSchema = z.object({
-  id: z.string(),
+export const CreateUserSchema = z.object({
   email: z.string().email("Email inválido").min(1, "Email es obligatorio"),
-  password: z.string().min(8,'La contraseña debe tener al menos 8 caracteres').or(z.literal('')),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
   firstName: z.string().min(1, "Nombre es obligatorio"),
   lastName: z.string().min(1, "Apellido es obligatorio"),
   role: z.string().min(1, "Rol es obligatorio"),
-  sucursalId: z.string().min(1, "sucursal es requerido"),
+  sucursalId: z.string().min(1, "Sucursal es requerida"),
 });
 export const EditUserSchema = z.object({
   id: z.string(),
@@ -17,7 +16,8 @@ export const EditUserSchema = z.object({
   role: z.string().min(1),
   sucursalId: z.string().min(1),
 });
-export type UserFormData = z.infer<typeof UserSchema>;
+export type CreateUserFormData = z.infer<typeof CreateUserSchema>;
+export type EditUserFormData = z.infer<typeof EditUserSchema>;
 
 export const ChangePasswordSchema = z
   .object({

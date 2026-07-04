@@ -15,23 +15,25 @@ import { ClientModal } from "../components/cliente-modal";
 import { Client } from "../types/client";
 import { DeleteClientDialog } from "../components/delete-cliente-dialog";
 import { toast } from "sonner";
-import { VisitModal } from "@/features/visits/components/visit-modal";
-import { useCreateVisit, useVisits } from "@/features/visits/hooks/use-visits";
+import { useCreateConsultation, useUpsertRefraction } from "@/features/consultation/hooks/use-consultation";
+import { ConsultationModal } from "@/features/consultation/components/consultation-modal";
 
 export function ClientsPage() {
   const { data: clients, isLoading, isError } = useClients();
-  const { data: visits, isLoading: visitsLoading, isError: visitsIsError } = useVisits();
   const createClientMutation = useCreateClient();
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
-  const createVisitMutation = useCreateVisit();
   const createPatientProfileMutation = useCreatePatientProfile();
   const updatePatientProfileMutation = useUpdatePatientProfile();
+  const createConsultationMutation = useCreateConsultation();
+  const upsertRefractionMutation = useUpsertRefraction();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isVisitOpen, setIsVisitOpen] = useState<Client | null>(null);
   const [deleteClient, setDeleteClient] = useState('');
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [consultClientId, setConsultClientId] = useState("");
+  const [consultClientName, setConsultClientName] = useState("");
+  const [consultModalOpen, setConsultModalOpen] = useState(false);
 
   const { data: editingPatientProfile } = usePatientProfile(editingClient?.id);
 
@@ -78,7 +80,11 @@ export function ClientsPage() {
           clients={clients}
           onEdit={(client) => setEditingClient(client)}
           onDelete={(client) => setDeleteClient(client.id)}
-          onVisit={(client) => setIsVisitOpen({id:client.id,fullName:client.fullName})}
+          onVisit={(client) => {
+            setConsultClientId(client.id);
+            setConsultClientName(client.fullName);
+            setConsultModalOpen(true);
+          }}
         />
       )}
       <ClientModal
@@ -149,22 +155,48 @@ export function ClientsPage() {
         }}
         loading={deleteClientMutation.isPending}
       />
-      <VisitModal
-        open={!!isVisitOpen}
-        mode= 'create'
-        client={isVisitOpen || undefined}
-        onClose={() => setIsVisitOpen(null)}
-        onSubmit={async (data) => {
-          if (!isVisitOpen) return;
-          await createVisitMutation.mutateAsync({
+      <ConsultationModal
+        open={consultModalOpen}
+        mode="create"
+        clientId={consultClientId}
+        clientName={consultClientName}
+        loading={createConsultationMutation.isPending}
+        onClose={() => {
+          setConsultModalOpen(false);
+          setConsultClientId("");
+          setConsultClientName("");
+        }}
+        onSubmit={async (data: any) => {
+          const consultation = await createConsultationMutation.mutateAsync({
             clientId: data.clientId,
-            userId: data.userId,
-            appointmentId: data.appointmentId,
-            status: data.status,
-            notes: data.notes
+            motivo: data.motivo,
+            diagnostico: data.diagnostico,
+            observaciones: data.observaciones,
+            nextControlAt: data.nextControlAt || undefined,
+            consultationDate: data.consultationDate || undefined,
           });
-          toast.success('Consulta creada correctamente');
-          setIsVisitOpen(null);
+          const refractionFields = [
+            "odLejosEsf","odLejosCil","odLejosEje","odLejosAv",
+            "oiLejosEsf","oiLejosCil","oiLejosEje","oiLejosAv",
+            "lejosDip","odCercaEsf","odCercaCil","odCercaEje","odCercaAv",
+            "oiCercaEsf","oiCercaCil","oiCercaEje","oiCercaAv",
+            "cercaDip","add",
+          ];
+          const refraction: any = {};
+          let hasValues = false;
+          for (const field of refractionFields) {
+            if (data[field] !== undefined && data[field] !== "") {
+              refraction[field] = data[field];
+              hasValues = true;
+            }
+          }
+          if (hasValues) {
+            await upsertRefractionMutation.mutateAsync({ consultationId: consultation.id, dto: refraction });
+          }
+          toast.success("Consulta registrada correctamente");
+          setConsultModalOpen(false);
+          setConsultClientId("");
+          setConsultClientName("");
         }}
       />
     </PageContainer>

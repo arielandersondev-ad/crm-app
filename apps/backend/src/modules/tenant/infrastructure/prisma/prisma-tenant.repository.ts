@@ -10,65 +10,46 @@ export class PrismaTenantRepository implements TenantRepository {
 
   async findAll(): Promise<Tenant[]> {
     const tenants = await this.prisma.tenant.findMany();
-    return tenants.map((tenant) => new Tenant(
-      tenant.id,
-      tenant.name,
-      tenant.slug,
-      tenant.plan,
-      tenant.createdAt,
-      tenant.updatedAt,
-    ));
+    return tenants.map((t) => this.toEntity(t));
   }
 
   async findOne(id: string): Promise<Tenant | null> {
-    const tenant = await this.prisma.tenant.findUnique({
-      where: { id },
-    });
+    const tenant = await this.prisma.tenant.findUnique({ where: { id } });
     if (!tenant) return null;
-    return new Tenant(
-      tenant.id,
-      tenant.name,
-      tenant.slug,
-      tenant.plan,
-      tenant.createdAt,
-      tenant.updatedAt,
-    );
+    return this.toEntity(tenant);
   }
 
   async findBySlug(slug: string): Promise<Tenant | null> {
-    const tenant = await this.prisma.tenant.findUnique({
-      where: { slug },
-    });
+    const tenant = await this.prisma.tenant.findUnique({ where: { slug } });
     if (!tenant) return null;
-    return new Tenant(
-      tenant.id,
-      tenant.name,
-      tenant.slug,
-      tenant.plan,
-      tenant.createdAt,
-      tenant.updatedAt,
-    );
+    return this.toEntity(tenant);
   }
 
   async create(tx: Prisma.TransactionClient, name: string, plan: Plan = Plan.FREE, slug?: string): Promise<Tenant> {
     const tenant = await tx.tenant.create({
       data: { name, plan, slug },
     });
-    return tenant;
+    return this.toEntity(tenant);
   }
 
-  async update(id: string, name?: string, plan?: Plan, slug?: string): Promise<Tenant> {
+  async update(id: string, name?: string, plan?: Plan, slug?: string, phone?: string, email?: string, whatsapp?: string, timezone?: string): Promise<Tenant> {
     const tenant = await this.prisma.tenant.update({
       where: { id },
-      data: { name, plan, slug },
+      data: { name, plan, slug, phone, email, whatsapp, timezone },
     });
-    return tenant;
+    return this.toEntity(tenant);
   }
 
   async delete(id: string): Promise<Tenant> {
-    const tenant = await this.prisma.tenant.delete({
-      where: { id },
-    });
-    return tenant;
+    const tenant = await this.prisma.tenant.delete({ where: { id } });
+    return this.toEntity(tenant);
+  }
+
+  private toEntity(t: any): Tenant {
+    return new Tenant(
+      t.id, t.name, t.slug, t.plan,
+      t.phone, t.email, t.whatsapp, t.timezone,
+      t.createdAt, t.updatedAt,
+    );
   }
 }
