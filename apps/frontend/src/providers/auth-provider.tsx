@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { getSession } from "@/infrastructure/auth";
 import { useAuthStore } from "@/stores/auth.store";
-import { api } from "@/infrastructure/api/axios";
+import { api, initApi } from "@/infrastructure/api/axios";
 
 export function AuthProvider({
   children,
@@ -21,6 +21,8 @@ export function AuthProvider({
   const isPublicPage = pathname === "/" || pathname === "/login";
 
   useEffect(() => {
+    initApi();
+
     if (isPublicPage) {
       setIsLoading(false);
       return;

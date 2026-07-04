@@ -1,5 +1,4 @@
 import axios from "axios";
-import { setupInterceptors } from "./interceprtors";
 
 import { env } from "../config/env";
 
@@ -12,4 +11,12 @@ export const api = axios.create({
   }
 })
 
-setupInterceptors() // personalmente prefiero evitar dependencias circulares y hacerlo desde un provider de infraestructura más adelante. (recuerdame cambiarlo en un futuro)
+let interceptorsReady = false;
+
+export function initApi() {
+  if (interceptorsReady) return;
+  interceptorsReady = true;
+
+  const { setupInterceptors } = require("./interceprtors");
+  setupInterceptors();
+}
