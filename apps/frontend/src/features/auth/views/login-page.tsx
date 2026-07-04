@@ -28,7 +28,7 @@ export function LoginPage() {
     return null;
   }
   return (
-    <main className="grid min-h-screen lg:grid-cols-2">
+    <main className="grid min-h-screen lg:grid-cols-2 login-background ">
       {/* Brand Panel */}
       <section className="relative hidden flex-col justify-between overflow-hidden bg-sidebar p-10 lg:flex">
         <div
@@ -42,18 +42,19 @@ export function LoginPage() {
         />
 
         <div className="relative flex items-center gap-2.5">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
-            <Orbit className="size-5.5 text-primary" />
-          </div>
-
-          <span className="text-lg font-semibold">
-            Alto's System
-          </span>
+          <Link href="/" className="flex items-center gap-2 font-semibold text-lg">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
+              <Orbit className="size-5 text-primary" />
+            </div>
+            <span className="font-semibold">
+              Sistema Oftalmológico
+            </span>
+          </Link>
         </div>
 
         <div className="relative space-y-6">
           <h1 className="max-w-md text-balance text-3xl font-semibold leading-tight tracking-tight">
-            La plataforma para gestionar visitas.
+            Plataforma para la gestión oftalmológica.
           </h1>
 
           <ul className="space-y-3 text-sm text-muted-foreground">
@@ -62,7 +63,7 @@ export function LoginPage() {
                 <Users className="size-4" />
               </span>
 
-              Clientes, mascotas y expedientes en un solo lugar
+              Pacientes, historial clínico y consultas en un solo lugar
             </li>
 
             <li className="flex items-center gap-3">
@@ -70,7 +71,7 @@ export function LoginPage() {
                 <Activity className="size-4" />
               </span>
 
-              Agenda, inventario y ventas conectados
+              Agenda de citas, controles y seguimiento
             </li>
 
             <li className="flex items-center gap-3">
@@ -84,7 +85,7 @@ export function LoginPage() {
         </div>
 
         <p className="relative text-xs text-muted-foreground">
-          © 2026 Alto's System. Todos los derechos reservados.
+          © 2026 Sistema Oftalmológico. Todos los derechos reservados.
         </p>
       </section>
 
@@ -93,13 +94,15 @@ export function LoginPage() {
         <div className="w-full max-w-sm space-y-8">
           <div className="space-y-2 lg:hidden">
             <div className="flex items-center gap-2.5">
-              <div className="flex size-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
-                <Orbit className="size-5 text-primary" />
-              </div>
 
-              <span className="font-semibold">
-                Alto's System
-              </span>
+              <Link href="/" className="flex items-center gap-2 font-semibold text-lg">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
+                  <Orbit className="size-5 text-primary" />
+                </div>
+                <span className="font-semibold">
+                  Sistema Oftalmológico
+                </span>
+              </Link>
             </div>
           </div>
 

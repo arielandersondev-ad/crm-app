@@ -141,7 +141,7 @@ export function AgendaBoard({data, onSelected}: AgendaBoardProps) {
           <AgendaDiaView 
             appointments={citasDelDia} 
             onSelected={(cita)=>{
-              console.log('[AgendaBoard → DiaView] Cita recibida:', { id: cita.id, cliente: cita.clientFullName, hora: cita.hora });
+              //console.log('[AgendaBoard → DiaView] Cita recibida:', { id: cita.id, cliente: cita.clientFullName, hora: cita.hora });
               onSelected(cita);
             }}
             />
@@ -170,32 +170,23 @@ export function AgendaBoard({data, onSelected}: AgendaBoardProps) {
 
       <div className="space-y-4">
         <Card className="gap-3 p-5">
-          <h3 className="font-semibold">Veterinarios hoy</h3>
-          <ul className="space-y-3">
-            {[
-              { nombre: 'Dra. Reyes', citas: 3, color: 'bg-chart-1' },
-              { nombre: 'Dr. Vargas', citas: 3, color: 'bg-chart-2' },
-            ].map((v) => (
-              <li key={v.nombre} className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <span className={cn('size-2.5 rounded-full', v.color)} />
-                  {v.nombre}
-                </span>
-                <span className="text-muted-foreground">{v.citas} citas</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-
-        <Card className="gap-3 p-5">
           <h3 className="font-semibold">Resumen del día</h3>
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between"><dt className="text-muted-foreground">Total citas</dt><dd className="font-medium">6</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Completadas</dt><dd className="font-medium text-success">1</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">En curso</dt><dd className="font-medium text-primary">1</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Pendientes</dt><dd className="font-medium text-warning">2</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Confirmadas</dt><dd className="font-medium">2</dd></div>
-          </dl>
+          {(() => {
+            const total = citasDelDia.length
+            const atendidas = citasDelDia.filter((c) => c.status === 'COMPLETED').length
+            const pendientes = citasDelDia.filter((c) => c.status === 'PENDING').length
+            const confirmadas = citasDelDia.filter((c) => c.status === 'CONFIRMED').length
+            const canceladas = citasDelDia.filter((c) => c.status === 'CANCELLED' || c.status === 'NO_SHOW').length
+            return (
+              <dl className="space-y-2 text-sm">
+                <div className="flex justify-between"><dt className="text-muted-foreground">Total citas</dt><dd className="font-medium">{total}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Atendidas</dt><dd className="font-medium text-success">{atendidas}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Confirmadas</dt><dd className="font-medium text-primary">{confirmadas}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Pendientes</dt><dd className="font-medium text-warning">{pendientes}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Canceladas / No asistió</dt><dd className="font-medium text-destructive">{canceladas}</dd></div>
+              </dl>
+            )
+          })()}
         </Card>
       </div>
     </div>

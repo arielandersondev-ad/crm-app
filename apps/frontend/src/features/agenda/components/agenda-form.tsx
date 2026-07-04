@@ -13,7 +13,7 @@ export function AgendaForm({ mode, currentClient, register}: AgendaFormProps) {
     <div className="space-y-4 flex flex-row justify-evenly gap-2">
       {currentClient!==null && 
         <div className="flex flex-col justify-center">
-          <label className="block mb-1 text-muted-foreground">Cliente</label>
+          <label className="block mb-1 text-muted-foreground">Paciente</label>
           <input disabled readOnly className="w-full border rounded-md p-2" value={currentClient?.fullName?.toUpperCase()} />
         </div>
       }

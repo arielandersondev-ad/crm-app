@@ -11,5 +11,6 @@ export class CitaEntity {
     public readonly status: AppointmentStatus,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
+    public readonly appointmentCode?: string,
   ){}
 }

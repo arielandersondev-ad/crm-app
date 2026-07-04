@@ -22,11 +22,11 @@ export function VisitInfoSection({ visit }: VisitInfoSectionProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Cliente y Profesional */}
+      {/* Paciente y Profesional */}
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            👤 Cliente
+            👤 Paciente
           </CardTitle>
         </CardHeader>
         <CardContent>

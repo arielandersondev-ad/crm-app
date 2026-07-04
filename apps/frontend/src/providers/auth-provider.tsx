@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { getSession } from "@/infrastructure/auth";
 import { useAuthStore } from "@/stores/auth.store";
+import { api } from "@/infrastructure/api/axios";
 
 export function AuthProvider({
   children,
@@ -15,8 +17,15 @@ export function AuthProvider({
   const setTenant = useAuthStore((s) => s.setTenant);
   const setBranch = useAuthStore((s) => s.setBranch);
   const logout = useAuthStore((s) => s.logout);
+  const pathname = usePathname();
+  const isPublicPage = pathname === "/" || pathname === "/login";
 
   useEffect(() => {
+    if (isPublicPage) {
+      setIsLoading(false);
+      return;
+    }
+
     async function loadSession() {
       try {
         const session = await getSession();
@@ -25,14 +34,22 @@ export function AuthProvider({
         setTenant(session.tenant);
         setBranch(session.sucursal ?? session.branch);
       } catch {
-        logout()
+        try {
+          await api.post("/auth/refresh");
+          const session = await getSession();
+          setUser(session.user);
+          setTenant(session.tenant);
+          setBranch(session.sucursal ?? session.branch);
+        } catch {
+          logout();
+        }
       } finally {
         setIsLoading(false);
       }
     }
 
     loadSession();
-  }, [setUser, setTenant, setBranch, logout]);
+  }, [setUser, setTenant, setBranch, logout, isPublicPage]);
 
   if (isLoading) {
     return null;

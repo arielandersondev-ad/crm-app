@@ -1,0 +1,27 @@
+export class RefractionEntity {
+  constructor(
+    public readonly id: string,
+    public readonly consultationId: string,
+    public readonly odLejosEsf: number | null,
+    public readonly odLejosCil: number | null,
+    public readonly odLejosEje: number | null,
+    public readonly odLejosAv: string | null,
+    public readonly oiLejosEsf: number | null,
+    public readonly oiLejosCil: number | null,
+    public readonly oiLejosEje: number | null,
+    public readonly oiLejosAv: string | null,
+    public readonly lejosDip: number | null,
+    public readonly odCercaEsf: number | null,
+    public readonly odCercaCil: number | null,
+    public readonly odCercaEje: number | null,
+    public readonly odCercaAv: string | null,
+    public readonly oiCercaEsf: number | null,
+    public readonly oiCercaCil: number | null,
+    public readonly oiCercaEje: number | null,
+    public readonly oiCercaAv: string | null,
+    public readonly cercaDip: number | null,
+    public readonly add: number | null,
+    public readonly createdAt: Date,
+    public readonly updatedAt: Date,
+  ) {}
+}

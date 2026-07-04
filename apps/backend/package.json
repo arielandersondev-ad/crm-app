@@ -11,13 +11,15 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -27,6 +29,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "6.19.3",
+    "@xenova/transformers": "^2.17.2",
     "bcrypt": "^6.0.0",
     "bcrypt-ts": "^8.0.1",
     "class-transformer": "^0.5.1",
@@ -35,6 +38,7 @@
     "luxon": "^3.7.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "pdfmake": "^0.2.20",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -83,5 +87,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }

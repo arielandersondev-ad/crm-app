@@ -10,5 +10,8 @@ export class Sucursal {
     public correo: string | null,
     public isDefault: boolean = false,
     public timezone: string = 'America/La_Paz',
+    public avgConsultationMinutes: number = 30,
+    public intervalBetweenAppointments: number = 5,
+    public autoNoShowMinutes: number = 30,
   ) {}
 }

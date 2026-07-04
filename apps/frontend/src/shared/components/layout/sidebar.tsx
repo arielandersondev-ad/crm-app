@@ -5,13 +5,19 @@ import { usePathname } from "next/navigation";
 
 import { navigation } from "@/constants/navigation";
 import { useUIStore } from "@/stores/ui.store";
+import { useAuthStore } from "@/stores/auth.store";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const userRole = useAuthStore((s) => s.user?.role);
 
   const sidebarOpen = useUIStore(
     (state) => state.sidebarOpen
   );
+
+  const visibleNav = userRole
+    ? navigation.filter((item) => !item.roles || item.roles.includes(userRole))
+    : navigation;
 
   return (
     <aside
@@ -21,11 +27,11 @@ export function Sidebar() {
       `}
     >
       <div className="flex h-16 items-center px-4 font-bold">
-        {sidebarOpen ? "Alto's System" : "AS"}
+        {sidebarOpen ? "Sistema Oftalmológico" : "SO"}
       </div>
 
       <nav className="space-y-1 p-2">
-        {navigation.map((item) => {
+        {visibleNav.map((item) => {
           const Icon = item.icon;
 
           const active =

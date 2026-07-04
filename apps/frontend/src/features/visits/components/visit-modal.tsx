@@ -45,15 +45,15 @@ export function VisitModal({ client, open, mode, visit, loading, onClose, onSubm
     reset({
       clientId: client?.id || ''
     });
-    console.log('[VisitModal] reset form en create mode con client:', { id: client?.id, nombre: client?.fullName });
+    //console.log('[VisitModal] reset form en create mode con client:', { id: client?.id, nombre: client?.fullName });
   }, [mode, visit, client, reset]);
   
   return(
     <Modal
       open={open}
       onClose={onClose}
-      title={mode === "create" ? "Crear visita" : "Editar visita"}
-      description={mode === "create" ? "Ingrese los detalles de la visita" : "Actualice los detalles de la visita"}
+      title={mode === "create" ? "Nueva consulta" : "Editar consulta"}
+      description={mode === "create" ? "Ingrese los detalles de la consulta" : "Actualice los detalles de la consulta"}
     >
       <form
         onSubmit={handleSubmit(

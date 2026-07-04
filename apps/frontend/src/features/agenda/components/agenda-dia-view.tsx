@@ -1,12 +1,12 @@
 'use client'
 
 import { Clock, User } from 'lucide-react'
+import Link from 'next/link'
 
 import { StatusBadge } from '@/shared/components/status-badge'
 import { cn } from '@/shared/utils/utils'
 
 import { Details } from '../types/interfaces'
-import { Button } from '@/shared/components/ui/button'
 
 const horas = [
   '09:00',
@@ -19,12 +19,12 @@ const horas = [
   '16:00',
 ]
 
-const tipoColor: Record<string, string> = {
-  'Consulta general': 'border-l-chart-1',
-  'Control tratamiento': 'border-l-chart-2',
-  Radiografía: 'border-l-chart-3',
-  'Cirugía menor': 'border-l-chart-5',
-  Vacunación: 'border-l-chart-4',
+const statusColor: Record<string, string> = {
+  PENDING: 'border-l-warning',
+  CONFIRMED: 'border-l-primary',
+  COMPLETED: 'border-l-success',
+  CANCELLED: 'border-l-destructive',
+  NO_SHOW: 'border-l-destructive',
 }
 
 interface Props {
@@ -53,22 +53,23 @@ export function AgendaDiaView({ appointments,onSelected }: Props) {
                 enHora.map((c) => (
                   <div
                     key={c.id}
-                    onClick={()=>{
-                      console.log('[AgendaDiaView] onClick → onSelected con:', { id: c.id, cliente: c.clientFullName, hora: c.hora, status: c.status, citaCompleta: c });
-                      onSelected(c);
-                    }}
+                    onClick={() => onSelected(c)}
                     className={cn(
-                      'rounded-md border border-l-4 border-border bg-secondary/40 p-3',
-                      tipoColor[c.status] ?? 'border-l-primary',
+                      'rounded-md border border-l-4 border-border bg-secondary/40 p-3 cursor-pointer hover:bg-secondary/60 transition-colors',
+                      statusColor[c.status] ?? 'border-l-primary',
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
+                          <Link
+                            href={`/dashboard/clientes/${c.clientId}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-1 hover:text-primary transition-colors"
+                          >
                             <User className="size-3" />
                             {c.clientFullName}
-                          </span>
+                          </Link>
 
                           <span className="flex items-center gap-1">
                             <Clock className="size-3" />

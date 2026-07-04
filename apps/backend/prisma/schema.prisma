@@ -35,6 +35,16 @@ enum BusinessType {
   BARBER_SHOP
 }
 
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
 enum ClientType {
   PERSON
   COMPANY
@@ -72,14 +82,23 @@ enum PaymentStatus {
 model Tenant {
   id   String @id @default(uuid()) @db.Uuid
   name String
+  slug String? @unique
   plan Plan   @default(FREE)
 
   businessType BusinessType @default(GENERIC)
+
+  phone    String?
+  email    String?
+  whatsapp String?
+  timezone String @default("America/La_Paz")
 
   isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  consultations Consultation[]
+  auditLogs AuditLog[]
 
   memberships Membership[]
   sucursales  Sucursal[]
@@ -88,6 +107,11 @@ model Tenant {
   services     Service[]
   appointments Appointment[]
   visits       Visit[]
+
+  faqs       FAQ[]
+  botConfigs BotConfig[]
+  chatLogs   ChatLog[]
+  generalConfiguration GeneralConfiguration?
 }
 
 model User {
@@ -104,11 +128,16 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  consultations Consultation[]
+  auditLogs AuditLog[]
+
   memberships  Membership[]
   sessions     Session[]
   sucursales   UserSucursal[]
   appointments Appointment[]
   visits       Visit[]
+  
+  chatLogs   ChatLog[]
 }
 
 model Membership {
@@ -154,6 +183,10 @@ model Sucursal {
   isDefault Boolean @default(false)
   isActive  Boolean @default(true)
 
+  avgConsultationMinutes     Int @default(30)
+  intervalBetweenAppointments Int @default(5)
+  autoNoShowMinutes           Int @default(30)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -164,7 +197,8 @@ model Sucursal {
   visits       Visit[]
   payments     Payment[]
 
-  services BranchService[]
+  services   BranchService[]
+  schedules  BranchSchedule[]
 
   @@unique([tenantId, name])
   @@index([tenantId])
@@ -209,6 +243,8 @@ model Client {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  patientProfile PatientProfile?
+  consultations Consultation[]
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   appointments Appointment[]
@@ -260,9 +296,10 @@ model BranchService {
 }
 
 model Appointment {
-  id String @id @default(uuid()) @db.Uuid
+  id              String            @id @default(uuid()) @db.Uuid
+  appointmentCode String?            @unique
 
-  tenantId String @db.Uuid
+  tenantId       String            @db.Uuid
 
   sucursalId String @db.Uuid
 
@@ -275,6 +312,8 @@ model Appointment {
   status AppointmentStatus @default(PENDING)
 
   visit Visit?
+
+  consultation Consultation?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -325,6 +364,8 @@ model Visit {
 
   startedAt DateTime? 
   completedAt DateTime? 
+
+  consultation Consultation?
   
   details VisitDetail[]
 
@@ -394,4 +435,238 @@ model Payment {
   @@index([visitId])
   @@index([sucursalId])
   @@index([paidAt])
+}
+
+// ============================================
+// MODELOS CLÍNICOS — Sprint 1
+// ============================================
+
+model PatientProfile {
+  id                   String   @id @default(uuid()) @db.Uuid
+  clientId             String   @unique @db.Uuid
+  antecedentes         String?
+  alergias             String?
+  observaciones        String?
+  contactoEmergencia   String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+enum ConsultationStatus {
+  DRAFT
+  COMPLETED
+  CANCELLED
+}
+
+model Consultation {
+  id                String             @id @default(uuid()) @db.Uuid
+  tenantId          String             @db.Uuid
+  clientId          String             @db.Uuid
+  userId            String             @db.Uuid
+  visitId           String?            @unique @db.Uuid
+  appointmentId     String?            @unique @db.Uuid
+
+  consultationDate  DateTime           @default(now())
+  status            ConsultationStatus @default(DRAFT)
+
+  motivo            String
+  diagnostico       String?
+  observaciones     String?
+  nextControlAt     DateTime?
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  tenant      Tenant          @relation(fields: [tenantId], references: [id])
+  client      Client          @relation(fields: [clientId], references: [id])
+  user        User            @relation(fields: [userId], references: [id])
+  visit       Visit?          @relation(fields: [visitId], references: [id])
+  appointment Appointment?   @relation(fields: [appointmentId], references: [id])
+  refraction  Refraction?
+
+  @@index([tenantId])
+  @@index([clientId])
+  @@index([userId])
+  @@index([tenantId, consultationDate])
+  @@index([tenantId, userId, consultationDate])
+  @@index([tenantId, clientId, consultationDate])
+}
+
+model Refraction {
+
+  id String @id @default(uuid()) @db.Uuid
+
+  consultationId String @unique @db.Uuid
+
+  // ---------- LEJOS ----------
+
+  odLejosEsf Decimal? @db.Decimal(5,2)
+  odLejosCil Decimal? @db.Decimal(5,2)
+  odLejosEje Int?
+  odLejosAv String?
+
+  oiLejosEsf Decimal? @db.Decimal(5,2)
+  oiLejosCil Decimal? @db.Decimal(5,2)
+  oiLejosEje Int?
+  oiLejosAv String?
+
+  lejosDip Decimal? @db.Decimal(5,2)
+
+  // ---------- CERCA ----------
+
+  odCercaEsf Decimal? @db.Decimal(5,2)
+  odCercaCil Decimal? @db.Decimal(5,2)
+  odCercaEje Int?
+  odCercaAv String?
+
+  oiCercaEsf Decimal? @db.Decimal(5,2)
+  oiCercaCil Decimal? @db.Decimal(5,2)
+  oiCercaEje Int?
+  oiCercaAv String?
+
+  cercaDip Decimal? @db.Decimal(5,2)
+
+  add Decimal? @db.Decimal(5,2)
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+
+
+enum FAQCategory {
+  GENERAL
+  HORARIOS
+  SERVICIOS
+  PRECIOS
+  CONTACTO
+  EMERGENCIAS
+  CITAS
+}
+
+model FAQ {
+  id        String       @id @default(uuid()) @db.Uuid
+  tenantId  String       @db.Uuid
+  question  String
+  answer    String
+  category  FAQCategory  @default(GENERAL)
+  embedding Json?
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, isActive])
+}
+
+model BotConfig {
+  id                 String  @id @default(uuid()) @db.Uuid
+  tenantId           String  @unique @db.Uuid
+  botName            String  @default("Asistente Virtual")
+  welcomeMessage     String  @default("¡Hola! Soy el asistente virtual. ¿En qué puedo ayudarte?")
+  disclaimer         String  @default("⚠️ Este asistente no realiza diagnósticos médicos ni reemplaza la consulta con un profesional de la salud.")
+  fallbackMessage    String  @default("No encontré una respuesta exacta. Por favor, contáctanos al teléfono o correo de la clínica.")
+  similarityThreshold Float @default(0.75)
+  mode               String  @default("FAQ_ONLY")
+  modelProvider      String  @default("huggingface")
+  embeddingModel     String  @default("Xenova/all-MiniLM-L6-v2")
+  maxTokens          Int     @default(150)
+  temperature        Float   @default(0.2)
+  isActive           Boolean @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model ChatLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId     String   @db.Uuid
+  userId       String?  @db.Uuid
+  question     String
+  answer       String
+  source       String   // "FAQ" | "AI" | "Fallback"
+  intent       String?  // "faq" | "generated" | "fallback"
+  confidence   Float?
+  responseTime Int?     // ms
+  modelName    String?
+  usedAI       Boolean  @default(false)
+  resolved     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, createdAt])
+}
+
+
+
+
+
+
+
+
+// ============================================
+// CONFIGURACIÓN — Sprint 9
+// ============================================
+
+model GeneralConfiguration {
+  id     String @id @default(uuid()) @db.Uuid
+  tenantId String @unique @db.Uuid
+
+  botName         String @default("Asistente Virtual")
+  welcomeMessage  String @default("¡Hola! Soy el asistente virtual. ¿En qué puedo ayudarte?")
+  fallbackMessage String @default("No encontré una respuesta exacta. Por favor, contáctanos al teléfono o correo de la clínica.")
+  disclaimer      String @default("⚠️ Este asistente no realiza diagnósticos médicos ni reemplaza la consulta con un profesional de la salud.")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model BranchSchedule {
+  id         String    @id @default(uuid()) @db.Uuid
+  sucursalId String   @db.Uuid
+  dayOfWeek  DayOfWeek
+  openTime   String?  // "08:00"
+  closeTime  String?  // "18:00"
+  isOpen     Boolean  @default(true)
+
+  sucursal Sucursal @relation(fields: [sucursalId], references: [id], onDelete: Cascade)
+
+  @@unique([sucursalId, dayOfWeek])
+  @@index([sucursalId])
+}
+
+// NOTA: VisualMeasurement fue reemplazado por Refraction.
+// VisualMeasurement modela una medición individual por ojo, pero el dominio
+// oftalmológico trabaja con recetas completas que contienen LEJOS+CERCA+ADD
+// en un solo registro (Refraction).
+// model VisualMeasurement { ... }
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @db.Uuid
+  userId    String   @db.Uuid
+  accion    String
+  entidad   String
+  entidadId String?
+  detalle   String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([createdAt])
 }

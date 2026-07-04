@@ -10,160 +10,69 @@ export class PrismaSucursalRepository implements SucursalRepository {
 
   async findAll(): Promise<Sucursal[]> {
     const sucursales = await this.prisma.sucursal.findMany();
-    return sucursales.map(sucursal => new Sucursal(
-      sucursal.id,
-      sucursal.tenantId,
-      sucursal.name,
-      sucursal.direccion,
-      sucursal.latitude,
-      sucursal.longitude,
-      sucursal.telefono,
-      sucursal.correo,
-      sucursal.isDefault,
-      sucursal.timezone,
-    ));
+    return sucursales.map(s => this.toEntity(s));
   }
+
   async findById(id: string): Promise<Sucursal | null> {
-    const sucursal = await this.prisma.sucursal.findUnique({
-      where: {
-        id,
-      }
-    });
-    if (!sucursal) {
-      return null;
-    }
-    return new Sucursal(
-      sucursal.id,
-      sucursal.tenantId,
-      sucursal.name,
-      sucursal.direccion,
-      sucursal.latitude,
-      sucursal.longitude,
-      sucursal.telefono,
-      sucursal.correo,
-      sucursal.isDefault,
-      sucursal.timezone,
-    );
+    const sucursal = await this.prisma.sucursal.findUnique({ where: { id } });
+    if (!sucursal) return null;
+    return this.toEntity(sucursal);
   }
+
   async findByTenantId(tenantId: string): Promise<Sucursal[] | null> {
-    const sucursal = await this.prisma.sucursal.findMany({
-      where: {
-        tenantId,
-      }
-    });
-    if (!sucursal) {
-      return null;
-    }
-    return sucursal.map(sucursal => new Sucursal(
-      sucursal.id,
-      sucursal.tenantId,
-      sucursal.name,
-      sucursal.direccion,
-      sucursal.latitude,
-      sucursal.longitude,
-      sucursal.telefono,
-      sucursal.correo,
-      sucursal.isDefault,
-      sucursal.timezone,
-    ));
+    const sucursales = await this.prisma.sucursal.findMany({ where: { tenantId } });
+    if (!sucursales) return null;
+    return sucursales.map(s => this.toEntity(s));
   }
 
   async create(db: PrismaService | Prisma.TransactionClient, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string, timezone: string, tenantId: string): Promise<Sucursal> {
-    const createdSucursal = await db.sucursal.create({
-      data: {
-        name,
-        direccion,
-        latitude,
-        longitude,
-        telefono,
-        correo,
-        timezone,
-        tenantId,
-      }
+    const created = await db.sucursal.create({
+      data: { name, direccion, latitude, longitude, telefono, correo, timezone, tenantId }
     });
-    return new Sucursal(
-      createdSucursal.id,
-      createdSucursal.tenantId,
-      createdSucursal.name,
-      createdSucursal.direccion,
-      createdSucursal.latitude,
-      createdSucursal.longitude,
-      createdSucursal.telefono,
-      createdSucursal.correo,
-      createdSucursal.isDefault,
-      createdSucursal.timezone,
-    );
+    return this.toEntity(created);
   }
-  async update(id: string, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string, timezone?: string): Promise<Sucursal> {
-    
+
+  async update(id: string, name: string, direccion: string, latitude: number, longitude: number, telefono: string, correo: string, timezone?: string, avgConsultationMinutes?: number, intervalBetweenAppointments?: number, autoNoShowMinutes?: number): Promise<Sucursal> {
     try {
-      const updatedSucursal = await this.prisma.sucursal.update({ 
-        where: {
-          id,
-        },
+      const updated = await this.prisma.sucursal.update({
+        where: { id },
         data: {
-          name,
-          direccion,
-          latitude,
-          longitude,
-          telefono,
-          correo,
+          name, direccion, latitude, longitude, telefono, correo,
           ...(timezone && { timezone }),
+          ...(avgConsultationMinutes !== undefined && { avgConsultationMinutes }),
+          ...(intervalBetweenAppointments !== undefined && { intervalBetweenAppointments }),
+          ...(autoNoShowMinutes !== undefined && { autoNoShowMinutes }),
         }
       });
-      return new Sucursal(
-        updatedSucursal.id,
-        updatedSucursal.tenantId,
-        updatedSucursal.name,
-        updatedSucursal.direccion,
-        updatedSucursal.latitude,
-        updatedSucursal.longitude,
-        updatedSucursal.telefono,
-        updatedSucursal.correo,
-        updatedSucursal.isDefault,
-        updatedSucursal.timezone,
-      );
+      return this.toEntity(updated);
     } catch (error) {
-
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         throw new NotFoundException('Sucursal no encontrada');
       }
-
       throw error;
     }
-   }
+  }
+
   async delete(id: string): Promise<Sucursal> {
     try {
-      const deletedSucursal = await this.prisma.sucursal.delete({
-        where: {
-          id,
-        }
-      }); 
-      return new Sucursal(
-        deletedSucursal.id,
-        deletedSucursal.tenantId,
-        deletedSucursal.name,
-        deletedSucursal.direccion,
-        deletedSucursal.latitude,
-        deletedSucursal.longitude,
-        deletedSucursal.telefono,
-        deletedSucursal.correo,
-        deletedSucursal.isDefault,
-        deletedSucursal.timezone,
-      );
+      const deleted = await this.prisma.sucursal.delete({ where: { id } });
+      return this.toEntity(deleted);
     } catch (error) {
-
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         throw new NotFoundException('Sucursal no encontrada');
       }
-
       throw error;
     }
+  }
+
+  private toEntity(s: any): Sucursal {
+    return new Sucursal(
+      s.id, s.tenantId, s.name, s.direccion,
+      s.latitude, s.longitude, s.telefono, s.correo,
+      s.isDefault, s.timezone,
+      s.avgConsultationMinutes ?? 30,
+      s.intervalBetweenAppointments ?? 5,
+      s.autoNoShowMinutes ?? 30,
+    );
   }
 }

@@ -5,6 +5,7 @@ import { UserRepository } from "../../../user/domain/repositories/user.repositor
 import { MembershipRepository } from "../../../membership/domain/repositories/membership.repository";
 import { TenantRepository } from "../../../tenant/domain/repositories/tenant.repository";
 import { SucursalRepository } from "../../../sucursal/domain/repositories/sucursal.repository";
+import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
 import * as bcrypt from "bcrypt";
 
 @Injectable()
@@ -17,6 +18,7 @@ export class LoginUseCase {
     private readonly membershipRepo: MembershipRepository,
     private readonly tenantRepo: TenantRepository,
     private readonly sucursalRepo: SucursalRepository,
+    private readonly prisma: PrismaService,
   ) {}
   async execute(email: string, password: string) {
 
@@ -52,7 +54,19 @@ export class LoginUseCase {
     };
     const tokens = await this.tokenService.generateTokenPair(payload);
 
-    // 7. Retornar
+    // 7. AuditLog
+    await this.prisma.auditLog.create({
+      data: {
+        tenantId: membership.tenantId,
+        userId: user.id,
+        accion: "LOGIN",
+        entidad: "User",
+        entidadId: user.id,
+        detalle: `Inicio de sesión exitoso: ${user.email}`,
+      },
+    });
+
+    // 8. Retornar
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,

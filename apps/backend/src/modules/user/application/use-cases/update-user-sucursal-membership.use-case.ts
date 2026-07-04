@@ -18,7 +18,7 @@ export class UpdateUserSucursalMembershipUseCase{
     const {id,email,firstName,lastName,role,sucursalId} = dto
     let user: any;let membership: any; let sucursal:any
     await this.prisma.$transaction(async (tx) => {
-      user = await this.userRepo.update(tx, id, email, firstName, lastName);
+      user = await this.userRepo.update(tx, id, email, undefined, firstName, lastName);
       membership = await this.memberRepo.updateRolByUser(tx, user.id, tenantId, role as UserRole);
       sucursal = await this.userSucursalRepo.updateSucursalUser(tx, user.id, sucursalId);
     });

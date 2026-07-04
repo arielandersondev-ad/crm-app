@@ -3,7 +3,8 @@
 import { useAuthStore } from "@/stores/auth.store";
 import { useDashboardStats } from "../hooks/use-dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
-import { Users, CalendarClock, Stethoscope, DollarSign, Clock } from "lucide-react";
+import { Users, CalendarClock, CalendarCheck, Clock, Activity, Stethoscope, FileText } from "lucide-react";
+import Link from "next/link";
 
 function StatCard({
   title,
@@ -48,9 +49,9 @@ export function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
-          title="Total Clientes"
+          title="Total Pacientes"
           value={stats?.totalClients.toLocaleString() ?? "0"}
           icon={Users}
           loading={isLoading}
@@ -62,15 +63,21 @@ export function DashboardPage() {
           loading={isLoading}
         />
         <StatCard
-          title="Visitas Hoy"
-          value={stats?.todayVisits.toLocaleString() ?? "0"}
+          title="Consultas Hoy"
+          value={stats?.todayConsultations.toLocaleString() ?? "0"}
           icon={Stethoscope}
           loading={isLoading}
         />
         <StatCard
-          title="Ingresos Hoy"
-          value={`$${stats?.todayRevenue.toLocaleString() ?? "0"}`}
-          icon={DollarSign}
+          title="Consultas Totales"
+          value={stats?.totalConsultations.toLocaleString() ?? "0"}
+          icon={Activity}
+          loading={isLoading}
+        />
+        <StatCard
+          title="Próximos Controles"
+          value={stats?.upcomingControls.toLocaleString() ?? "0"}
+          icon={CalendarCheck}
           loading={isLoading}
         />
         <StatCard
@@ -87,7 +94,7 @@ export function DashboardPage() {
         </p>
       )}
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>Usuario</CardTitle>
@@ -115,6 +122,20 @@ export function DashboardPage() {
             <p>{branch?.name}</p>
           </CardContent>
         </Card>
+
+        <Link href="/dashboard/reportes">
+          <Card className="h-full cursor-pointer hover:bg-muted/50 transition-colors">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="size-4" />
+                Reportes
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm text-muted-foreground">
+              <p>Generar reportes clínicos en PDF</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </div>
   );

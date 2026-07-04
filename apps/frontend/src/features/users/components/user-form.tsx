@@ -1,5 +1,7 @@
 import { UseFormRegister } from "react-hook-form";
-import { UserFormData } from "../schemas/user.schema";
+import { CreateUserFormData, EditUserFormData } from "../schemas/user.schema";
+
+type UserFormData = CreateUserFormData | EditUserFormData;
 import { Sucursal } from "../types/user";
 
 interface UserFormProps {

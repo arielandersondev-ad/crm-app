@@ -6,6 +6,7 @@ import { UpdateVisitUseCase } from "./application/update-visit.use-case";
 import { VisitRepository } from "./domain/repositories/visit.repository";
 import { PrismaVisitaRepository } from "./infrastructure/prisma/prisma-visita.repository";
 import { DeleteVisitUseCase } from "./application/delete-visit.use-case";
+import { FindByClientIdUseCase } from "./application/find-by-client-id.use-case";
 import { CitaModule } from "../cita/cita.module";
 
 @Module({
@@ -20,6 +21,7 @@ import { CitaModule } from "../cita/cita.module";
     FindAllBySucursalIdUseCase,
     UpdateVisitUseCase,
     DeleteVisitUseCase,
+    FindByClientIdUseCase,
     {
       provide: VisitRepository,
       useClass: PrismaVisitaRepository,

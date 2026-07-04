@@ -24,12 +24,18 @@ export interface CreateTenantUserDto {
 export interface UpdateUserRoleSucursalDto {
   id: string;
   email?: string;
-  password?: string;
   firstName?: string;
   lastName?: string;
   role?: string;
-  sucursalId?: string
+  sucursalId?: string;
 }
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export interface Sucursal{
   id:       string 
   tenantId: string 

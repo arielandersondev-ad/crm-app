@@ -17,12 +17,14 @@ export class FindAgendaUseCase{
       timezone,
       appointments: appointments.map((appointment) => ({
         id: appointment.id,
+        appointmentCode: appointment.appointmentCode,
         status: appointment.status,
         scheduledAt: appointment.scheduledAt,
         hora: appointment.scheduledAt.toLocaleTimeString('es-BO',{
           hour: '2-digit',
           minute: '2-digit',
-          timeZone: timezone
+          hour12: false,
+          timeZone: timezone,
         }),
         clientId: appointment.clientId,
         clientFullName: appointment.client.fullName,
@@ -30,6 +32,7 @@ export class FindAgendaUseCase{
           ? `${appointment.user.firstName} ${appointment.user.lastName}`
           : null,
         visit: appointment.visit,
+        consultation: appointment.consultation,
       })),
     };
   }

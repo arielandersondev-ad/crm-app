@@ -15,7 +15,7 @@ export function VisitForm({ mode, client, register }: VisitFormProps) {
     <div className="space-y-4">
       <div>
         <div className="flex flex-col md:flex-row justify-center gap-2">
-          <label className="block mb-1 text-muted-foreground">VISITA PARA</label>
+          <label className="block mb-1 text-muted-foreground">CONSULTA PARA</label>
           <label className="text-sm text-muted-foreground">{client?.fullName?.toUpperCase() || '-'} </label>
           <input
             type="hidden"

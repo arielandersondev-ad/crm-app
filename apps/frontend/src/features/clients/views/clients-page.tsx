@@ -5,6 +5,7 @@ import { PageHeader } from "@/shared/components/page-header";
 import { EmptyState } from "@/shared/components/empty-state";
 
 import { useClients, useCreateClient, useDeleteClient, useUpdateClient } from "../hooks/use-clients";
+import { usePatientProfile, useCreatePatientProfile, useUpdatePatientProfile } from "../hooks/use-patient-profile";
 import { ClientsTable } from "../components/clients-table";
 import { LoadingState } from "@/shared/components/loading-state";
 import { Button } from "@/shared/components/ui/button";
@@ -14,29 +15,34 @@ import { ClientModal } from "../components/cliente-modal";
 import { Client } from "../types/client";
 import { DeleteClientDialog } from "../components/delete-cliente-dialog";
 import { toast } from "sonner";
-import { VisitModal } from "@/features/visits/components/visit-modal";
-import { useCreateVisit, useVisits } from "@/features/visits/hooks/use-visits";
-import { VisitFormData } from "@/features/visits/schemas/visit.schema";
+import { useCreateConsultation, useUpsertRefraction } from "@/features/consultation/hooks/use-consultation";
+import { ConsultationModal } from "@/features/consultation/components/consultation-modal";
 
 export function ClientsPage() {
   const { data: clients, isLoading, isError } = useClients();
-  const { data: visits, isLoading: visitsLoading, isError: visitsIsError } = useVisits();
   const createClientMutation = useCreateClient();
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
-  const createVisitMutation = useCreateVisit();
+  const createPatientProfileMutation = useCreatePatientProfile();
+  const updatePatientProfileMutation = useUpdatePatientProfile();
+  const createConsultationMutation = useCreateConsultation();
+  const upsertRefractionMutation = useUpsertRefraction();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isVisitOpen, setIsVisitOpen] = useState<Client | null>(null);
   const [deleteClient, setDeleteClient] = useState('');
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [consultClientId, setConsultClientId] = useState("");
+  const [consultClientName, setConsultClientName] = useState("");
+  const [consultModalOpen, setConsultModalOpen] = useState(false);
+
+  const { data: editingPatientProfile } = usePatientProfile(editingClient?.id);
 
   if (isLoading) return <LoadingState />
 
   if (isError) {
     return (
       <EmptyState
-        title="Error al cargar clientes"
+        title="Error al cargar pacientes"
       />
     );
   }
@@ -44,8 +50,8 @@ export function ClientsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Clientes"
-        description="Gestión de clientes"
+        title="Pacientes"
+        description="Gestión de pacientes"
         actions={
           <div className="flex gap-2 items-center justify-center align-center">
 
@@ -58,7 +64,7 @@ export function ClientsPage() {
               className="gap-2"
             >
               <Plus className="size-4" />
-              Nuevo cliente
+              Nuevo paciente
             </Button>
           </div>
         }
@@ -66,15 +72,19 @@ export function ClientsPage() {
 
       {!clients?.length ? (
         <EmptyState
-          title="No hay clientes registrados"
-          description="Crea tu primer cliente."
+          title="No hay pacientes registrados"
+          description="Registra tu primer paciente."
         />
       ) : (
         <ClientsTable 
           clients={clients}
           onEdit={(client) => setEditingClient(client)}
           onDelete={(client) => setDeleteClient(client.id)}
-          onVisit={(client) => setIsVisitOpen({id:client.id,fullName:client.fullName})}
+          onVisit={(client) => {
+            setConsultClientId(client.id);
+            setConsultClientName(client.fullName);
+            setConsultModalOpen(true);
+          }}
         />
       )}
       <ClientModal
@@ -82,16 +92,28 @@ export function ClientsPage() {
         mode="create"
         onClose={() => setIsCreateOpen(false)}
         onSubmit={async (data) => {
-          await createClientMutation.mutateAsync(data);
-          toast.success('Cliente creado correctamente');
+          const {antecedentes, alergias, contactoEmergencia, observaciones, ...clientData} = data
+          const client = await createClientMutation.mutateAsync(clientData);
+          const hasClinicalData = data.antecedentes || data.alergias || data.contactoEmergencia || data.observaciones;
+          if (hasClinicalData) {
+            await createPatientProfileMutation.mutateAsync({
+              clientId: client.id,
+              antecedentes: data.antecedentes,
+              alergias: data.alergias,
+              contactoEmergencia: data.contactoEmergencia,
+              observaciones: data.observaciones,
+            });
+          }
+          toast.success('Paciente registrado correctamente');
           setIsCreateOpen(false);
         }}
-        loading={createClientMutation.isPending}
+        loading={createClientMutation.isPending || createPatientProfileMutation.isPending}
       />
      <ClientModal
         open={!!editingClient}
         mode="edit"
         client={editingClient || undefined}
+        patientProfile={editingPatientProfile}
         onClose={() => setEditingClient(null)}
         onSubmit={async (data) => {
           if (!editingClient) return;
@@ -99,10 +121,28 @@ export function ClientsPage() {
             id: editingClient.id,
             ...data,
           });
-          toast.success('Cliente actualizado correctamente');
+          const hasClinicalData = data.antecedentes || data.alergias || data.contactoEmergencia || data.observaciones;
+          if (hasClinicalData && editingPatientProfile) {
+            await updatePatientProfileMutation.mutateAsync({
+              clientId: editingClient.id,
+              antecedentes: data.antecedentes,
+              alergias: data.alergias,
+              contactoEmergencia: data.contactoEmergencia,
+              observaciones: data.observaciones,
+            });
+          } else if (hasClinicalData && !editingPatientProfile) {
+            await createPatientProfileMutation.mutateAsync({
+              clientId: editingClient.id,
+              antecedentes: data.antecedentes,
+              alergias: data.alergias,
+              contactoEmergencia: data.contactoEmergencia,
+              observaciones: data.observaciones,
+            });
+          }
+          toast.success('Paciente actualizado correctamente');
           setEditingClient(null);
         }}
-        loading={updateClientMutation.isPending}
+        loading={updateClientMutation.isPending || updatePatientProfileMutation.isPending}
       />
       <DeleteClientDialog
         open={!!deleteClient}
@@ -110,27 +150,53 @@ export function ClientsPage() {
         onConfirm={async () => {
           if (!deleteClient) return;
             await deleteClientMutation.mutateAsync( deleteClient );
-            toast.success('Cliente eliminado correctamente');
+            toast.success('Paciente eliminado correctamente');
             setDeleteClient('');
         }}
         loading={deleteClientMutation.isPending}
       />
-      <VisitModal
-        open={!!isVisitOpen}
-        mode= 'create'
-        client={isVisitOpen || undefined}
-        onClose={() => setIsVisitOpen(null)}
-        onSubmit={async (data) => {
-          if (!isVisitOpen) return;
-          await createVisitMutation.mutateAsync({
+      <ConsultationModal
+        open={consultModalOpen}
+        mode="create"
+        clientId={consultClientId}
+        clientName={consultClientName}
+        loading={createConsultationMutation.isPending}
+        onClose={() => {
+          setConsultModalOpen(false);
+          setConsultClientId("");
+          setConsultClientName("");
+        }}
+        onSubmit={async (data: any) => {
+          const consultation = await createConsultationMutation.mutateAsync({
             clientId: data.clientId,
-            userId: data.userId,
-            appointmentId: data.appointmentId,
-            status: data.status,
-            notes: data.notes
+            motivo: data.motivo,
+            diagnostico: data.diagnostico,
+            observaciones: data.observaciones,
+            nextControlAt: data.nextControlAt || undefined,
+            consultationDate: data.consultationDate || undefined,
           });
-          toast.success('Visita creada correctamente');
-          setIsVisitOpen(null);
+          const refractionFields = [
+            "odLejosEsf","odLejosCil","odLejosEje","odLejosAv",
+            "oiLejosEsf","oiLejosCil","oiLejosEje","oiLejosAv",
+            "lejosDip","odCercaEsf","odCercaCil","odCercaEje","odCercaAv",
+            "oiCercaEsf","oiCercaCil","oiCercaEje","oiCercaAv",
+            "cercaDip","add",
+          ];
+          const refraction: any = {};
+          let hasValues = false;
+          for (const field of refractionFields) {
+            if (data[field] !== undefined && data[field] !== "") {
+              refraction[field] = data[field];
+              hasValues = true;
+            }
+          }
+          if (hasValues) {
+            await upsertRefractionMutation.mutateAsync({ consultationId: consultation.id, dto: refraction });
+          }
+          toast.success("Consulta registrada correctamente");
+          setConsultModalOpen(false);
+          setConsultClientId("");
+          setConsultClientName("");
         }}
       />
     </PageContainer>
