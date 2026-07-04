@@ -92,7 +92,7 @@ export function PatientDetailView() {
   const { data: appointments, isLoading: appointmentsLoading } = usePatientAppointments(clientId);
   const { data: consultations, isLoading: consultationsLoading } = usePatientConsultations(clientId);
   const userRole = useAuthStore((s) => s.user?.role);
-  const canEditClinical = userRole && CLINICAL_ROLES.includes(userRole);
+  const canEditClinical = !!userRole && CLINICAL_ROLES.includes(userRole);
 
   const createConsultationMutation = useCreateConsultation();
   const updateConsultationMutation = useUpdateConsultation();
@@ -153,7 +153,7 @@ export function PatientDetailView() {
         </div>
 
         {/* Resumen clínico */}
-        <ClinicalSummary consultations={consultations} appointments={appointments} />
+        <ClinicalSummary consultations={consultations || []}  appointments={appointments || []} />
 
         {/* Tabs */}
         <Tabs defaultValue="consultas">

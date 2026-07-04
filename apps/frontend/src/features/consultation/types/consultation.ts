@@ -62,7 +62,7 @@ export interface UpdateConsultationDto {
 }
 
 export interface UpsertRefractionDto {
-  consultationId: string;
+  //consultationId: string;
   odLejosEsf?: number | null;
   odLejosCil?: number | null;
   odLejosEje?: number | null;

@@ -32,7 +32,7 @@ export default function ConsultasPage() {
   const upsertRefractionMutation = useUpsertRefraction();
   const downloadSummaryMutation = useDownloadClinicalSummary();
   const userRole = useAuthStore((s) => s.user?.role);
-  const canEdit = userRole && CLINICAL_ROLES.includes(userRole);
+  const canEdit = !!userRole && CLINICAL_ROLES.includes(userRole);
 
   if (isLoading) return <LoadingState />;
   if (isError) return <EmptyState title="Error al cargar consultas" description="Intente nuevamente más tarde." />;
