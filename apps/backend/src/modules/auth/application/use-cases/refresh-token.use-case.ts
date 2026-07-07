@@ -26,8 +26,14 @@ export class RefreshTokenUseCase {
     const user = await this.userRepo.findById(payload.sub);
     if (!user || !user.isActive) throw new UnauthorizedException('Usuario no encontrado o inactivo.');
     
-    // 3. Generar nuevo token pair
-    const newPayload: JwtPayload = { ...payload };
+    // 3. Generar nuevo token pair (construir payload limpio sin exp/iat del token anterior)
+    const newPayload: JwtPayload = {
+      sub: payload.sub,
+      email: payload.email,
+      tenantId: payload.tenantId,
+      sucursalId: payload.sucursalId,
+      role: payload.role,
+    };
     const { accessToken, refreshToken, expiresIn, expiresInRefresh } = await this.tokenService.generateTokenPair(newPayload);
     
     // 4. Retornar mismo shape que login/register
