@@ -4,3 +4,4 @@ dist
 .env.*
 apps/backend/node_modules
 apps/frontend/node_modules
+.trae/
