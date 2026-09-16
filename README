@@ -1,6 +1,10 @@
 Detalles de Requerimientos
  -usar node v22.22.2 o superior
 
+Documentación operativa
+
+- [Sugerencias de FAQ con Qwen](docs/manuales/SUGERENCIAS_FAQ_QWEN.md)
+
  ✅ 3. Alias en PowerShell (hack limpio)
 
 Puedes hacer:

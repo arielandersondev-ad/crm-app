@@ -7,4 +7,5 @@ export const ENDPOINTS = {
   UPDATE: "/chatbot/faqs/:id",
   DELETE: "/chatbot/faqs/:id",
   UPDATE_CONFIG: "/chatbot/config",
+  GENERATE_SUGGESTIONS: "/chatbot/faqs/suggestions/generate",
 };

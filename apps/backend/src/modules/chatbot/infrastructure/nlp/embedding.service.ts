@@ -47,7 +47,7 @@ export class EmbeddingService {
     console.log(`[EmbeddingService] Llamando a HF API con modelo: ${model}`);
 
     const res = await fetch(
-      `https://api-inference.huggingface.co/models/${model}`,
+      `https://router.huggingface.co/hf-inference/models/${model}`,
       {
         method: "POST",
         headers: {

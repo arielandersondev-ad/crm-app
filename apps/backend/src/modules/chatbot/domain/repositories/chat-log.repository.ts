@@ -1,4 +1,4 @@
-import type { ChatLog } from "@prisma/client";
+import type { ChatLog } from '@prisma/client';
 
 export abstract class ChatLogRepository {
   abstract create(data: {
@@ -14,4 +14,8 @@ export abstract class ChatLogRepository {
     usedAI?: boolean;
   }): Promise<ChatLog>;
   abstract findByTenant(tenantId: string, limit?: number): Promise<ChatLog[]>;
+  abstract findRecentByTenant(
+    tenantId: string,
+    since: Date,
+  ): Promise<ChatLog[]>;
 }

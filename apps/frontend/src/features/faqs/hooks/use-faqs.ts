@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { faqService } from "../services/faq.service";
+import type { UpdateFaqDto } from "../types/faq";
 
 export function useFaqs() {
   return useQuery({
@@ -21,7 +22,7 @@ export function useCreateFaq() {
 export function useUpdateFaq() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Record<string, any> }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateFaqDto }) =>
       faqService.update(id, data),
     onSuccess: () => {
       client.invalidateQueries({ queryKey: ["faqs"] });
@@ -53,5 +54,12 @@ export function useUpdateBotConfig() {
     onSuccess: () => {
       client.invalidateQueries({ queryKey: ["bot-config"] });
     },
+  });
+}
+
+export function useGenerateFaqSuggestions() {
+  return useMutation({
+    mutationFn: faqService.generateSuggestions,
+    retry: false,
   });
 }
