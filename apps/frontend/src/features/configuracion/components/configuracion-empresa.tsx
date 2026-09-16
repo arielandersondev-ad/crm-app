@@ -11,6 +11,7 @@ export function ConfiguracionEmpresa() {
   const { register, handleSubmit, formState: { isDirty } } = useForm({
     values: tenant ? {
       name: tenant.name,
+      slug: tenant.slug ?? "",
       phone: tenant.phone ?? "",
       email: tenant.email ?? "",
       whatsapp: tenant.whatsapp ?? "",
@@ -32,6 +33,24 @@ export function ConfiguracionEmpresa() {
       <div>
         <label className="block mb-1 text-sm font-medium">Nombre de la empresa</label>
         <input {...register("name")} className="w-full border rounded-md p-2" />
+      </div>
+
+      <div>
+        <label className="block mb-1 text-sm font-medium" htmlFor="tenant-slug">
+          Identificador público del chatbot
+        </label>
+        <input
+          id="tenant-slug"
+          {...register("slug")}
+          className="w-full border rounded-md p-2"
+          placeholder="mi-clinica"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Debe coincidir con NEXT_PUBLIC_TENANT_SLUG en Vercel. Usa minúsculas, números y guiones.
+        </p>
       </div>
 
       <div>

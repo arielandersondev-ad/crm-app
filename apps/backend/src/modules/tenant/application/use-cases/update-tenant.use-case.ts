@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { Plan } from "@prisma/client";
 import { TenantRepository } from "../../domain/repositories/tenant.repository";
 import { UpdateTenantDto } from "../../presentation/dto/update-tenant.dto";
@@ -16,6 +16,13 @@ export class UpdateTenantUseCase {
       throw new Error('Plan inválido');
     }
 
-    return this.tenantRepo.update(dto.id, dto.name, dto.plan, undefined, dto.phone, dto.email, dto.whatsapp, dto.timezone);
+    if (dto.slug) {
+      const tenantWithSlug = await this.tenantRepo.findBySlug(dto.slug);
+      if (tenantWithSlug && tenantWithSlug.id !== dto.id) {
+        throw new ConflictException('El identificador público ya está en uso');
+      }
+    }
+
+    return this.tenantRepo.update(dto.id, dto.name, dto.plan, dto.slug, dto.phone, dto.email, dto.whatsapp, dto.timezone);
   }
 }
