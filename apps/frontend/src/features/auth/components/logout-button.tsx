@@ -10,14 +10,18 @@ export function LogoutButton() {
   return (
     <Button
       variant="outline"
+      aria-label={logoutMutation.isPending ? "Cerrando sesión" : "Cerrar sesión"}
+      className="shrink-0 px-2 sm:px-3"
       onClick={() => logoutMutation.mutate()}
       disabled={logoutMutation.isPending}
     >
-      <LogOut className="mr-2 h-4 w-4" />
+      <LogOut className="size-4 sm:mr-2" />
 
-      {logoutMutation.isPending
-        ? "Cerrando sesión..."
-        : "Cerrar sesión"}
+      <span className="sr-only sm:not-sr-only">
+        {logoutMutation.isPending
+          ? "Cerrando sesión..."
+          : "Cerrar sesión"}
+      </span>
     </Button>
   );
 }

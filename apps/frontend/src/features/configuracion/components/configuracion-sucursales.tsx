@@ -50,8 +50,8 @@ function ScheduleEditor({ sucursalId }: { sucursalId: string }) {
     <div className="space-y-2 mt-4">
       <h4 className="font-medium text-sm">Horarios de atención</h4>
       {current.map((day) => (
-        <div key={day.value} className="flex items-center gap-3">
-          <label className="w-28 text-sm">{day.label}</label>
+        <div key={day.value} className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <label className="w-full text-sm sm:w-28">{day.label}</label>
           <input
             type="checkbox"
             checked={day.isOpen}
@@ -142,13 +142,13 @@ export function ConfiguracionSucursales() {
   };
 
   return (
-    <div className="space-y-6 max-w-xl">
-      <div className="flex gap-2">
+    <div className="max-w-xl space-y-6">
+      <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
         {sucursales?.map((s) => (
           <button
             key={s.id}
             onClick={() => setSelectedId(s.id)}
-            className={`px-3 py-1 rounded text-sm border ${selected?.id === s.id ? "bg-primary text-primary-foreground" : ""}`}
+            className={`shrink-0 px-3 py-1 rounded text-sm border ${selected?.id === s.id ? "bg-primary text-primary-foreground" : ""}`}
           >
             {s.name}
           </button>
@@ -157,7 +157,7 @@ export function ConfiguracionSucursales() {
 
       {selected && (
         <>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block mb-1 text-sm font-medium">Nombre</label>
               <input

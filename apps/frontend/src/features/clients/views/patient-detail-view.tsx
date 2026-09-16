@@ -58,7 +58,7 @@ function ClinicalSummary({ consultations, appointments }: { consultations: any[]
   }, [appointments]);
 
   return (
-    <div className="border rounded-lg p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 rounded-lg border p-4 sm:grid-cols-2 md:grid-cols-4">
       <div>
         <p className="text-xs text-muted-foreground flex items-center gap-1"><ClipboardList className="size-3" /> Último diagnóstico</p>
         <p className="font-medium text-sm mt-1">{last.diagnostico || "Sin diagnóstico"}</p>
@@ -114,13 +114,13 @@ export function PatientDetailView() {
     <PageContainer>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
           <Button variant="outline" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="size-4" />
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold">{client.fullName}</h1>
-            <p className="text-sm text-muted-foreground">
+          <div className="min-w-0">
+            <h1 className="break-words text-2xl font-bold">{client.fullName}</h1>
+            <p className="break-words text-sm text-muted-foreground">
               {client.documentNumber && `Doc: ${client.documentNumber} · `}
               {formatDate(client.birthDate)} · {client.email}
             </p>
@@ -129,25 +129,25 @@ export function PatientDetailView() {
 
         {/* Info cards */}
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="border rounded-lg p-4 flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3 rounded-lg border p-4">
             <Phone className="size-5 text-muted-foreground" />
-            <div>
+              <div className="min-w-0">
               <p className="text-xs text-muted-foreground">Teléfono</p>
               <p className="font-medium">{client.phone || "-"}</p>
             </div>
           </div>
-          <div className="border rounded-lg p-4 flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3 rounded-lg border p-4">
             <Mail className="size-5 text-muted-foreground" />
-            <div>
+              <div className="min-w-0">
               <p className="text-xs text-muted-foreground">Email</p>
-              <p className="font-medium">{client.email || "-"}</p>
+              <p className="break-all font-medium">{client.email || "-"}</p>
             </div>
           </div>
-          <div className="border rounded-lg p-4 flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3 rounded-lg border p-4">
             <MapPin className="size-5 text-muted-foreground" />
-            <div>
+              <div className="min-w-0">
               <p className="text-xs text-muted-foreground">Dirección</p>
-              <p className="font-medium">{client.address || "-"}</p>
+              <p className="break-words font-medium">{client.address || "-"}</p>
             </div>
           </div>
         </div>
@@ -157,16 +157,16 @@ export function PatientDetailView() {
 
         {/* Tabs */}
         <Tabs defaultValue="consultas">
-          <TabsList>
-            <TabsTrigger value="consultas">
+          <TabsList className="max-w-full justify-start overflow-x-auto">
+            <TabsTrigger className="shrink-0 flex-none" value="consultas">
               <Stethoscope className="size-4" />
               Consultas ({consultations?.length ?? 0})
             </TabsTrigger>
-            <TabsTrigger value="antecedentes">
+            <TabsTrigger className="shrink-0 flex-none" value="antecedentes">
               <FileText className="size-4" />
               Antecedentes
             </TabsTrigger>
-            <TabsTrigger value="citas">
+            <TabsTrigger className="shrink-0 flex-none" value="citas">
               <Calendar className="size-4" />
               Citas ({appointments?.length ?? 0})
             </TabsTrigger>
@@ -174,7 +174,7 @@ export function PatientDetailView() {
 
           {/* Tab: Consultas (timeline) */}
           <TabsContent value="consultas" className="mt-4">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">
                 {consultations?.length ?? 0} consulta(s) registrada(s)
               </p>
@@ -266,7 +266,7 @@ export function PatientDetailView() {
             ) : appointments?.length ? (
               <div className="space-y-3">
                 {appointments.map((cita: any) => (
-                  <div key={cita.id} className="border rounded-lg p-4 flex items-center justify-between">
+                  <div key={cita.id} className="flex flex-col items-start gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="font-medium">{formatDateTime(cita.scheduledAt)}</p>
                       <p className="text-sm text-muted-foreground">

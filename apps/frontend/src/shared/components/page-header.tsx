@@ -14,27 +14,31 @@ export function PageHeader({ title, description, actions, backButton }: PageHead
   const router = useRouter();
 
   return (
-    <div className="mb-6 flex flex-col gap-4">
-      <div className="flex justify-between gap-4 items-center">
-        <div className="flex items-center gap-3">
+    <div className="mb-6 min-w-0">
+      <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-start gap-2 sm:items-center sm:gap-3">
           {backButton && (
             <Button variant="ghost" size="sm" onClick={() => router.back()}>
               <ChevronLeft className="size-4" />
             </Button>
           )}
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+          <div className="min-w-0">
+            <h1 className="break-words text-2xl font-bold tracking-tight sm:text-3xl">
               {title}
             </h1>
 
             {description && (
-              <p className="text-muted-foreground">
+              <p className="mt-1 break-words text-sm text-muted-foreground sm:text-base">
                 {description}
               </p>
             )}
           </div>
         </div>
-        {actions && actions}
+        {actions && (
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
+            {actions}
+          </div>
+        )}
       </div>
     </div>
   );

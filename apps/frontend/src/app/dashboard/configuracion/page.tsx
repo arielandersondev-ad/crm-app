@@ -26,14 +26,14 @@ export default function ConfiguracionPage() {
         description="Administra la configuración general del sistema"
       />
 
-      <div className="flex gap-1 border-b mb-6">
+      <div className="mb-6 flex max-w-full gap-1 overflow-x-auto border-b pb-px">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === tab.id
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"

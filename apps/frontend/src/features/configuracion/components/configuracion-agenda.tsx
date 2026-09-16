@@ -21,13 +21,13 @@ export function ConfiguracionAgenda() {
   const currentValues = values[selected.id] !== undefined ? values : {};
 
   return (
-    <div className="space-y-6 max-w-xl">
-      <div className="flex gap-2">
+    <div className="max-w-xl space-y-6">
+      <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
         {sucursales?.map((s) => (
           <button
             key={s.id}
             onClick={() => { setSelectedId(s.id); setValues({}); }}
-            className={`px-3 py-1 rounded text-sm border ${selected.id === s.id ? "bg-primary text-primary-foreground" : ""}`}
+            className={`shrink-0 px-3 py-1 rounded text-sm border ${selected.id === s.id ? "bg-primary text-primary-foreground" : ""}`}
           >
             {s.name}
           </button>

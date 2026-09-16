@@ -33,8 +33,8 @@ export function SearchModal<T extends SearchableItem>({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-lg">
-      <div className="bg-background rounded-lg w-full max-w-lg p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg bg-background p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">
             {title}

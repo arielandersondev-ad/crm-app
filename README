@@ -1,6 +1,10 @@
 Detalles de Requerimientos
  -usar node v22.22.2 o superior
 
+Documentación operativa
+
+- [Sugerencias de FAQ con Qwen](docs/manuales/SUGERENCIAS_FAQ_QWEN.md)
+
  ✅ 3. Alias en PowerShell (hack limpio)
 
 Puedes hacer:
@@ -8,3 +12,63 @@ Puedes hacer:
 Set-Alias npm npm.cmd
 
 👉 así puedes escribir npm normalme
+
+Análisis de Mejoras de Rendimiento — CRM App (Oftalmológica K & Y)
+Stack actual
+Capa	Tecnología
+Backend	NestJS 11, Prisma 6.19, PostgreSQL
+Frontend	Next.js 16, React 19, TanStack Query 5, Zustand 5, Tailwind 4
+Chatbot	@xenova/transformers (embeddings) + HuggingFace API fallback
+Auth	JWT (access + refresh token pair), cookies
+1. Backend — Base de Datos y Queries
+#	Problema
+1	FAQ similarity en memoria: Carga TODAS las FAQs del tenant en JS y calcula cosine similarity en cada request
+2	Sin paginación en queries principales: findAllBySucursalId, findAll, findByTenantId devuelven TODOS los registros
+3	findAllBySucursalIdComplete carga todo sin límite: Incluye details: true, payments: true y todas las relaciones sin select explícito
+4	findAll() sin filtro de tenant: Método que retorna TODOS los clientes globalmente
+5	Sin connection pooling configurado: PrismaClient se instancia sin opciones de pool
+6	Report queries con retry sin filtro sucursal: Si la query con sucursal devuelve 0, reintenta sin filtro — puede retornar datos de otras sucursales
+7	Embedding fallback a vector de ceros: Si falla el modelo local y la API, retorna zeros — el chatbot deja de funcionar silenciosamente
+2. Backend — Infraestructura y Seguridad
+#	Problema
+8	Sin rate limiting: No hay throttler en ningún endpoint
+9	Sin compresión de respuestas: No hay middleware de gzip/brotli
+10	Sin security headers (helmet): No hay headers de seguridad HTTP
+11	Sin logging estructurado: Usa console.log/info/warn/error en producción (incluido en repos de reportes y chatbot)
+12	Sessions nunca se limpian: Tabla Session existe pero no hay cron de limpieza de expirados
+13	AuditLog definido pero no utilizado: Modelo existe en schema pero no hay interceptor o servicio escribiendo
+14	@xenova/transformers cargado dinámicamente: Primera request será lenta por carga del modelo ONNX
+15	Dependencias redundantes: bcrypt + bcrypt-ts ambas en dependencies
+16	Sin health check endpoint: No hay /health para monitoreo
+3. Frontend — Rendimiento de Rendering
+#	Problema
+17	Sin code splitting/dynamic imports: Todas las páginas y modales se cargan estáticamente
+18	React Query DevTools en producción: Se renderiza sin verificación de environment
+19	next.config.ts vacío: Sin optimizaciones de build configuradas
+20	Ruta duplicada: /dashboard/page.tsx y /dashboard/dashboard/page.tsx ambos renderizan DashboardPage
+21	Dashboard layout flash: El patrón useRef(false) + useEffect causa flash de contenido vacío antes de validar auth
+22	StatCard no memoizado: Se re-crea en cada render del dashboard
+4. Frontend — Gestión de Datos
+#	Problema
+23	Tablas sin paginación client-side ni server-side: Clientes, visitas, servicios cargan TODO el dataset en memoria
+24	useVisits carga visitas con relaciones completas al montar: FIND_ALL_COMPLETE retorna todo con tenant, sucursal, client, user, appointment, details, payments
+25	Zustand persist escribe a localStorage en cada cambio de auth state: auth-storage se serializa constantemente
+26	Sin staleTime diferenciado por query: Todas las queries usan el mismo staleTime de 5 min global
+27	Query key "visits" genérica: Todas las mutaciones invalidan "visits" sin distinción de sucursal/tenant
+28	useSumary y usePaymentVisit comparten query key: Ambos usan ["visit-payments", visitId] — se pisarán
+5. Backend — Chatbot/Rendimiento Específico
+#	Problema
+29	Embedding generado en cada request del chatbot: No se cachea el embedding de FAQs ni de queries frecuentes
+30	findTopSimilar calcula cosine en JS para todas las FAQs: Ineficiente comparado con operación vectorial en DB
+31	Modelo ONNX cargado en memoria del proceso Node: Ocupa ~200MB+ RAM y bloquea en cold start
+32	3 queries secuenciales en chat-query: botConfigRepo, generalConfigRepo, tenantRepo se ejecutan en Promise.all pero los handlers anteriores ya hicieron queries
+6. Infraestructura y Despliegue
+#	Problema
+33	Sin Dockerfile visible en infra/docker: Directorio existe pero vacío
+34	Sin variables de entorno documentadas: No hay .env.example visible
+35	Prisma migrations no automatizadas: Script prisma:migrate existe pero no hay integración en CI/CD
+Resumen por Prioridad
+Prioridad	Cantidad	Items clave
+Alta	9	Paginación (#2, #3, #23, #24), pgvector (#1, #30), rate limiting (#8), code splitting (#17), cache embeddings (#29), query key bug (#28)
+Media	14	Compresión (#9), helmet (#10), logging (#11), sessions cleanup (#12), config vacía (#19), auth flash (#21), staleTime diferenciado (#26), next.config (#19), Dockerfile (#33)
+Baja	5	AuditLog (#13), bcrypt redundante (#15), devtools (#18), ruta duplicada (#20), memoización (#22)

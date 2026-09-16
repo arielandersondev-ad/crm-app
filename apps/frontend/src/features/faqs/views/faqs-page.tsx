@@ -4,7 +4,7 @@ import { PageContainer } from "@/shared/components/page-container";
 import { PageHeader } from "@/shared/components/page-header";
 import { Button } from "@/shared/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import { Plus, Settings } from "lucide-react";
+import { Plus, Settings, Sparkles } from "lucide-react";
 import { useCreateFaq, useDeleteFaq, useFaqs, useUpdateFaq } from "../hooks/use-faqs";
 import { LoadingState } from "@/shared/components/loading-state";
 import { FaqModal } from "../components/faq-modal";
@@ -14,6 +14,9 @@ import { FaqTable } from "../components/faq-table";
 import { Faq } from "../types/faq";
 import { DeleteFaqDialog } from "../components/delete-faq.dialog";
 import { BotConfigPanel } from "../components/bot-config-panel";
+import { FaqSuggestionsPanel } from "../components/faq-suggestions-panel";
+import { useAuthStore } from "@/stores/auth.store";
+import { canAccessFaqSuggestions } from "../utils/faq-suggestions";
 
 export function FaqsPage() {
   const { data: faqs, isLoading, error } = useFaqs();
@@ -24,6 +27,8 @@ export function FaqsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFaq, setEditingFaq] = useState<Faq | null>(null);
   const [deleteFaq, setDeleteFaq] = useState<Faq | null>(null);
+  const userRole = useAuthStore((state) => state.user?.role);
+  const showSuggestions = canAccessFaqSuggestions(userRole);
 
   if (isLoading) return <LoadingState />;
   if (error) {
@@ -37,12 +42,20 @@ export function FaqsPage() {
         description="Administra las preguntas frecuentes y la configuración del chatbot"
       />
       <Tabs defaultValue="faqs" className="mt-6">
-        <TabsList>
-          <TabsTrigger value="faqs">Preguntas Frecuentes</TabsTrigger>
-          <TabsTrigger value="config">
+        <TabsList className="h-auto max-w-full flex-wrap justify-start">
+          <TabsTrigger value="faqs" className="py-1.5">
+            Preguntas Frecuentes
+          </TabsTrigger>
+          <TabsTrigger value="config" className="py-1.5">
             <Settings className="size-4 mr-1" />
             Configuración
           </TabsTrigger>
+          {showSuggestions && (
+            <TabsTrigger value="suggestions" className="py-1.5">
+              <Sparkles className="mr-1 size-4" />
+              Sugerencias basadas en conversaciones
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="faqs" className="pt-6">
@@ -69,6 +82,12 @@ export function FaqsPage() {
         <TabsContent value="config" className="pt-6">
           <BotConfigPanel />
         </TabsContent>
+
+        {showSuggestions && (
+          <TabsContent value="suggestions" className="pt-6">
+            <FaqSuggestionsPanel />
+          </TabsContent>
+        )}
       </Tabs>
 
       <FaqModal

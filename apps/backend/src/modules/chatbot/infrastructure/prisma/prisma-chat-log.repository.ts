@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
-import { ChatLogRepository } from "../../domain/repositories/chat-log.repository";
-import type { ChatLog } from "@prisma/client";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../../common/infrastructure/database/prisma/prisma.service';
+import { ChatLogRepository } from '../../domain/repositories/chat-log.repository';
+import type { ChatLog, Prisma } from '@prisma/client';
 
 @Injectable()
 export class PrismaChatLogRepository implements ChatLogRepository {
@@ -19,14 +19,26 @@ export class PrismaChatLogRepository implements ChatLogRepository {
     modelName?: string;
     usedAI?: boolean;
   }): Promise<ChatLog> {
-    return this.prisma.chatLog.create({ data } as any);
+    return this.prisma.chatLog.create({
+      data: data as Prisma.ChatLogUncheckedCreateInput,
+    });
   }
 
   async findByTenant(tenantId: string, limit = 50): Promise<ChatLog[]> {
     return this.prisma.chatLog.findMany({
       where: { tenantId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       take: limit,
+    });
+  }
+
+  async findRecentByTenant(tenantId: string, since: Date): Promise<ChatLog[]> {
+    return this.prisma.chatLog.findMany({
+      where: {
+        tenantId,
+        createdAt: { gte: since },
+      },
+      orderBy: { createdAt: 'desc' },
     });
   }
 }

@@ -8,7 +8,7 @@ export function BranchSelector() {
   );
 
   return (
-    <div className="rounded-md border px-3 py-2 text-sm">
+    <div className="max-w-48 truncate rounded-md border px-3 py-2 text-sm">
       {branch?.name ?? "Sin sucursal"}
     </div>
   );

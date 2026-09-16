@@ -1,6 +1,15 @@
 import { api } from "@/infrastructure/api/axios";
 import { ENDPOINTS } from "../api/endpoints";
-import { BotConfig, CreateFaqDto, Faq, UpdateBotConfigDto, UpdateFaqDto } from "../types/faq";
+import {
+  BotConfig,
+  CreateFaqDto,
+  Faq,
+  FaqSuggestionsResponse,
+  GenerateFaqSuggestionsDto,
+  UpdateBotConfigDto,
+  UpdateFaqDto,
+} from "../types/faq";
+import { FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS } from "../utils/faq-suggestions";
 
 class FaqService {
   async list(): Promise<Faq[]> {
@@ -29,6 +38,17 @@ class FaqService {
 
   async updateConfig(data: UpdateBotConfigDto): Promise<BotConfig> {
     const res = await api.patch<BotConfig>(ENDPOINTS.UPDATE_CONFIG, data);
+    return res.data;
+  }
+
+  async generateSuggestions(
+    data: GenerateFaqSuggestionsDto,
+  ): Promise<FaqSuggestionsResponse> {
+    const res = await api.post<FaqSuggestionsResponse>(
+      ENDPOINTS.GENERATE_SUGGESTIONS,
+      data,
+      { timeout: FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS },
+    );
     return res.data;
   }
 }

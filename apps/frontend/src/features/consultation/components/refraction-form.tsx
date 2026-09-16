@@ -57,7 +57,8 @@ export function RefractionForm({ register, readOnly }: RefractionFormProps) {
       {/* LEJOS */}
       <div>
         <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Lejos</p>
-        <table className="w-full border-collapse">
+        <div className="max-w-full overflow-x-auto">
+        <table className="min-w-[28rem] border-collapse">
           <thead>
             <tr>
               <th className={thClass}></th>
@@ -72,6 +73,7 @@ export function RefractionForm({ register, readOnly }: RefractionFormProps) {
             <EyeSection prefix="oiLejos" register={register} readOnly={readOnly} />
           </tbody>
         </table>
+        </div>
         <div className="flex items-center gap-2 mt-2">
           <label className={labelClass}>DIP</label>
           <input {...register("lejosDip")} className={inputClass} readOnly={readOnly} placeholder=" " />
@@ -81,7 +83,8 @@ export function RefractionForm({ register, readOnly }: RefractionFormProps) {
       {/* CERCA */}
       <div>
         <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Cerca</p>
-        <table className="w-full border-collapse">
+        <div className="max-w-full overflow-x-auto">
+        <table className="min-w-[28rem] border-collapse">
           <thead>
             <tr>
               <th className={thClass}></th>
@@ -96,6 +99,7 @@ export function RefractionForm({ register, readOnly }: RefractionFormProps) {
             <EyeSection prefix="oiCerca" register={register} readOnly={readOnly} />
           </tbody>
         </table>
+        </div>
         <div className="flex items-center gap-2 mt-2">
           <label className={labelClass}>DIP</label>
           <input {...register("cercaDip")} className={inputClass} readOnly={readOnly} placeholder=" " />

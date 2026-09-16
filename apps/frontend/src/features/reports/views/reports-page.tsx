@@ -60,7 +60,7 @@ export function ReportsPage() {
         description="Genere reportes clínicos en PDF"
       />
 
-      <Card className="max-w-2xl p-6 space-y-6">
+      <Card className="max-w-2xl space-y-6 p-4 sm:p-6">
         <div>
           <label className="block mb-1 text-sm font-medium">Tipo de reporte</label>
           <select
@@ -75,7 +75,7 @@ export function ReportsPage() {
         </div>
 
         {reportType !== "upcoming-controls" && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block mb-1 text-sm font-medium">Fecha inicio</label>
               <input
@@ -105,7 +105,7 @@ export function ReportsPage() {
         <Button
           onClick={handleExport}
           disabled={isPending || (reportType !== "upcoming-controls" && (!startDate || !endDate))}
-          className="gap-2"
+          className="w-full gap-2 sm:w-auto"
         >
           <Download className="size-4" />
           {isPending ? "Generando..." : "Exportar PDF"}

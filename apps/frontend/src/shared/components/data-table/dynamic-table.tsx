@@ -196,6 +196,7 @@ export function DynamicTable<
   return (
     <div
       className={`
+        max-w-full
         overflow-hidden
         rounded-xl
         border
@@ -226,8 +227,8 @@ export function DynamicTable<
         />
       )}
 
-      <div className="overflow-auto">
-        <table className="w-full">
+      <div className="max-w-full overflow-x-auto">
+        <table className="w-full min-w-max">
           <thead
             className={`
               bg-muted
@@ -388,11 +389,15 @@ export function DynamicTable<
         <div
           className="
             flex
-            items-center
+            flex-col
+            items-stretch
             justify-between
+            gap-3
             border-t
             px-4
             py-3
+            sm:flex-row
+            sm:items-center
           "
         >
           {showResultCount && (

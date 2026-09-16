@@ -2,7 +2,7 @@ import {
   Home,
   Users,
   Calendar,
-  Package,
+  //Package,
   Stethoscope,
   ShieldUser,
   FileText,
@@ -28,12 +28,13 @@ export const navigation: NavItem[] = [
     href: "/dashboard/clientes",
     icon: Users,
   },
+  /* 
   {
     label: "Servicios",
     href: "/dashboard/servicios",
     icon: Package,
   },
-  /* {
+  {
     label: "Consultas (Visitas)",
     href: "/dashboard/visitas",
     icon: Stethoscope,

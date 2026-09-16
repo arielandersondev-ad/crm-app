@@ -71,7 +71,7 @@ export function ChatWidget({
   return (
     <>
       {isOpen && (
-        <div className="fixed bottom-20 right-4 z-50 w-80 sm:w-96 shadow-xl rounded-lg border bg-background flex flex-col overflow-hidden">
+        <div className="fixed bottom-20 left-4 right-4 z-50 flex max-h-[calc(100dvh-6rem)] flex-col overflow-hidden rounded-lg border bg-background shadow-xl sm:left-auto sm:w-96">
           {/* Header */}
           <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -119,14 +119,14 @@ export function ChatWidget({
           )}
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="border-t p-3 flex gap-2">
+          <form onSubmit={handleSubmit} className="flex min-w-0 gap-2 border-t p-3">
             <input
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Escribe tu pregunta..."
               disabled={isLoading}
-              className="flex-1 border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="min-w-0 flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <button
               type="submit"
