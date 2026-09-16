@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import { useState, useCallback, useRef } from "react";
 import { chatbotService, ChatbotQueryResponse } from "./chatbot.service";
 
@@ -62,10 +63,19 @@ export function useChatbot(mode: "landing" | "crm" = "crm", tenantSlug?: string,
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, botMsg]);
-      } catch {
+      } catch (error) {
+        const unavailable = axios.isAxiosError(error) && !error.response;
+        const tenantNotFound =
+          mode === "landing" &&
+          axios.isAxiosError(error) &&
+          error.response?.status === 404;
         const errorMsg: Message = {
           id: `msg-${idCounter.current++}`,
-          text: "Lo siento, ocurrió un error. Intenta de nuevo más tarde.",
+          text: tenantNotFound
+            ? "⚠️ El asistente no está configurado para esta clínica. Contacte al administrador."
+            : unavailable
+              ? "No se pudo conectar con el asistente. Intenta nuevamente más tarde."
+              : "Lo siento, ocurrió un error. Intenta de nuevo más tarde.",
           sender: "bot",
           timestamp: new Date(),
         };

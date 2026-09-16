@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -12,6 +13,22 @@ import { useLogin } from "../api/use-login";
 
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+
+function getLoginErrorMessage(error: unknown): string {
+  if (!axios.isAxiosError(error)) {
+    return "No se pudo iniciar sesión. Intenta nuevamente.";
+  }
+
+  if (!error.response) {
+    return "No se pudo conectar con el servidor. Intenta nuevamente más tarde.";
+  }
+
+  if (error.response.status === 401) {
+    return "Credenciales incorrectas";
+  }
+
+  return "El servidor no pudo procesar el inicio de sesión.";
+}
 
 export function LoginForm() {
   const loginMutation = useLogin();
@@ -85,7 +102,7 @@ export function LoginForm() {
 
       {loginMutation.isError && (
         <p className="text-sm text-destructive">
-          Credenciales incorrectas
+          {getLoginErrorMessage(loginMutation.error)}
         </p>
       )}
 
