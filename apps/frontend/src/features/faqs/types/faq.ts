@@ -82,12 +82,12 @@ export interface FaqSuggestionExcludedSummary {
 
 export interface FaqSuggestionsResponse {
   periodHours: number;
-  totalLogs: number;
+  totalLogs?: number;
   questionsFound: number;
   questionsAnalyzed: number;
   truncated: boolean;
   groupsDetected: number;
-  excludedSummary: FaqSuggestionExcludedSummary;
+  excludedSummary?: FaqSuggestionExcludedSummary;
   suggestions: FaqSuggestion[];
   message?: string;
 }

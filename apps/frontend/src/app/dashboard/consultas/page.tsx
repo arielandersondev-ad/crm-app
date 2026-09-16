@@ -63,8 +63,8 @@ export default function ConsultasPage() {
           description="Registre una nueva consulta desde la ficha del paciente o desde la agenda."
         />
       ) : (
-        <div className="rounded-lg border">
-          <table className="w-full text-sm">
+        <div className="max-w-full overflow-x-auto rounded-lg border">
+          <table className="min-w-[720px] w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/50">
                 <th className="text-left p-3 font-medium">Fecha</th>

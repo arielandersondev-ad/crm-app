@@ -6,7 +6,7 @@ interface Props {
 
 export function DataTablePagination({ currentPage, totalPages, onChange }: Props) {
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       <button
         onClick={() => onChange(currentPage - 1)}
         disabled={currentPage === 1}

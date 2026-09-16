@@ -54,7 +54,7 @@ export function AppointmentDetailModal({open, mode, loading, details, onStartCon
             </p>
           </div>
         )}
-        <div className="space-y-4 grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 gap-2 space-y-4 sm:grid-cols-2">
           <div>
             <label className="block mb-1 text-muted-foreground">Paciente</label>
             <input 

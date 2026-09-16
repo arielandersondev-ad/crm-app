@@ -47,7 +47,7 @@ export function AgendaHeader({ vista, currentDate, onPrev, onNext, onChangeView,
   }
   return (
     <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 items-center gap-2">
         <Button
           variant="outline"
           size="icon"
@@ -57,7 +57,7 @@ export function AgendaHeader({ vista, currentDate, onPrev, onNext, onChangeView,
           <ChevronLeft className="size-4" />
         </Button>
 
-        <span className="min-w-40 text-center text-sm font-medium">
+        <span className="min-w-0 flex-1 text-center text-sm font-medium sm:min-w-40">
           {title}
         </span>
 
@@ -71,8 +71,8 @@ export function AgendaHeader({ vista, currentDate, onPrev, onNext, onChangeView,
         </Button>
       </div>
 
-      <Tabs value={vista} onValueChange={onChangeView}>
-        <TabsList>
+      <Tabs className="w-full sm:w-auto" value={vista} onValueChange={onChangeView}>
+        <TabsList className="w-full sm:w-fit">
           <TabsTrigger value="Día">Día</TabsTrigger>
           <TabsTrigger value="Semana">Semana</TabsTrigger>
           <TabsTrigger value="Mes">Mes</TabsTrigger>

@@ -43,6 +43,19 @@ const QWEN_DISABLED_MESSAGE =
 const NO_SUGGESTIONS_MESSAGE =
   "No se encontraron conversaciones recientes que generen nuevas sugerencias de FAQ.";
 
+const EMPTY_EXCLUDED_SUMMARY: FaqSuggestionExcludedSummary = {
+  totalExcluded: 0,
+  repeatedQuestions: 0,
+  repeatedGroups: 0,
+  byReason: {
+    resolvedOrHighConfidence: 0,
+    prohibitedOrSensitive: 0,
+    emptyOrInvalid: 0,
+    other: 0,
+  },
+  byCategory: {},
+};
+
 const CATEGORY_LABELS: Record<string, string> = {
   GENERAL: "General",
   HORARIOS: "Horarios",
@@ -425,7 +438,10 @@ export function FaqSuggestionsPanel() {
                 label="Periodo analizado"
                 value={`${result.periodHours} h`}
               />
-              <SummaryItem label="Logs encontrados" value={result.totalLogs} />
+              <SummaryItem
+                label="Logs encontrados"
+                value={result.totalLogs ?? result.questionsFound}
+              />
               <SummaryItem
                 label="Preguntas elegibles"
                 value={result.questionsFound}
@@ -445,7 +461,9 @@ export function FaqSuggestionsPanel() {
             </div>
           </section>
 
-          <ExcludedSummary summary={result.excludedSummary} />
+          <ExcludedSummary
+            summary={result.excludedSummary ?? EMPTY_EXCLUDED_SUMMARY}
+          />
 
           {result.message && hasSuggestions && (
             <p className="rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">

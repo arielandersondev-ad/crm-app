@@ -36,7 +36,7 @@ export function Modal({
       open={open}
       onOpenChange={onClose}
     >
-      <DialogContent className={sizes[size]}>
+      <DialogContent className={`w-[calc(100%-1.5rem)] ${sizes[size]}`}>
         <DialogHeader>
           <DialogTitle>
             {title}

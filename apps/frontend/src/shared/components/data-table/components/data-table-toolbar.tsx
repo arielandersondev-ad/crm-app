@@ -39,7 +39,7 @@ export function DataTableToolbar({ searchTerm, onSearch, columns, visibleColumns
       >
         <div />
 
-        <div className="relative w-full lg:max-w-xs flex items-center gap-2">
+        <div className="relative flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:items-center lg:max-w-xs">
           <input
             value={searchTerm}
             onChange={(e) =>
@@ -56,7 +56,7 @@ export function DataTableToolbar({ searchTerm, onSearch, columns, visibleColumns
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="w-full sm:w-auto">
                 Columnas
               </Button>
             </DropdownMenuTrigger>

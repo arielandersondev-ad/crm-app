@@ -17,20 +17,20 @@ export function PaymentSummaryCard({ total, paid, pending }: PaymentSummaryCardP
           💸 Resumen Financiero
         </CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-3 gap-4">
+      <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="text-center p-3 bg-muted rounded-lg">
           <p className="text-xs text-muted-foreground mb-1">Total</p>
-          <p className="text-xl font-bold text-foreground">Bs. {total.toFixed(2)}</p>
+          <p className="break-words text-xl font-bold text-foreground">Bs. {total.toFixed(2)}</p>
         </div>
         
         <div className="text-center p-3 bg-success/10 rounded-lg">
           <p className="text-xs text-success mb-1">Pagado</p>
-          <p className="text-xl font-bold text-success">Bs. {paid.toFixed(2)}</p>
+          <p className="break-words text-xl font-bold text-success">Bs. {paid.toFixed(2)}</p>
         </div>
         
         <div className="text-center p-3 bg-warning/10 rounded-lg">
           <p className="text-xs text-warning mb-1">Pendiente</p>
-          <p className="text-xl font-bold text-warning">Bs. {pending.toFixed(2)}</p>
+          <p className="break-words text-xl font-bold text-warning">Bs. {pending.toFixed(2)}</p>
         </div>
       </CardContent>
     </Card>
