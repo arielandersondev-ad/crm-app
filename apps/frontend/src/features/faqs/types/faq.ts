@@ -132,5 +132,8 @@ export interface FaqSuggestionsErrorData {
   message?: string | string[];
   retryable?: boolean;
   retryAfterSeconds?: number;
+  validationError?: string;
+  providerResponse?: string;
+  providerResponseTruncated?: boolean;
   analysis?: Omit<FaqSuggestionsResponse, "groupsDetected" | "suggestions">;
 }
