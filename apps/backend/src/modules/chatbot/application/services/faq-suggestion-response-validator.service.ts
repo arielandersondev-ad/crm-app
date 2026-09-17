@@ -7,8 +7,10 @@ import {
 import { FaqSuggestionSanitizer } from './faq-suggestion-sanitizer.service';
 
 export class InvalidFaqSuggestionsResponseError extends Error {
-  constructor() {
-    super('La respuesta de IA no contiene sugerencias FAQ válidas');
+  constructor(public readonly validationReason: string) {
+    super(
+      `La respuesta de IA no contiene sugerencias FAQ válidas: ${validationReason}`,
+    );
     this.name = 'InvalidFaqSuggestionsResponseError';
   }
 }
@@ -42,11 +44,13 @@ export class FaqSuggestionResponseValidator {
     try {
       parsed = JSON.parse(rawResponse) as unknown;
     } catch {
-      throw new InvalidFaqSuggestionsResponseError();
+      throw new InvalidFaqSuggestionsResponseError('JSON inválido');
     }
 
     if (!this.isPlainObject(parsed)) {
-      throw new InvalidFaqSuggestionsResponseError();
+      throw new InvalidFaqSuggestionsResponseError(
+        'la raíz de la respuesta no es un objeto JSON',
+      );
     }
 
     const topLevelKeys = Object.keys(parsed);
@@ -57,7 +61,9 @@ export class FaqSuggestionResponseValidator {
       !Array.isArray(parsedSuggestions) ||
       parsedSuggestions.length > questionCount
     ) {
-      throw new InvalidFaqSuggestionsResponseError();
+      throw new InvalidFaqSuggestionsResponseError(
+        'la estructura principal o la cantidad de sugerencias es inválida',
+      );
     }
 
     const usedIndexes = new Set<number>();
@@ -68,7 +74,9 @@ export class FaqSuggestionResponseValidator {
         !this.isPlainObject(candidate) ||
         !this.hasOnlyRequiredKeys(candidate)
       ) {
-        throw new InvalidFaqSuggestionsResponseError();
+        throw new InvalidFaqSuggestionsResponseError(
+          'una sugerencia contiene propiedades faltantes o adicionales',
+        );
       }
 
       const {
@@ -79,7 +87,6 @@ export class FaqSuggestionResponseValidator {
         suggestedAnswer,
         reason,
         needsHumanAnswer,
-        evidenceCount,
       } = candidate;
 
       if (
@@ -89,14 +96,14 @@ export class FaqSuggestionResponseValidator {
         usedGroups.has(group) ||
         !Array.isArray(sourceQuestionIndexes) ||
         sourceQuestionIndexes.length === 0 ||
-        typeof evidenceCount !== 'number' ||
-        !Number.isInteger(evidenceCount) ||
         typeof needsHumanAnswer !== 'boolean' ||
         !this.isSafeText(question, 300) ||
         !this.isSafeText(reason, 1_000) ||
         !this.isAllowedCategory(category)
       ) {
-        throw new InvalidFaqSuggestionsResponseError();
+        throw new InvalidFaqSuggestionsResponseError(
+          `la sugerencia del grupo ${String(group)} tiene campos estructurales o contenido inválido`,
+        );
       }
 
       usedGroups.add(group);
@@ -113,7 +120,9 @@ export class FaqSuggestionResponseValidator {
           localIndexes.has(indexValue) ||
           usedIndexes.has(indexValue)
         ) {
-          throw new InvalidFaqSuggestionsResponseError();
+          throw new InvalidFaqSuggestionsResponseError(
+            `el grupo ${group} contiene un índice inexistente, repetido o ya utilizado`,
+          );
         }
         localIndexes.add(indexValue);
         usedIndexes.add(indexValue);
@@ -121,25 +130,22 @@ export class FaqSuggestionResponseValidator {
         expectedEvidenceCount += questionOccurrences[indexValue - 1] ?? 0;
       }
 
-      if (evidenceCount !== expectedEvidenceCount) {
-        throw new InvalidFaqSuggestionsResponseError();
-      }
-
       let validatedAnswer: string | null;
       if (suggestedAnswer === null) {
         validatedAnswer = null;
       } else {
         if (!this.isSafeText(suggestedAnswer, 2_000)) {
-          throw new InvalidFaqSuggestionsResponseError();
+          throw new InvalidFaqSuggestionsResponseError(
+            `la respuesta sugerida del grupo ${group} contiene texto no permitido`,
+          );
         }
         validatedAnswer = suggestedAnswer.trim();
       }
 
-      if (
-        (!needsHumanAnswer && suggestedAnswer === null) ||
-        (suggestedAnswer !== null && !authorizedCategories.has(category))
-      ) {
-        throw new InvalidFaqSuggestionsResponseError();
+      if (suggestedAnswer !== null && !authorizedCategories.has(category)) {
+        throw new InvalidFaqSuggestionsResponseError(
+          `el grupo ${group} propone una respuesta sin una fuente institucional autorizada de la categoría ${category}`,
+        );
       }
 
       return {
@@ -149,8 +155,8 @@ export class FaqSuggestionResponseValidator {
         category,
         suggestedAnswer: validatedAnswer,
         reason: reason.trim(),
-        needsHumanAnswer,
-        evidenceCount,
+        needsHumanAnswer: validatedAnswer === null ? true : needsHumanAnswer,
+        evidenceCount: expectedEvidenceCount,
       };
     });
   }

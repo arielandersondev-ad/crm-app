@@ -18,6 +18,12 @@ import { EmptyState } from "@/shared/components/empty-state";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/shared/components/ui/accordion";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -382,8 +388,7 @@ export function FaqSuggestionsPanel() {
     return {
       ...next,
       offset: previous.offset,
-      questionsAnalyzed:
-        previous.questionsAnalyzed + next.questionsAnalyzed,
+      questionsAnalyzed: previous.questionsAnalyzed + next.questionsAnalyzed,
       groupsDetected: suggestions.length,
       suggestions,
     };
@@ -476,6 +481,9 @@ export function FaqSuggestionsPanel() {
   };
 
   const hasSuggestions = Boolean(result?.suggestions.length);
+  const hasPartialAnalysisError = Boolean(
+    generateMutation.isError && errorData?.analysis,
+  );
 
   return (
     <div className="space-y-6">
@@ -606,6 +614,11 @@ export function FaqSuggestionsPanel() {
               <p className="mt-1 text-sm">
                 {getFaqSuggestionsErrorMessage(generateMutation.error)}
               </p>
+              {errorData?.validationError && (
+                <p className="mt-2 text-sm">
+                  Motivo de validación: {errorData.validationError}.
+                </p>
+              )}
               {errorData?.retryable && (
                 <p className="mt-2 text-sm">
                   No se realizó un reintento automático para evitar consumo
@@ -626,6 +639,33 @@ export function FaqSuggestionsPanel() {
                     : "Reintentar análisis"}
                 </Button>
               )}
+              {errorData?.providerResponse && (
+                <Accordion
+                  type="single"
+                  collapsible
+                  className="mt-3 text-foreground"
+                >
+                  <AccordionItem
+                    value="provider-response"
+                    className="rounded-md border border-destructive/30 bg-background px-3"
+                  >
+                    <AccordionTrigger>
+                      Ver respuesta de Qwen que no pasó la validación
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-md bg-muted p-3 text-xs">
+                        {errorData.providerResponse}
+                      </pre>
+                      {errorData.providerResponseTruncated && (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          La respuesta fue recortada para mostrarla de forma
+                          segura.
+                        </p>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              )}
             </div>
           </div>
         </div>
@@ -645,12 +685,18 @@ export function FaqSuggestionsPanel() {
         <div className="space-y-6" aria-live="polite">
           <section aria-labelledby="suggestions-summary-title">
             <div className="mb-3 flex items-center gap-2">
-              <CheckCircle2 className="size-5 text-emerald-600" />
+              {hasPartialAnalysisError ? (
+                <AlertCircle className="size-5 text-amber-600" />
+              ) : (
+                <CheckCircle2 className="size-5 text-emerald-600" />
+              )}
               <h2
                 id="suggestions-summary-title"
                 className="text-lg font-semibold"
               >
-                Resumen del análisis
+                {hasPartialAnalysisError
+                  ? "Resumen de la preselección"
+                  : "Resumen del análisis"}
               </h2>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -675,7 +721,11 @@ export function FaqSuggestionsPanel() {
                 value={result.eligibleQuestions}
               />
               <SummaryItem
-                label="Preguntas analizadas"
+                label={
+                  hasPartialAnalysisError
+                    ? "Preguntas enviadas"
+                    : "Preguntas analizadas"
+                }
                 value={result.questionsAnalyzed}
               />
               <SummaryItem
@@ -701,12 +751,12 @@ export function FaqSuggestionsPanel() {
             </p>
           )}
 
-          {!hasSuggestions ? (
+          {!hasSuggestions && !hasPartialAnalysisError ? (
             <EmptyState
               title="Sin nuevas sugerencias"
               description={result.message || NO_SUGGESTIONS_MESSAGE}
             />
-          ) : (
+          ) : hasSuggestions ? (
             <section
               aria-labelledby="suggestions-list-title"
               className="space-y-4"
@@ -732,25 +782,29 @@ export function FaqSuggestionsPanel() {
                 />
               ))}
             </section>
-          )}
+          ) : null}
 
-          {result.hasMore && result.nextOffset !== null && (
-            <div className="flex flex-col items-start gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-muted-foreground">
-                Quedan {result.pendingQuestions} preguntas únicas relevantes
-                por analizar. Cada solicitud procesa como máximo 10.
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={generateMutation.isPending || generateMutation.isError}
-                onClick={handleNextBatch}
-              >
-                <MessageSquareText />
-                Analizar siguiente lote
-              </Button>
-            </div>
-          )}
+          {!generateMutation.isError &&
+            result.hasMore &&
+            result.nextOffset !== null && (
+              <div className="flex flex-col items-start gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Quedan {result.pendingQuestions} preguntas únicas relevantes
+                  por analizar. Cada solicitud procesa como máximo 10.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={
+                    generateMutation.isPending || generateMutation.isError
+                  }
+                  onClick={handleNextBatch}
+                >
+                  <MessageSquareText />
+                  Analizar siguiente lote
+                </Button>
+              </div>
+            )}
         </div>
       )}
     </div>

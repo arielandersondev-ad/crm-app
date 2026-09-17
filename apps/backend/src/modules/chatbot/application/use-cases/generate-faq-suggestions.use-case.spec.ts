@@ -489,12 +489,21 @@ describe('GenerateFaqSuggestionsUseCase', () => {
 
   it('falla de forma atómica ante una salida inválida', async () => {
     chatLogRepo.findRecentByTenant.mockResolvedValue([makeLog()]);
+    const invalidProviderResponse = JSON.stringify({
+      suggestions: [{ group: 1 }],
+    });
     aiProvider.generateFaqSuggestions.mockResolvedValue(
-      JSON.stringify({ suggestions: [{ group: 1 }] }),
+      invalidProviderResponse,
     );
 
     await expect(useCase.execute('tenant-a', true)).rejects.toMatchObject({
       status: 502,
+      response: expect.objectContaining({
+        validationError:
+          'una sugerencia contiene propiedades faltantes o adicionales',
+        providerResponse: invalidProviderResponse,
+        providerResponseTruncated: false,
+      }),
     } as Partial<HttpException>);
     expect(chatLogRepo.create).not.toHaveBeenCalled();
     expect(faqRepo.create).not.toHaveBeenCalled();

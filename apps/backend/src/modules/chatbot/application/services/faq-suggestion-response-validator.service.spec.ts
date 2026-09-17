@@ -84,16 +84,6 @@ describe('FaqSuggestionResponseValidator', () => {
       true,
     ],
     [
-      'evidenceCount inconsistente',
-      JSON.stringify({
-        suggestions: [
-          suggestion({ sourceQuestionIndexes: [1, 2], evidenceCount: 1 }),
-        ],
-      }),
-      2,
-      true,
-    ],
-    [
       'categoría no permitida',
       JSON.stringify({ suggestions: [suggestion({ category: 'OTRA' })] }),
       1,
@@ -224,6 +214,21 @@ describe('FaqSuggestionResponseValidator', () => {
     ).toThrow(InvalidFaqSuggestionsResponseError);
   });
 
+  it('calcula evidenceCount en backend aunque Qwen devuelva otro valor', () => {
+    const raw = JSON.stringify({
+      suggestions: [
+        suggestion({
+          sourceQuestionIndexes: [1, 2],
+          evidenceCount: 999,
+        }),
+      ],
+    });
+
+    expect(
+      validator.validate(raw, [3, 2], allCategories)[0].evidenceCount,
+    ).toBe(5);
+  });
+
   it('permite respuesta nula cuando necesita intervención humana', () => {
     const raw = JSON.stringify({
       suggestions: [
@@ -234,6 +239,18 @@ describe('FaqSuggestionResponseValidator', () => {
     expect(
       validator.validate(raw, 1, noCategories)[0].suggestedAnswer,
     ).toBeNull();
+  });
+
+  it('marca intervención humana cuando Qwen devuelve respuesta nula', () => {
+    const raw = JSON.stringify({
+      suggestions: [
+        suggestion({ suggestedAnswer: null, needsHumanAnswer: false }),
+      ],
+    });
+
+    expect(validator.validate(raw, 1, noCategories)[0].needsHumanAnswer).toBe(
+      true,
+    );
   });
 
   it('rechaza una respuesta factual sin fuente de la misma categoría', () => {

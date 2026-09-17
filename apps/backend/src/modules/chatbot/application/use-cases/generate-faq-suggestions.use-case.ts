@@ -29,6 +29,7 @@ const MAX_SOURCE_QUESTION_LENGTH = 300;
 const MAX_SOURCE_ANSWER_LENGTH = 800;
 const MAX_QUESTION_CONTEXT_CHARS = 12_000;
 const MAX_SOURCE_CONTEXT_CHARS = 8_000;
+const MAX_INVALID_PROVIDER_RESPONSE_CHARS = 20_000;
 export const FAQ_SUGGESTIONS_MAX_PROMPT_LENGTH = 24_000;
 
 export const QWEN_DISABLED_MESSAGE =
@@ -255,12 +256,28 @@ export class GenerateFaqSuggestionsUseCase {
       };
     } catch (error: unknown) {
       if (error instanceof InvalidFaqSuggestionsResponseError) {
+        const providerResponse = rawResponse.slice(
+          0,
+          MAX_INVALID_PROVIDER_RESPONSE_CHARS,
+        );
+
+        console.error('[FAQ VALIDATION ERROR]', {
+          reason: error.validationReason,
+          responseLength: rawResponse.length,
+          responseTruncated:
+            rawResponse.length > MAX_INVALID_PROVIDER_RESPONSE_CHARS,
+        });
+
         throw new HttpException(
           {
             statusCode: 502,
             code: 'FAQ_AI_INVALID_RESPONSE',
             message: INVALID_SUGGESTIONS_MESSAGE,
             retryable: true,
+            validationError: error.validationReason,
+            providerResponse,
+            providerResponseTruncated:
+              rawResponse.length > MAX_INVALID_PROVIDER_RESPONSE_CHARS,
             analysis: responseContext,
           },
           502,
