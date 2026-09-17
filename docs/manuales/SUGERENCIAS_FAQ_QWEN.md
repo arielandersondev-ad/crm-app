@@ -23,7 +23,7 @@ Qwen no accede directamente a la base de datos. El backend selecciona los logs d
 
 Las sugerencias, agrupaciones y respuestas descartadas no se guardan. Tampoco existe aprobación, rechazo, historial ni vínculo automático con una FAQ. El resultado vive únicamente en la respuesta del endpoint y en la memoria de la pantalla; desaparece al recargar o abandonar la página. Los logs originales y las FAQ existentes conservan su persistencia normal.
 
-El backend consulta la ventana completa de 48 horas. La respuesta informa `totalLogs` antes de aplicar filtros y agrega `excludedSummary` con conteos por motivo, categoría o tema y repeticiones detectadas. Este resumen nunca devuelve el texto de las preguntas descartadas. Para mantener el contexto dentro de un tamaño seguro, puede priorizar las preguntas más recientes cuando haya demasiadas para una sola solicitud. En ese caso la respuesta informa `questionsFound`, `questionsAnalyzed` y `truncated`, y muestra cuántas se enviaron realmente; este recorte técnico no es una cuota ni guarda historial.
+El backend consulta una instantánea estable de las últimas 48 horas. La respuesta informa `totalLogs`, los grupos descartados con muestras anonimizadas, las repeticiones consolidadas y las preguntas únicas elegibles. El contenido sensible se representa siempre como `[Contenido protegido]`. Cada solicitud procesa como máximo diez preguntas únicas; si quedan pendientes, el OWNER puede solicitar manualmente el siguiente lote.
 
 Antes de mostrar el resultado, el backend debe rechazar por completo cualquier salida inválida o que reintroduzca datos personales. Una respuesta parcial nunca debe mostrarse.
 
@@ -42,7 +42,7 @@ Generar o copiar una sugerencia no crea ni modifica una FAQ.
 
 - Sin preguntas relevantes: **No se encontraron conversaciones recientes que generen nuevas sugerencias de FAQ.**
 - Qwen desactivado: **La generación con Qwen está desactivada. Actívala únicamente si cuentas con capacidad suficiente en el modelo configurado.**
-- Proveedor no disponible o salida inválida: se informa que no fue posible generar sugerencias válidas; no se modifica ningún dato y el OWNER puede reintentar más tarde.
+- Proveedor no disponible, límite temporal, timeout o salida inválida: no se ejecuta un retry automático. El OWNER puede reintentar manualmente el mismo lote; ese segundo intento dispone del doble de tiempo para responder.
 - Solicitud ajena a FAQ, si se admite una instrucción adicional: **Esta solicitud no corresponde a la mejora de preguntas frecuentes ni a la atención informativa al cliente. No fue enviada al servicio de IA.**
 
 ## Configuración del servidor
@@ -53,7 +53,8 @@ Las variables se configuran en el entorno del backend; nunca se incluyen valores
 | -------------------- | ------------------------------------------ | -------------------------- |
 | `HF_TOKEN`           | Credencial del proveedor Hugging Face      | `<token-del-proveedor>`    |
 | `HF_MODEL`           | Modelo Qwen habilitado para inferencia     | `Qwen/Qwen2.5-3B-Instruct` |
-| `HF_TIMEOUT`         | Tiempo máximo de espera en milisegundos    | `10000`                    |
+| `HF_TIMEOUT`         | Timeout del chatbot interactivo            | `20000`                    |
+| `FAQ_HF_TIMEOUT`     | Timeout inicial de sugerencias FAQ          | `120000`                   |
 | `HF_EMBEDDING_MODEL` | Modelo de embeddings del chatbot existente | `Xenova/all-MiniLM-L6-v2`  |
 
 La ausencia, expiración o falta de permisos de `HF_TOKEN`, la indisponibilidad del modelo y un límite de contexto insuficiente deben tratarse como fallos recuperables. El máximo de salida de 800 tokens es una configuración de la solicitud al proveedor, no una cuota diaria. Esta fase no incorpora cuotas, cooldowns, presupuestos por tenant, contadores ni historial de consumo.
@@ -72,6 +73,8 @@ La ausencia, expiración o falta de permisos de `HF_TOKEN`, la indisponibilidad 
 - [ ] Sin fuente institucional, la respuesta es `null` y `needsHumanAnswer` es `true`.
 - [ ] JSON inválido, propiedades inesperadas o contenido ejecutable invalidan toda la generación.
 - [ ] Fallos del proveedor no afectan al chatbot público ni a la administración manual de FAQ.
+- [ ] No existen reintentos automáticos; el retry manual conserva snapshot y lote y duplica el timeout.
+- [ ] Cada solicitud envía como máximo diez preguntas únicas y consolida repeticiones exactas.
 - [ ] El resultado desaparece al recargar o salir de la pantalla.
 - [ ] Copiar una sugerencia no crea ni modifica una FAQ; la creación sigue siendo manual.
 - [ ] No se crean tablas, migraciones ni registros de sugerencias o ejecuciones.

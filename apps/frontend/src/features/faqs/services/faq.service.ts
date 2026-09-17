@@ -9,7 +9,10 @@ import {
   UpdateBotConfigDto,
   UpdateFaqDto,
 } from "../types/faq";
-import { FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS } from "../utils/faq-suggestions";
+import {
+  FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS,
+  FAQ_SUGGESTIONS_RETRY_TIMEOUT_MS,
+} from "../utils/faq-suggestions";
 
 class FaqService {
   async list(): Promise<Faq[]> {
@@ -47,7 +50,11 @@ class FaqService {
     const res = await api.post<FaqSuggestionsResponse>(
       ENDPOINTS.GENERATE_SUGGESTIONS,
       data,
-      { timeout: FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS },
+      {
+        timeout: data.retry
+          ? FAQ_SUGGESTIONS_RETRY_TIMEOUT_MS
+          : FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS,
+      },
     );
     return res.data;
   }

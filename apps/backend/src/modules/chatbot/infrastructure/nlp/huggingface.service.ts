@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AIProvider } from '../../domain/interfaces/ai-provider.interface';
+import {
+  AIProvider,
+  AIProviderRequestError,
+} from '../../domain/interfaces/ai-provider.interface';
 
 const FAQ_SUGGESTIONS_RESPONSE_FORMAT = {
   type: 'json_schema',
@@ -64,7 +67,8 @@ export class HuggingFaceService implements AIProvider {
   private readonly model: string;
   private readonly faqModel: string;
   private readonly faqProvider: string;
-  private readonly timeout: number;
+  private readonly chatTimeout: number;
+  private readonly faqTimeout: number;
 
   constructor(private readonly configService: ConfigService) {
     this.apiKey = this.configService.get<string>('HF_TOKEN') ?? '';
@@ -80,7 +84,8 @@ export class HuggingFaceService implements AIProvider {
       'FAQ_HF_PROVIDER',
       'nscale',
     );
-    this.timeout = this.configService.get<number>('HF_TIMEOUT', 10000);
+    this.chatTimeout = this.readPositiveNumber('HF_TIMEOUT', 20_000);
+    this.faqTimeout = this.readPositiveNumber('FAQ_HF_TIMEOUT', 120_000);
   }
 
   async generate(question: string, context: string): Promise<string> {
@@ -95,7 +100,7 @@ Si el contexto no contiene la respuesta, responde exactamente:
     const prompt = `${systemPrompt}\n\nContexto:\n${context}\n\nPregunta: ${question}`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    const timeoutId = setTimeout(() => controller.abort(), this.chatTimeout);
 
     try {
       const res = await fetch(
@@ -143,9 +148,13 @@ Si el contexto no contiene la respuesta, responde exactamente:
     }
   }
 
-  async generateFaqSuggestions(prompt: string): Promise<string> {
+  async generateFaqSuggestions(
+    prompt: string,
+    options: { retry?: boolean } = {},
+  ): Promise<string> {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    const timeout = options.retry ? this.faqTimeout * 2 : this.faqTimeout;
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
       const res = await fetch(
@@ -177,7 +186,10 @@ Si el contexto no contiene la respuesta, responde exactamente:
           model: this.faqModel,
         });
 
-        throw new Error(`HuggingFace API error: ${res.status}`);
+        throw this.buildProviderError(
+          res.status,
+          res.headers.get('retry-after'),
+        );
       }
 
       const data = (await res.json()) as unknown;
@@ -188,9 +200,143 @@ Si el contexto no contiene la respuesta, responde exactamente:
       }
 
       return generatedText.trim();
+    } catch (error: unknown) {
+      if (error instanceof AIProviderRequestError) {
+        throw error;
+      }
+
+      this.logFaqProviderFailure(error, options.retry === true, timeout);
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new AIProviderRequestError(
+          `El proveedor no respondió dentro de ${timeout / 1_000} segundos.`,
+          504,
+          'FAQ_AI_TIMEOUT',
+          true,
+        );
+      }
+
+      throw new AIProviderRequestError(
+        'No fue posible establecer comunicación con el proveedor de IA.',
+        503,
+        'FAQ_AI_UNAVAILABLE',
+        true,
+      );
     } finally {
       clearTimeout(timeoutId);
     }
+  }
+
+  private logFaqProviderFailure(
+    error: unknown,
+    retry: boolean,
+    timeoutMs: number,
+  ): void {
+    const errorRecord = this.isRecord(error) ? error : undefined;
+    const cause = errorRecord?.cause;
+    const causeRecord = this.isRecord(cause) ? cause : undefined;
+
+    console.error('[FAQ AI ERROR]', {
+      name: error instanceof Error ? error.name : typeof error,
+      message:
+        error instanceof Error ? error.message : 'Error no reconocido',
+      cause: causeRecord
+        ? {
+            name:
+              typeof causeRecord.name === 'string'
+                ? causeRecord.name
+                : undefined,
+            message:
+              typeof causeRecord.message === 'string'
+                ? causeRecord.message
+                : undefined,
+            code:
+              typeof causeRecord.code === 'string'
+                ? causeRecord.code
+                : undefined,
+          }
+        : undefined,
+      model: this.faqModel,
+      provider: this.faqProvider,
+      retry,
+      timeoutMs,
+    });
+  }
+
+  private buildProviderError(
+    status: number,
+    retryAfterHeader: string | null,
+  ): AIProviderRequestError {
+    const retryAfterSeconds = this.parseRetryAfter(retryAfterHeader);
+    const definitions: Record<
+      number,
+      { code: string; message: string; retryable: boolean }
+    > = {
+      400: {
+        code: 'FAQ_AI_INVALID_REQUEST',
+        message: 'El modelo o los parámetros configurados no son válidos.',
+        retryable: false,
+      },
+      401: {
+        code: 'FAQ_AI_AUTH_ERROR',
+        message: 'El proveedor rechazó las credenciales configuradas.',
+        retryable: false,
+      },
+      403: {
+        code: 'FAQ_AI_AUTH_ERROR',
+        message: 'La cuenta no tiene permisos para utilizar el modelo.',
+        retryable: false,
+      },
+      429: {
+        code: 'FAQ_AI_RATE_LIMITED',
+        message: 'El proveedor alcanzó temporalmente su límite de solicitudes.',
+        retryable: true,
+      },
+      502: {
+        code: 'FAQ_AI_BAD_GATEWAY',
+        message: 'El proveedor devolvió una respuesta temporalmente inválida.',
+        retryable: true,
+      },
+      503: {
+        code: 'FAQ_AI_UNAVAILABLE',
+        message: 'El proveedor de IA está temporalmente no disponible.',
+        retryable: true,
+      },
+      504: {
+        code: 'FAQ_AI_TIMEOUT',
+        message: 'El proveedor agotó el tiempo disponible para responder.',
+        retryable: true,
+      },
+    };
+    const definition = definitions[status] ?? definitions[503];
+
+    return new AIProviderRequestError(
+      definition.message,
+      status >= 400 && status <= 599 ? status : 503,
+      definition.code,
+      definition.retryable,
+      retryAfterSeconds,
+    );
+  }
+
+  private parseRetryAfter(value: string | null): number | undefined {
+    if (!value) return undefined;
+
+    const seconds = Number(value);
+    if (Number.isFinite(seconds) && seconds >= 0) {
+      return Math.ceil(seconds);
+    }
+
+    const date = Date.parse(value);
+    if (Number.isNaN(date)) return undefined;
+    return Math.max(0, Math.ceil((date - Date.now()) / 1_000));
+  }
+
+  private readPositiveNumber(key: string, fallback: number): number {
+    const value = Number(
+      this.configService.get<string | number>(key, fallback),
+    );
+    return Number.isFinite(value) && value > 0 ? value : fallback;
   }
 
   private extractGeneratedText(data: unknown): string | undefined {
