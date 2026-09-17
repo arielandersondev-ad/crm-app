@@ -3,14 +3,15 @@ import test from "node:test";
 
 import {
   FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS,
+  FAQ_SUGGESTIONS_RETRY_TIMEOUT_MS,
   buildCompleteFaqText,
   canAccessFaqSuggestions,
   getFaqSuggestionsErrorMessage,
 } from "./faq-suggestions.ts";
 
 test("permite que el backend complete Qwen antes del timeout del navegador", () => {
-  assert.equal(FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS, 60_000);
-  assert.ok(FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS > 10_000);
+  assert.equal(FAQ_SUGGESTIONS_REQUEST_TIMEOUT_MS, 130_000);
+  assert.equal(FAQ_SUGGESTIONS_RETRY_TIMEOUT_MS, 250_000);
 });
 
 test("las sugerencias solo son visibles para OWNER", () => {

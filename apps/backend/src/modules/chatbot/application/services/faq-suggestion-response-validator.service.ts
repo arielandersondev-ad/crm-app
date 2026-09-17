@@ -30,9 +30,13 @@ export class FaqSuggestionResponseValidator {
 
   validate(
     rawResponse: string,
-    questionCount: number,
+    questionCountOrOccurrences: number | number[],
     authorizedCategories: ReadonlySet<FaqSuggestionCategory>,
   ): FaqSuggestion[] {
+    const questionOccurrences = Array.isArray(questionCountOrOccurrences)
+      ? questionCountOrOccurrences
+      : new Array(questionCountOrOccurrences).fill(1);
+    const questionCount = questionOccurrences.length;
     let parsed: unknown;
 
     try {
@@ -87,7 +91,6 @@ export class FaqSuggestionResponseValidator {
         sourceQuestionIndexes.length === 0 ||
         typeof evidenceCount !== 'number' ||
         !Number.isInteger(evidenceCount) ||
-        evidenceCount !== sourceQuestionIndexes.length ||
         typeof needsHumanAnswer !== 'boolean' ||
         !this.isSafeText(question, 300) ||
         !this.isSafeText(reason, 1_000) ||
@@ -100,6 +103,7 @@ export class FaqSuggestionResponseValidator {
 
       const localIndexes = new Set<number>();
       const validatedIndexes: number[] = [];
+      let expectedEvidenceCount = 0;
       for (const indexValue of sourceQuestionIndexes) {
         if (
           typeof indexValue !== 'number' ||
@@ -114,6 +118,11 @@ export class FaqSuggestionResponseValidator {
         localIndexes.add(indexValue);
         usedIndexes.add(indexValue);
         validatedIndexes.push(indexValue);
+        expectedEvidenceCount += questionOccurrences[indexValue - 1] ?? 0;
+      }
+
+      if (evidenceCount !== expectedEvidenceCount) {
+        throw new InvalidFaqSuggestionsResponseError();
       }
 
       let validatedAnswer: string | null;

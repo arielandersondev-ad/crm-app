@@ -101,6 +101,7 @@ export class ChatQueryUseCase {
       responseTime: Date.now() - start,
       modelName,
       usedAI: source === "AI",
+      resolved: source !== "Fallback",
     });
 
     return { answer, source, confidence: topFAQs[0]?.score ?? 0 };

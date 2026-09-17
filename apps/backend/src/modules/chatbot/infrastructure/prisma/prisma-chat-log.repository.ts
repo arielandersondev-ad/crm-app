@@ -18,6 +18,7 @@ export class PrismaChatLogRepository implements ChatLogRepository {
     responseTime?: number;
     modelName?: string;
     usedAI?: boolean;
+    resolved?: boolean;
   }): Promise<ChatLog> {
     return this.prisma.chatLog.create({
       data: data as Prisma.ChatLogUncheckedCreateInput,
@@ -32,11 +33,15 @@ export class PrismaChatLogRepository implements ChatLogRepository {
     });
   }
 
-  async findRecentByTenant(tenantId: string, since: Date): Promise<ChatLog[]> {
+  async findRecentByTenant(
+    tenantId: string,
+    since: Date,
+    until?: Date,
+  ): Promise<ChatLog[]> {
     return this.prisma.chatLog.findMany({
       where: {
         tenantId,
-        createdAt: { gte: since },
+        createdAt: { gte: since, ...(until ? { lte: until } : {}) },
       },
       orderBy: { createdAt: 'desc' },
     });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertCircle,
   Bot,
@@ -9,6 +9,7 @@ import {
   Clock3,
   Loader2,
   MessageSquareText,
+  RefreshCw,
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -29,11 +30,16 @@ import { cn } from "@/shared/utils/utils";
 import { useGenerateFaqSuggestions } from "../hooks/use-faqs";
 import type {
   FaqSuggestion,
+  FaqConsolidatedQuestion,
+  FaqExcludedGroup,
+  FaqExclusionReason,
   FaqSuggestionExcludedSummary,
   FaqSuggestionsResponse,
+  GenerateFaqSuggestionsDto,
 } from "../types/faq";
 import {
   buildCompleteFaqText,
+  getFaqSuggestionsErrorData,
   getFaqSuggestionsErrorMessage,
 } from "../utils/faq-suggestions";
 
@@ -76,6 +82,18 @@ const EXCLUSION_REASON_LABELS: Record<
   other: "Otros motivos",
 };
 
+const EXCLUSION_GROUP_LABELS: Record<FaqExclusionReason, string> = {
+  GREETING: "Saludos o conversación social",
+  NOISE: "Texto sin significado suficiente",
+  OUT_OF_SCOPE: "Contenido fuera de temática",
+  CLINICAL: "Consulta clínica",
+  SENSITIVE: "Datos personales o identificadores",
+  APPOINTMENT_TRANSACTION: "Gestión individual de una cita",
+  PROMPT_INJECTION: "Instrucción potencialmente insegura",
+  RESOLVED_HIGH_CONFIDENCE: "Resuelta con confianza suficiente",
+  EMPTY_OR_INVALID: "Vacía o sin contenido útil",
+};
+
 interface SummaryItemProps {
   label: string;
   value: string | number;
@@ -92,8 +110,12 @@ function SummaryItem({ label, value }: SummaryItemProps) {
 
 function ExcludedSummary({
   summary,
+  groups,
+  consolidatedQuestions,
 }: {
   summary: FaqSuggestionExcludedSummary;
+  groups: FaqExcludedGroup[];
+  consolidatedQuestions: FaqConsolidatedQuestion[];
 }) {
   const reasons = Object.entries(summary.byReason).filter(
     ([, count]) => count > 0,
@@ -109,8 +131,8 @@ function ExcludedSummary({
           Resumen de filtros y repeticiones
         </CardTitle>
         <CardDescription>
-          Solo se muestran conteos agregados; las preguntas descartadas no se
-          exponen.
+          Las muestras están anonimizadas. El contenido sensible nunca se
+          muestra literalmente.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5 md:grid-cols-3">
@@ -153,6 +175,71 @@ function ExcludedSummary({
           </div>
         </div>
       </CardContent>
+      {(groups.length > 0 || consolidatedQuestions.length > 0) && (
+        <CardFooter className="grid w-full gap-5 border-t pt-5 lg:grid-cols-2">
+          <div>
+            <p className="mb-3 font-medium">Preguntas descartadas</p>
+            {groups.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No hubo preguntas descartadas.
+              </p>
+            ) : (
+              <ul className="max-h-80 space-y-2 overflow-y-auto pr-1">
+                {groups.map((group, index) => (
+                  <li
+                    key={`${group.reason}-${group.representativeQuestion}-${index}`}
+                    className="rounded-md border bg-background p-3"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-medium">
+                          {EXCLUSION_GROUP_LABELS[group.reason]}
+                        </p>
+                        <p className="mt-1 break-words text-sm text-muted-foreground">
+                          “{group.representativeQuestion}”
+                        </p>
+                      </div>
+                      <Badge variant="secondary">{group.count}</Badge>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div>
+            <p className="mb-3 font-medium">Repeticiones consolidadas</p>
+            {consolidatedQuestions.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No hubo preguntas relevantes repetidas.
+              </p>
+            ) : (
+              <ul className="max-h-80 space-y-2 overflow-y-auto pr-1">
+                {consolidatedQuestions.map((item, index) => (
+                  <li
+                    key={`${item.question}-${index}`}
+                    className="rounded-md border bg-background p-3"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="break-words text-sm font-medium">
+                          “{item.question}”
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Enviada una sola vez a la IA
+                        </p>
+                      </div>
+                      <Badge variant="outline">
+                        {item.occurrences} ocurrencias
+                      </Badge>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </CardFooter>
+      )}
     </Card>
   );
 }
@@ -250,20 +337,130 @@ function SuggestionCard({ suggestion, position, onCopy }: SuggestionCardProps) {
 export function FaqSuggestionsPanel() {
   const [useQwen, setUseQwen] = useState(false);
   const [result, setResult] = useState<FaqSuggestionsResponse | null>(null);
+  const [lastRequest, setLastRequest] =
+    useState<GenerateFaqSuggestionsDto | null>(null);
+  const [retryWaitSeconds, setRetryWaitSeconds] = useState(0);
   const generateMutation = useGenerateFaqSuggestions();
+  const errorData = getFaqSuggestionsErrorData(generateMutation.error);
+
+  useEffect(() => {
+    if (!generateMutation.isError || retryWaitSeconds <= 0) return;
+    const intervalId = window.setInterval(() => {
+      setRetryWaitSeconds((current) => {
+        if (current <= 1) {
+          window.clearInterval(intervalId);
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 1_000);
+
+    return () => window.clearInterval(intervalId);
+  }, [generateMutation.isError, retryWaitSeconds]);
+
+  const mergeResults = (
+    previous: FaqSuggestionsResponse | null,
+    next: FaqSuggestionsResponse,
+    append: boolean,
+  ): FaqSuggestionsResponse => {
+    if (!append || !previous) return next;
+
+    const suggestions = [...previous.suggestions];
+    const existing = new Set(
+      suggestions.map(
+        (item) => `${item.category}:${item.question.trim().toLowerCase()}`,
+      ),
+    );
+    for (const suggestion of next.suggestions) {
+      const key = `${suggestion.category}:${suggestion.question.trim().toLowerCase()}`;
+      if (!existing.has(key)) {
+        suggestions.push(suggestion);
+        existing.add(key);
+      }
+    }
+
+    return {
+      ...next,
+      offset: previous.offset,
+      questionsAnalyzed:
+        previous.questionsAnalyzed + next.questionsAnalyzed,
+      groupsDetected: suggestions.length,
+      suggestions,
+    };
+  };
+
+  const executeAnalysis = async (
+    request: GenerateFaqSuggestionsDto,
+    append: boolean,
+  ) => {
+    setLastRequest(request);
+    setRetryWaitSeconds(0);
+    generateMutation.reset();
+
+    try {
+      const response = await generateMutation.mutateAsync(request);
+      setResult((current) => mergeResults(current, response, append));
+    } catch (error) {
+      const details = getFaqSuggestionsErrorData(error);
+      setRetryWaitSeconds(details?.retryAfterSeconds ?? 0);
+      if (details?.analysis) {
+        setLastRequest({
+          useQwen: true,
+          snapshotAt: details.analysis.snapshotAt,
+          offset: details.analysis.offset,
+        });
+        if (!append) {
+          setResult({
+            ...details.analysis,
+            groupsDetected: 0,
+            suggestions: [],
+          });
+        }
+      }
+    }
+  };
 
   const handleAnalyze = async () => {
     if (!useQwen || generateMutation.isPending) return;
 
     setResult(null);
-    generateMutation.reset();
+    setLastRequest(null);
+    await executeAnalysis({ useQwen: true, offset: 0 }, false);
+  };
 
-    try {
-      const response = await generateMutation.mutateAsync({ useQwen: true });
-      setResult(response);
-    } catch {
-      // El error se presenta en el panel; no se conserva una respuesta anterior.
+  const handleNextBatch = async () => {
+    if (
+      !result?.hasMore ||
+      result.nextOffset === null ||
+      generateMutation.isPending
+    ) {
+      return;
     }
+
+    await executeAnalysis(
+      {
+        useQwen: true,
+        snapshotAt: result.snapshotAt,
+        offset: result.nextOffset,
+      },
+      true,
+    );
+  };
+
+  const handleRetry = async () => {
+    if (
+      !lastRequest ||
+      !errorData?.retryable ||
+      retryWaitSeconds > 0 ||
+      generateMutation.isPending
+    ) {
+      return;
+    }
+
+    await executeAnalysis(
+      { ...lastRequest, retry: true },
+      (lastRequest.offset ?? 0) > 0,
+    );
   };
 
   const handleCopy = async (text: string, contentName: string) => {
@@ -328,6 +525,7 @@ export function FaqSuggestionsPanel() {
               onClick={() => {
                 setUseQwen((current) => !current);
                 generateMutation.reset();
+                setLastRequest(null);
               }}
               className={cn(
                 "relative h-6 w-11 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
@@ -399,14 +597,36 @@ export function FaqSuggestionsPanel() {
       {generateMutation.isError && !generateMutation.isPending && (
         <div
           role="alert"
-          className="flex items-start gap-3 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-destructive"
+          className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-destructive"
         >
-          <AlertCircle className="mt-0.5 size-5 shrink-0" />
-          <div>
-            <p className="font-medium">No se pudo completar el análisis</p>
-            <p className="mt-1 text-sm">
-              {getFaqSuggestionsErrorMessage(generateMutation.error)}
-            </p>
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 size-5 shrink-0" />
+            <div>
+              <p className="font-medium">No se pudo completar el análisis</p>
+              <p className="mt-1 text-sm">
+                {getFaqSuggestionsErrorMessage(generateMutation.error)}
+              </p>
+              {errorData?.retryable && (
+                <p className="mt-2 text-sm">
+                  No se realizó un reintento automático para evitar consumo
+                  duplicado. El reintento manual utilizará hasta 240 segundos.
+                </p>
+              )}
+              {errorData?.retryable && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-3 border-destructive/40 bg-background text-foreground"
+                  disabled={retryWaitSeconds > 0}
+                  onClick={handleRetry}
+                >
+                  <RefreshCw />
+                  {retryWaitSeconds > 0
+                    ? `Reintentar en ${retryWaitSeconds} s`
+                    : "Reintentar análisis"}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -421,7 +641,7 @@ export function FaqSuggestionsPanel() {
           />
         )}
 
-      {result && !generateMutation.isPending && !generateMutation.isError && (
+      {result && !generateMutation.isPending && (
         <div className="space-y-6" aria-live="polite">
           <section aria-labelledby="suggestions-summary-title">
             <div className="mb-3 flex items-center gap-2">
@@ -433,7 +653,7 @@ export function FaqSuggestionsPanel() {
                 Resumen del análisis
               </h2>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <SummaryItem
                 label="Periodo analizado"
                 value={`${result.periodHours} h`}
@@ -443,16 +663,24 @@ export function FaqSuggestionsPanel() {
                 value={result.totalLogs ?? result.questionsFound}
               />
               <SummaryItem
-                label="Preguntas elegibles"
-                value={result.questionsFound}
+                label="Preguntas descartadas"
+                value={result.excludedSummary?.totalExcluded ?? 0}
+              />
+              <SummaryItem
+                label="Repeticiones consolidadas"
+                value={result.consolidatedDuplicates}
+              />
+              <SummaryItem
+                label="Preguntas únicas elegibles"
+                value={result.eligibleQuestions}
               />
               <SummaryItem
                 label="Preguntas analizadas"
                 value={result.questionsAnalyzed}
               />
               <SummaryItem
-                label="Grupos detectados"
-                value={result.groupsDetected}
+                label="Preguntas pendientes"
+                value={result.pendingQuestions}
               />
               <SummaryItem
                 label="FAQ sugeridas"
@@ -463,6 +691,8 @@ export function FaqSuggestionsPanel() {
 
           <ExcludedSummary
             summary={result.excludedSummary ?? EMPTY_EXCLUDED_SUMMARY}
+            groups={result.excludedGroups ?? []}
+            consolidatedQuestions={result.consolidatedQuestions ?? []}
           />
 
           {result.message && hasSuggestions && (
@@ -502,6 +732,24 @@ export function FaqSuggestionsPanel() {
                 />
               ))}
             </section>
+          )}
+
+          {result.hasMore && result.nextOffset !== null && (
+            <div className="flex flex-col items-start gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">
+                Quedan {result.pendingQuestions} preguntas únicas relevantes
+                por analizar. Cada solicitud procesa como máximo 10.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={generateMutation.isPending || generateMutation.isError}
+                onClick={handleNextBatch}
+              >
+                <MessageSquareText />
+                Analizar siguiente lote
+              </Button>
+            </div>
           )}
         </div>
       )}

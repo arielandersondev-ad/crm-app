@@ -73,7 +73,11 @@ export class ChatbotController {
     @CurrentUser('tenantId') tenantId: string,
     @Body() dto: GenerateFaqSuggestionsDto,
   ) {
-    return this.generateFaqSuggestionsUseCase.execute(tenantId, dto.useQwen);
+    return this.generateFaqSuggestionsUseCase.execute(tenantId, dto.useQwen, {
+      snapshotAt: dto.snapshotAt,
+      offset: dto.offset,
+      retry: dto.retry,
+    });
   }
 
   @Post('public/query')

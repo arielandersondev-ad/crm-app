@@ -12,10 +12,12 @@ export abstract class ChatLogRepository {
     responseTime?: number;
     modelName?: string;
     usedAI?: boolean;
+    resolved?: boolean;
   }): Promise<ChatLog>;
   abstract findByTenant(tenantId: string, limit?: number): Promise<ChatLog[]>;
   abstract findRecentByTenant(
     tenantId: string,
     since: Date,
+    until?: Date,
   ): Promise<ChatLog[]>;
 }
