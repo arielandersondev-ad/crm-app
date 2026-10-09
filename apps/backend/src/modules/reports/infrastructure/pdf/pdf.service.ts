@@ -1,6 +1,3 @@
-import * as fs from "fs";
-import * as path from "path";
-import * as os from "os";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
@@ -12,20 +9,13 @@ export class PdfService {
       const PdfPrinter = require("pdfmake/src/printer");
       const vfs = require("pdfmake/build/vfs_fonts");
 
-      const fontsDir = path.join(os.tmpdir(), "pdfmake-fonts");
-      if (!fs.existsSync(fontsDir)) {
-        fs.mkdirSync(fontsDir, { recursive: true });
-        for (const [name, data] of Object.entries(vfs)) {
-          fs.writeFileSync(path.join(fontsDir, name), Buffer.from(data as string, "base64"));
-        }
-      }
-
+      // Use the bundled fonts directly; a stale temporary directory may be incomplete.
       const fonts = {
         Roboto: {
-          normal: path.join(fontsDir, "Roboto-Regular.ttf"),
-          bold: path.join(fontsDir, "Roboto-Medium.ttf"),
-          italics: path.join(fontsDir, "Roboto-Italic.ttf"),
-          bolditalics: path.join(fontsDir, "Roboto-MediumItalic.ttf"),
+          normal: Buffer.from(vfs["Roboto-Regular.ttf"], "base64"),
+          bold: Buffer.from(vfs["Roboto-Medium.ttf"], "base64"),
+          italics: Buffer.from(vfs["Roboto-Italic.ttf"], "base64"),
+          bolditalics: Buffer.from(vfs["Roboto-MediumItalic.ttf"], "base64"),
         },
       };
 
@@ -54,5 +44,4 @@ export class PdfService {
       }
     });
   }
-
 }
