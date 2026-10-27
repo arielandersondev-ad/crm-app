@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Modal } from "@/shared/components/modal";
+import { PasswordInput } from "@/shared/components/ui/password-input";
 import { ChangePasswordSchema, ChangePasswordFormData } from "../schemas/user.schema";
 import { useChangePassword } from "../hooks/use-users";
 import { toast } from "sonner";
@@ -44,11 +45,12 @@ export function ChangePasswordModal({ open, onClose }: ChangePasswordModalProps)
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           <div>
-            <label className="block mb-1">Contraseña Actual</label>
-            <input
+            <label htmlFor="current-password" className="block mb-1">Contraseña Actual</label>
+            <PasswordInput
               {...register("currentPassword")}
-              type="password"
-              className="w-full border rounded-md p-2"
+              id="current-password"
+              autoComplete="current-password"
+              className="h-auto w-full border rounded-md p-2"
               placeholder="Ingrese su contraseña actual"
             />
             {errors?.currentPassword && (
@@ -56,11 +58,12 @@ export function ChangePasswordModal({ open, onClose }: ChangePasswordModalProps)
             )}
           </div>
           <div>
-            <label className="block mb-1">Nueva Contraseña</label>
-            <input
+            <label htmlFor="new-password" className="block mb-1">Nueva Contraseña</label>
+            <PasswordInput
               {...register("newPassword")}
-              type="password"
-              className="w-full border rounded-md p-2"
+              id="new-password"
+              autoComplete="new-password"
+              className="h-auto w-full border rounded-md p-2"
               placeholder="Mínimo 8 caracteres"
             />
             {errors?.newPassword && (
@@ -68,11 +71,12 @@ export function ChangePasswordModal({ open, onClose }: ChangePasswordModalProps)
             )}
           </div>
           <div>
-            <label className="block mb-1">Confirmar Nueva Contraseña</label>
-            <input
+            <label htmlFor="confirm-new-password" className="block mb-1">Confirmar Nueva Contraseña</label>
+            <PasswordInput
               {...register("confirmPassword")}
-              type="password"
-              className="w-full border rounded-md p-2"
+              id="confirm-new-password"
+              autoComplete="new-password"
+              className="h-auto w-full border rounded-md p-2"
               placeholder="Repita la nueva contraseña"
             />
             {errors?.confirmPassword && (

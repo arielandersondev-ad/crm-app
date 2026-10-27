@@ -1,4 +1,5 @@
 import { UseFormRegister } from "react-hook-form";
+import { PasswordInput } from "@/shared/components/ui/password-input";
 import { CreateUserFormData, EditUserFormData } from "../schemas/user.schema";
 
 type UserFormData = CreateUserFormData | EditUserFormData;
@@ -28,11 +29,12 @@ export function UserForm({isEdit, sucursales, register, errors }: UserFormProps)
       </div>
       {!isEdit && (
         <div>
-          <label className="block mb-1">Contraseña</label>
-          <input
+          <label htmlFor="user-password" className="block mb-1">Contraseña</label>
+          <PasswordInput
             {...register("password")}
-            type="password"
-            className="w-full border rounded-md p-2"
+            id="user-password"
+            autoComplete="new-password"
+            className="h-auto w-full border rounded-md p-2"
             placeholder="Mínimo 8 caracteres"
           />
           {errors?.password && (
