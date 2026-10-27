@@ -9,7 +9,7 @@ import { usePatientProfile, useCreatePatientProfile, useUpdatePatientProfile } f
 import { ClientsTable } from "../components/clients-table";
 import { LoadingState } from "@/shared/components/loading-state";
 import { Button } from "@/shared/components/ui/button";
-import { Download, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { ClientModal } from "../components/cliente-modal";
 import { Client } from "../types/client";
@@ -55,10 +55,6 @@ export function ClientsPage() {
         actions={
           <div className="flex gap-2 items-center justify-center align-center">
 
-            <Button variant="outline" className="gap-2">
-              <Download className="size-4" />
-              Exportar
-            </Button>
             <Button 
               onClick={() => setIsCreateOpen(true)}
               className="gap-2"

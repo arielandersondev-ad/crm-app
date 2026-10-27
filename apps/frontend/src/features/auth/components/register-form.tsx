@@ -10,6 +10,7 @@ import {
 
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { PasswordInput } from "@/shared/components/ui/password-input";
 import { useRegister } from "../api/use-register";
 
 export function RegisterForm() {
@@ -115,9 +116,9 @@ export function RegisterForm() {
           Password
         </label>
 
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
+          autoComplete="new-password"
           placeholder="********"
           {...register("password")}
         />
@@ -130,15 +131,15 @@ export function RegisterForm() {
       </div>
       <div className="space-y-2">
         <label
-          htmlFor="password"
+          htmlFor="confirmPassword"
           className="text-sm font-medium"
         >
-          Password
+          Confirmar contraseña
         </label>
 
-        <Input
+        <PasswordInput
           id="confirmPassword"
-          type="password"
+          autoComplete="new-password"
           placeholder="********"
           {...register("confirmPassword")}
         />

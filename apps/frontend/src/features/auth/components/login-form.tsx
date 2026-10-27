@@ -13,6 +13,7 @@ import { useLogin } from "../api/use-login";
 
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { PasswordInput } from "@/shared/components/ui/password-input";
 
 function getLoginErrorMessage(error: unknown): string {
   if (!axios.isAxiosError(error)) {
@@ -86,9 +87,9 @@ export function LoginForm() {
           Contraseña
         </label>
 
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
+          autoComplete="current-password"
           placeholder="********"
           {...register("password")}
         />

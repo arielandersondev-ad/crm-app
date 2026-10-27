@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
 import { SearchableItem } from "./types";
 
 interface SearchModalProps<T extends SearchableItem> {
@@ -33,29 +34,22 @@ export function SearchModal<T extends SearchableItem>({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg bg-background p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+      <DialogContent className="flex max-h-[calc(100dvh-2rem)] flex-col overflow-hidden sm:max-w-lg" aria-describedby={undefined}>
+        <DialogHeader className="shrink-0 pr-8">
+          <DialogTitle className="text-lg font-semibold">
             {title}
-          </h2>
-
-          <button
-            type="button"
-            onClick={onClose}
-          >
-            ✕
-          </button>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar..."
-          className="w-full border rounded-md p-2 mb-4"
+          className="w-full shrink-0 border rounded-md p-2"
         />
 
-        <div className="max-h-80 overflow-y-auto space-y-2">
+        <div className="min-h-0 max-h-80 overflow-y-auto overscroll-contain space-y-2">
           {filteredItems.map((item) => (
             <button
               key={item.id}
@@ -78,8 +72,8 @@ export function SearchModal<T extends SearchableItem>({
             </button>
           ))}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
