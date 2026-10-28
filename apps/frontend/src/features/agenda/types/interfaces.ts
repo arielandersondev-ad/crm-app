@@ -5,6 +5,7 @@ export interface Details{
   status:any,
   scheduledAt:string,
   hora:string,
+  scheduleWarning?: string | null,
   clientFullName: string,
   userName: string,
   visit:any,

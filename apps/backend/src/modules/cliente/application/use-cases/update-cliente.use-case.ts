@@ -9,7 +9,7 @@ export class UpdateClienteUseCase {
   ) {}
   async execute(tenantId: string, id: string, dto: UpdateClienteDto): Promise<void> {
     if (!tenantId) {
-      throw new Error('TenantId es requerido');
+      throw new Error('La empresa es obligatoria');
     }
     await this.clienteRepo.update(
       id,

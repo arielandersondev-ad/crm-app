@@ -1,5 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/shared/components/ui/accordion"
 import { Details } from "../types/interfaces"
+import { cn } from "@/shared/utils/utils"
+import { OUTSIDE_SCHEDULE_CLASSES } from "../utils/agenda-schedule"
 
 interface MonthWeek {
   numero: number
@@ -11,9 +13,10 @@ interface MonthWeek {
 interface Props {
   weeks: MonthWeek[]
   onSelected: (c:any)=>void
+  timezone: string
 }
 
-export function AgendaMesView({weeks, onSelected}: Props) {
+export function AgendaMesView({weeks, onSelected, timezone}: Props) {
   return (
     <div className="space-y-4 p-4">
       <Accordion
@@ -51,7 +54,8 @@ export function AgendaMesView({weeks, onSelected}: Props) {
                   {week.citas.map((cita) => (
                     <div
                       key={cita.id}
-                      className="rounded border p-2"
+                      className={cn("rounded border p-2", cita.scheduleWarning && OUTSIDE_SCHEDULE_CLASSES)}
+                      title={cita.scheduleWarning ?? undefined}
                       onClick={()=>onSelected(cita)}
                     >
                       <div className="font-medium">
@@ -60,10 +64,11 @@ export function AgendaMesView({weeks, onSelected}: Props) {
 
                       <div className="text-xs text-muted-foreground">
                         {new Date(cita.scheduledAt)
-                          .toLocaleDateString('es-BO')}
+                          .toLocaleDateString('es-BO', { timeZone: timezone })}
                         {' - '}
                         {cita.hora}
                       </div>
+                      {cita.scheduleWarning && <p className="mt-1 text-xs font-medium text-yellow-950 dark:text-yellow-100">{cita.scheduleWarning}</p>}
                     </div>
                   ))}
                 </div>

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const ClientSchema = z.object({
   fullName: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
 
-  email: z.email("Ingrese un email válido"),
+  email: z.email("Ingrese un correo electrónico válido"),
 
   phone: z.string().min(8, "El teléfono debe tener al menos 8 caracteres"),
 

@@ -1,29 +1,32 @@
-import { IsEmail, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsEmail, IsNotEmpty, IsOptional, IsString, ValidateIf } from "class-validator";
 
 export class CreateClienteDto {
 
-  @IsString()
+  @IsNotEmpty({ message: "El nombre completo es obligatorio" })
+  @IsString({ message: "El nombre completo debe ser un texto" })
   fullName: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: "Ingrese un correo electrónico válido" })
   email: string;
 
-  @IsString()
+  @IsNotEmpty({ message: "El teléfono es obligatorio" })
+  @IsString({ message: "El teléfono debe ser un texto" })
   phone: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: "El número de documento debe ser un texto" })
   documentNumber?: string;
 
   @IsOptional()
-  @IsString()
+  @ValidateIf((_object, value) => value !== "")
+  @IsDateString({ strict: true }, { message: "Ingrese una fecha de nacimiento válida" })
   birthDate?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: "La dirección debe ser un texto" })
   address?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: "Las notas deben ser un texto" })
   notes?: string;
 }

@@ -10,9 +10,10 @@ import { FindAllConsultationsUseCase } from "./application/use-cases/find-all-co
 import { ConsultationRepository } from "./domain/repositories/consultation.repository";
 import { PrismaConsultationRepository } from "./infrastructure/prisma/prisma-consultation.repository";
 import { CitaModule } from "../cita/cita.module";
+import { SucursalModule } from "../sucursal/sucursal.module";
 
 @Module({
-  imports: [CitaModule],
+  imports: [CitaModule, SucursalModule],
   controllers: [ConsultationController],
   providers: [
     CreateConsultationUseCase,

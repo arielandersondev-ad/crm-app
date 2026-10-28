@@ -7,17 +7,8 @@ import { StatusBadge } from '@/shared/components/status-badge'
 import { cn } from '@/shared/utils/utils'
 
 import { Details } from '../types/interfaces'
-
-const horas = [
-  '09:00',
-  '10:00',
-  '11:00',
-  '12:00',
-  '13:00',
-  '14:00',
-  '15:00',
-  '16:00',
-]
+import { daySlots } from '../utils/agenda-calendar'
+import { OUTSIDE_SCHEDULE_CLASSES } from '../utils/agenda-schedule'
 
 const statusColor: Record<string, string> = {
   PENDING: 'border-l-warning',
@@ -35,9 +26,9 @@ interface Props {
 export function AgendaDiaView({ appointments,onSelected }: Props) {
   return (
     <div className="divide-y divide-border">
-      {horas.map((hora) => {
+      {daySlots(appointments).map((hora) => {
         const enHora = appointments.filter((c) =>
-          c.hora.startsWith(hora.slice(0, 2))
+          Number(c.hora.split(':')[0]) === Number(hora.slice(0, 2))
         )
 
         return (
@@ -54,9 +45,10 @@ export function AgendaDiaView({ appointments,onSelected }: Props) {
                   <div
                     key={c.id}
                     onClick={() => onSelected(c)}
+                    title={c.scheduleWarning ?? undefined}
                     className={cn(
-                      'rounded-md border border-l-4 border-border bg-secondary/40 p-3 cursor-pointer hover:bg-secondary/60 transition-colors',
-                      statusColor[c.status] ?? 'border-l-primary',
+                      'rounded-md border border-l-4 p-3 cursor-pointer transition-colors',
+                      c.scheduleWarning ? OUTSIDE_SCHEDULE_CLASSES : cn('border-border bg-secondary/40 hover:bg-secondary/60', statusColor[c.status] ?? 'border-l-primary'),
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -80,6 +72,7 @@ export function AgendaDiaView({ appointments,onSelected }: Props) {
 
                       <StatusBadge status={c.status} />
                     </div>
+                    {c.scheduleWarning && <p className="mt-2 text-xs font-medium text-yellow-950 dark:text-yellow-100">{c.scheduleWarning}</p>}
                   </div>
                 ))
               )}

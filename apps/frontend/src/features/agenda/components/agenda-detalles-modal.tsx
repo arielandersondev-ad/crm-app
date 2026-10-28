@@ -21,18 +21,22 @@ interface AgendaDetailModalProps {
   onClose: () => void;
   onSubmit: ( values: any ) => Promise<void> | void;
   onUpdateStatus?: (id: string, status: string) => Promise<void>;
+  timezone?: string;
 }
-export function AppointmentDetailModal({open, mode, loading, details, onStartConsultation, onClose, onSubmit, onUpdateStatus}: AgendaDetailModalProps){
+export function AppointmentDetailModal({open, mode, loading, details, onStartConsultation, onClose, onSubmit, onUpdateStatus, timezone = "America/La_Paz"}: AgendaDetailModalProps){
   const [isEditing, setIsEditing] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState(details?.status ?? "PENDING")
   const hasConsultation = !!details?.consultation
+  const scheduledDate = details?.scheduledAt
+    ? new Date(details.scheduledAt).toLocaleDateString("es-BO", { timeZone: timezone })
+    : "";
 
   return(
     <Modal
       open={open}
       onClose={onClose}
       title="Cita / Control"
-      description={details?.scheduledAt || ""}
+      description={scheduledDate}
     >
       <form
         onSubmit={async (e) => {
@@ -77,7 +81,7 @@ export function AppointmentDetailModal({open, mode, loading, details, onStartCon
             <input 
               disabled 
               className="w-full border rounded-md p-2"
-              value={details?.scheduledAt} 
+              value={scheduledDate}
             />
           </div>
           <div>

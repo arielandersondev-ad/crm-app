@@ -31,10 +31,11 @@ export function useUpdateClient() {
     mutationFn: clientService.updateClient,
     mutationKey: ["updateClient"],
 
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["clients"],
       });
+      queryClient.invalidateQueries({ queryKey: ["client", variables.id] });
     },
   });
 }

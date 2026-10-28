@@ -17,6 +17,7 @@ import { DeleteClientDialog } from "../components/delete-cliente-dialog";
 import { toast } from "sonner";
 import { useCreateConsultation, useUpsertRefraction } from "@/features/consultation/hooks/use-consultation";
 import { ConsultationModal } from "@/features/consultation/components/consultation-modal";
+import { splitClientFormData } from "../utils/client-form";
 
 export function ClientsPage() {
   const { data: clients, isLoading, isError } = useClients();
@@ -35,7 +36,7 @@ export function ClientsPage() {
   const [consultClientName, setConsultClientName] = useState("");
   const [consultModalOpen, setConsultModalOpen] = useState(false);
 
-  const { data: editingPatientProfile } = usePatientProfile(editingClient?.id);
+  const { data: editingPatientProfile, isLoading: profileLoading, isError: profileError } = usePatientProfile(editingClient?.id);
 
   if (isLoading) return <LoadingState />
 
@@ -88,16 +89,12 @@ export function ClientsPage() {
         mode="create"
         onClose={() => setIsCreateOpen(false)}
         onSubmit={async (data) => {
-          const {antecedentes, alergias, contactoEmergencia, observaciones, ...clientData} = data
+          const { clientData, clinicalData, hasClinicalData } = splitClientFormData(data);
           const client = await createClientMutation.mutateAsync(clientData);
-          const hasClinicalData = data.antecedentes || data.alergias || data.contactoEmergencia || data.observaciones;
           if (hasClinicalData) {
             await createPatientProfileMutation.mutateAsync({
               clientId: client.id,
-              antecedentes: data.antecedentes,
-              alergias: data.alergias,
-              contactoEmergencia: data.contactoEmergencia,
-              observaciones: data.observaciones,
+              ...clinicalData,
             });
           }
           toast.success('Paciente registrado correctamente');
@@ -113,32 +110,28 @@ export function ClientsPage() {
         onClose={() => setEditingClient(null)}
         onSubmit={async (data) => {
           if (!editingClient) return;
+          const { clientData, clinicalData, hasClinicalData } = splitClientFormData(data);
           await updateClientMutation.mutateAsync({
             id: editingClient.id,
-            ...data,
+            ...clientData,
           });
-          const hasClinicalData = data.antecedentes || data.alergias || data.contactoEmergencia || data.observaciones;
-          if (hasClinicalData && editingPatientProfile) {
+          if (editingPatientProfile) {
             await updatePatientProfileMutation.mutateAsync({
               clientId: editingClient.id,
-              antecedentes: data.antecedentes,
-              alergias: data.alergias,
-              contactoEmergencia: data.contactoEmergencia,
-              observaciones: data.observaciones,
+              ...clinicalData,
             });
           } else if (hasClinicalData && !editingPatientProfile) {
             await createPatientProfileMutation.mutateAsync({
               clientId: editingClient.id,
-              antecedentes: data.antecedentes,
-              alergias: data.alergias,
-              contactoEmergencia: data.contactoEmergencia,
-              observaciones: data.observaciones,
+              ...clinicalData,
             });
           }
           toast.success('Paciente actualizado correctamente');
           setEditingClient(null);
         }}
-        loading={updateClientMutation.isPending || updatePatientProfileMutation.isPending}
+        loading={updateClientMutation.isPending || updatePatientProfileMutation.isPending || createPatientProfileMutation.isPending}
+        disabled={profileLoading || profileError}
+        notice={profileLoading ? "Cargando antecedentes clínicos..." : profileError ? "No se pudieron cargar los antecedentes. Cierre y vuelva a abrir la edición para reintentar." : undefined}
       />
       <DeleteClientDialog
         open={!!deleteClient}

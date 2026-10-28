@@ -1,28 +1,3 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-export class UpdateClienteDto {
+import { CreateClienteDto } from './create-cliente.dto';
 
-  @IsNotEmpty()
-  @IsString()
-  fullName: string;  
-
-  @IsNotEmpty()
-  @IsString()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  @IsString()
-  phone: string;
-
-  @IsString()
-  documentNumber?: string;
- 
-  @IsOptional()
-  birthDate?: string;
-  
-  @IsOptional()
-  address?: string;
-  
-  @IsOptional()
-  notes?: string;
-}
+export class UpdateClienteDto extends CreateClienteDto {}
