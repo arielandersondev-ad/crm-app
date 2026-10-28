@@ -9,7 +9,7 @@ export class Cliente {
     public readonly phone: string,
     public readonly email: string,
     public readonly documentNumber: string,
-    public readonly birthday: string,
+    public readonly birthDate: string,
     public readonly address: string,
     public readonly notes: string,
     public readonly isActive: boolean,

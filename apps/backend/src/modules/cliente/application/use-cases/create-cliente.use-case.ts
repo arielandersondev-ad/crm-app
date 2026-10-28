@@ -12,16 +12,16 @@ export class CreateClienteUseCase {
   ) {}
   async execute(tenantId: string, userId: string, createClienteDto: CreateClienteDto): Promise<Cliente> {
     if (!tenantId) {
-      throw new Error('TenantId es requerido');
+      throw new Error('La empresa es obligatoria');
     }
     if (!createClienteDto.fullName) {
-      throw new Error('Fullname es requerido');
+      throw new Error('El nombre completo es obligatorio');
     }
     if (!createClienteDto.email) {
-      throw new Error('Email es requerido');
+      throw new Error('El correo electrónico es obligatorio');
     }
     if (!createClienteDto.phone) {
-      throw new Error('Phone es requerido');
+      throw new Error('El teléfono es obligatorio');
     }
     const cliente = await this.clienteRepo.create(tenantId, createClienteDto.fullName, createClienteDto.email, createClienteDto.phone, createClienteDto.documentNumber, createClienteDto.birthDate, createClienteDto.address, createClienteDto.notes);
 

@@ -29,7 +29,7 @@ export function AgendaHeader({ vista, currentDate, onPrev, onNext, onChangeView,
   const diff = day === 0 ? -6 : 1 - day
   inicioSemana.setDate(inicioSemana.getDate() + diff)
   const finSemana = new Date(inicioSemana)
-  finSemana.setDate(finSemana.getDate() + 4)
+  finSemana.setDate(finSemana.getDate() + 6)
     title = `${inicioSemana.toLocaleDateString('es-BO', {
       day: 'numeric',
       month: 'short',

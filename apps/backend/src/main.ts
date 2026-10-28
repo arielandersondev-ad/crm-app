@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
+import { validationExceptionFactory } from './common/validation/validation-exception.factory';
 import {
   normalizeOrigin,
   parseAllowedOrigins,
@@ -33,6 +34,7 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
+      exceptionFactory: validationExceptionFactory,
     })
   );
   console.info(`[CORS] Orígenes permitidos: ${allowedOrigins.join(', ') || 'ninguno'}`);

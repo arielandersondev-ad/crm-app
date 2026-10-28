@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node src/features/faqs/utils/faq-suggestions.test.mjs",
+    "test": "node --test src/features/faqs/utils/faq-suggestions.test.mjs src/features/clients/utils/client-form.test.mjs tests/agenda-regression.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

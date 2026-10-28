@@ -31,6 +31,10 @@ export function useCreateConsultation() {
     mutationFn: (dto: CreateConsultationDto) => consultationService.create(dto),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["patient-consultations", data.clientId] });
+      queryClient.invalidateQueries({ queryKey: ["consultations"] });
+      queryClient.invalidateQueries({ queryKey: ["agenda"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-appointments", data.clientId] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 }
@@ -44,6 +48,9 @@ export function useUpdateConsultation() {
       queryClient.invalidateQueries({ queryKey: ["consultation"] });
       queryClient.invalidateQueries({ queryKey: ["patient-consultations"] });
       queryClient.invalidateQueries({ queryKey: ["agenda"] });
+      queryClient.invalidateQueries({ queryKey: ["consultations"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 }

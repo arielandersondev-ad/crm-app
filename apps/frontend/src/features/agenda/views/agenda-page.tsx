@@ -10,23 +10,25 @@ import { useUpdateCita } from "../hooks/use-update-cita";
 import { toast } from "sonner";
 import { AgendaBoard } from "../components/agenda-board";
 import { AppointmentDetailModal } from "../components/agenda-detalles-modal";
-import { Details } from "../types/interfaces";
 import { useAuthStore } from "@/stores/auth.store";
 import { useStartConsultation } from "@/features/consultation/hooks/use-consultation";
 import { EmptyState } from "@/shared/components/empty-state";
 import { LoadingState } from "@/shared/components/loading-state";
+import { useSchedules } from "@/features/configuracion/hooks/use-configuracion";
 
 export function AgendaPage() {
   // Estados de control
   const [createOpen, setCreateOpen] = useState(false)
   const [detailAgendaOpen, setDetailAgendaOpen] = useState(false)
 
-  const [citaSelected, setCitaSelected] = useState<Details>()
+  const [selectedCitaId, setSelectedCitaId] = useState<string>()
 
   //hooks
   const createAgendaMutation = useCreateAgenda()
   const branch = useAuthStore((state) => state.branch)
   const {data: agenda, isLoading, isError} = useGetAgenda(branch?.id ?? '')
+  const { data: schedules, isError: schedulesError } = useSchedules(branch?.id)
+  const citaSelected = agenda?.appointments.find((cita) => cita.id === selectedCitaId)
   const startConsultationMutation = useStartConsultation()
   const updateCitaMutation = useUpdateCita()
   //console.log('agenda de useGetAgenda: ',agenda)
@@ -51,6 +53,7 @@ export function AgendaPage() {
         }
       />
       {/* Renderizado de la agenda */}
+      {schedulesError && <p role="status" className="mb-3 text-sm text-muted-foreground">No se pudieron cargar los horarios de atención. El resaltado estará disponible al reintentar la carga.</p>}
       {!agenda?.appointments?.length ? (
         <EmptyState
           title="No hay citas"
@@ -59,9 +62,10 @@ export function AgendaPage() {
       ) : (
       <AgendaBoard
         data={agenda}
+        schedules={schedules}
         onSelected={(cita)=>{
           //console.log('[AgendaPage] onSelected recibió:', { id: cita.id, cliente: cita.clientFullName, hora: cita.hora, status: cita.status });
-          setCitaSelected(cita)
+          setSelectedCitaId(cita.id)
           setDetailAgendaOpen(true)
           //console.log('[AgendaPage] seteados: citaSelected, clienteSelect, detailAgendaOpen=true');
         }}
@@ -82,6 +86,7 @@ export function AgendaPage() {
         open={detailAgendaOpen}
         mode="create"
         details={citaSelected}
+        timezone={agenda?.timezone}
         onStartConsultation={async () => {
           if (!citaSelected) return;
           try {

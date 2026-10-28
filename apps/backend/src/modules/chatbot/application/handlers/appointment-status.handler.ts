@@ -1,10 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { CitaRepository } from "../../../cita/domain/repositories/cita.repository";
+import { SucursalRepository } from "../../../sucursal/domain/repositories/sucursal.repository";
 import type { ChatResponse } from "../../domain/interfaces/chatbot.interface";
 
 @Injectable()
 export class AppointmentStatusHandler {
-  constructor(private readonly citaRepo: CitaRepository) {}
+  constructor(
+    private readonly citaRepo: CitaRepository,
+    private readonly sucursalRepo: SucursalRepository,
+  ) {}
 
   async tryHandle(question: string, tenantId: string): Promise<ChatResponse | null> {
     // Regex: busca patrón APT-XXXXXX y un número de CI (6-15 dígitos)
@@ -33,14 +37,19 @@ export class AppointmentStatusHandler {
       NO_SHOW: "No asistió",
     };
 
+    const sucursal = await this.sucursalRepo.findById(cita.sucursalId);
+    const timeZone = sucursal?.timezone ?? "America/La_Paz";
     const dateStr = cita.scheduledAt.toLocaleDateString("es-BO", {
+      timeZone,
       day: "numeric",
       month: "long",
       year: "numeric",
     });
     const timeStr = cita.scheduledAt.toLocaleTimeString("es-BO", {
+      timeZone,
       hour: "2-digit",
       minute: "2-digit",
+      hour12: true,
     });
 
     const answer = `Estado: ${statusLabels[cita.status] ?? cita.status}

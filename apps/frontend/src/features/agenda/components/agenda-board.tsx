@@ -2,20 +2,28 @@
 
 import { useState } from 'react'
 import { Card } from '@/shared/components/ui/card'
-import { cn } from '@/shared/utils/utils'
+import { dateKey } from '@/shared/utils/date-time'
+import { buildAgendaCalendar } from '../utils/agenda-calendar'
 import { AgendaHeader } from './agenda-header'
 import { AgendaDiaView } from './agenda-dia-view'
 import { AgendaMesView } from './agenada-mes-view'
 import { AgendaSemanaView } from './agenada-semana-view'
 import { AgendaResponse, Details } from '../types/interfaces'
+import type { BranchSchedule } from '@/features/configuracion/services/configuracion.service'
+import { getScheduleWarning, isClosedDay } from '../utils/agenda-schedule'
 interface AgendaBoardProps{
   data?: AgendaResponse
   onSelected: (cita: Details)=> void
+  schedules?: BranchSchedule[]
 }
-export function AgendaBoard({data, onSelected}: AgendaBoardProps) {
-  const agendaData = data?.appointments ?? []
+export function AgendaBoard({data, onSelected, schedules}: AgendaBoardProps) {
   const [vista, setVista] = useState('Día')
-  const [currentDate, setCurrentDate] = useState(new Date())
+  const timezone = data?.timezone ?? 'America/La_Paz'
+  const agendaData = (data?.appointments ?? []).map((appointment) => ({
+    ...appointment,
+    scheduleWarning: getScheduleWarning(appointment.scheduledAt, timezone, schedules),
+  }))
+  const [currentDate, setCurrentDate] = useState(() => new Date(`${dateKey(new Date(), timezone)}T12:00:00`))
 
   // funciones de paginacion
   const prevPeriod = () => {
@@ -32,103 +40,12 @@ export function AgendaBoard({data, onSelected}: AgendaBoardProps) {
     if (vista === 'Mes') {date.setMonth(date.getMonth() + 1)}
     setCurrentDate(date)
   }
-  // datos para el dia
-  const citasDelDia = agendaData.filter((appointment) => {
-    const citaDate = new Date(appointment.scheduledAt)
-
-    return (
-      citaDate.getFullYear() === currentDate.getFullYear() &&
-      citaDate.getMonth() === currentDate.getMonth() &&
-      citaDate.getDate() === currentDate.getDate()
-    )
-  })
-  const inicioSemana = new Date(currentDate)
-  inicioSemana.setDate(currentDate.getDate() - currentDate.getDay())
-  inicioSemana.setHours(0, 0, 0, 0)
-
-  const finSemana = new Date(inicioSemana)
-  finSemana.setDate(finSemana.getDate() + 6)
-  finSemana.setHours(23, 59, 59, 999)
-
-  const citasSemana = agendaData.filter((appointment) => {
-    const fecha = new Date(appointment.scheduledAt)
-    return fecha >= inicioSemana && fecha <= finSemana
-  })
-  // datos para el mes
-  const citasMes = agendaData.filter((appointment) => {
-    const fecha = new Date(appointment.scheduledAt)
-
-    return (
-      fecha.getFullYear() === currentDate.getFullYear() &&
-      fecha.getMonth() === currentDate.getMonth()
-    )
-  })
-  // dias Semana
-  const diasSemana = Array.from({ length: 5 }, (_, index) => {
-    const fecha = new Date(inicioSemana)
-    fecha.setDate(inicioSemana.getDate() + index)
-    return fecha
-  })
-  const semanaAgrupada = diasSemana.map((dia) => {
-    const citas = citasSemana.filter((appointment) => {
-      const fecha = new Date(appointment.scheduledAt)
-
-      return (
-        fecha.getFullYear() === dia.getFullYear() &&
-        fecha.getMonth() === dia.getMonth() &&
-        fecha.getDate() === dia.getDate()
-      )
-    })
-
-    return {
-      fecha: dia,
-      citas,
-    }
-  })
-  //Mes
-  const inicioMes = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1
-  )
-
-  const finMes = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    0
-  )
-  const semanasDelMes = []
-  let inicioSemanaMes = new Date(inicioMes)
-  while (inicioSemanaMes <= finMes) {
-    const finSemanaMes = new Date(inicioSemanaMes)
-    finSemanaMes.setDate(finSemanaMes.getDate() + 6)
-    semanasDelMes.push({
-      inicio: new Date(inicioSemanaMes),
-      fin: new Date(finSemanaMes),
-    })
-    inicioSemanaMes = new Date(finSemanaMes)
-    inicioSemanaMes.setDate(inicioSemanaMes.getDate() + 1)
-  }
-  const mesAgrupado = semanasDelMes.map((semana, index) => {
-    const citas = citasMes.filter((appointment) => {
-      const fecha = new Date(appointment.scheduledAt)
-
-      return (
-        fecha >= semana.inicio &&
-        fecha <= semana.fin
-      )
-    })
-
-    return {
-      numero: index + 1,
-      inicio: semana.inicio,
-      fin: semana.fin,
-      citas,
-    }
-  })
+  const { dayAppointments: citasDelDia, week: semanaAgrupada, month: mesAgrupado } =
+    buildAgendaCalendar(agendaData, currentDate, timezone)
+  const dayClosed = isClosedDay(currentDate, schedules)
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
-      <Card className="gap-0 p-0">
+      <Card className={`gap-0 p-0 ${vista === 'Día' && dayClosed ? 'border-yellow-400 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-950/40' : ''}`}>
         <AgendaHeader
           vista={vista}
           currentDate={currentDate}
@@ -136,6 +53,12 @@ export function AgendaBoard({data, onSelected}: AgendaBoardProps) {
           onNext={nextPeriod}
           onChangeView={setVista}
         />
+
+        {vista === 'Día' && dayClosed && (
+          <p className="border-b border-yellow-300 px-4 py-3 text-sm font-medium text-yellow-950 dark:border-yellow-700 dark:text-yellow-100">
+            Día sin atención configurada. Las citas registradas siguen visibles.
+          </p>
+        )}
 
         {vista === 'Día' && (
           <AgendaDiaView 
@@ -150,6 +73,7 @@ export function AgendaBoard({data, onSelected}: AgendaBoardProps) {
         {vista === 'Semana' && (
           <AgendaSemanaView 
             week={semanaAgrupada} 
+            schedules={schedules}
             onSelected={(cita)=>{
               console.log('[AgendaBoard → SemanaView] Cita recibida:', { id: cita.id, cliente: cita.clientFullName, hora: cita.hora });
               onSelected(cita);
@@ -159,7 +83,7 @@ export function AgendaBoard({data, onSelected}: AgendaBoardProps) {
 
         {vista === 'Mes' && (
           <AgendaMesView 
-            weeks={mesAgrupado} 
+            weeks={mesAgrupado} timezone={timezone}
             onSelected={(cita)=>{
               console.log('[AgendaBoard → MesView] Cita recibida:', { id: cita.id, cliente: cita.clientFullName, hora: cita.hora });
               onSelected(cita);
@@ -169,6 +93,11 @@ export function AgendaBoard({data, onSelected}: AgendaBoardProps) {
       </Card>
 
       <div className="space-y-4">
+        {!!schedules?.length && (
+          <p className="rounded-md border border-yellow-400 bg-yellow-100 p-3 text-sm text-yellow-950 dark:border-yellow-600 dark:bg-yellow-950/60 dark:text-yellow-100">
+            Amarillo: fuera de los días u horarios de atención configurados.
+          </p>
+        )}
         <Card className="gap-3 p-5">
           <h3 className="font-semibold">Resumen del día</h3>
           {(() => {

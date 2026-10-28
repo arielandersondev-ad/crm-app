@@ -7,15 +7,7 @@ import type { PatientProfile } from "../types/patient-profile";
 import { Modal } from "@/shared/components/modal";
 import  { zodResolver } from "@hookform/resolvers/zod";
 import { ClientSchema, ClientFormData } from "../schemas/client.schema";
-
-const formatDateForInput = (dateString: string | null | undefined): string => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+import { formatBirthDateForInput } from "../utils/client-form";
 
 interface ClientModalProps {
   open: boolean;
@@ -23,12 +15,14 @@ interface ClientModalProps {
   client?: Client;
   patientProfile?: PatientProfile | null;
   loading?: boolean;
+  disabled?: boolean;
+  notice?: string;
 
   onClose: () => void;
   onSubmit: ( values: ClientFormData ) => Promise<void> | void;
 }
 
-export function ClientModal({ open, mode, client, patientProfile, loading, onClose, onSubmit }: ClientModalProps) {
+export function ClientModal({ open, mode, client, patientProfile, loading, disabled, notice, onClose, onSubmit }: ClientModalProps) {
   const resolver = zodResolver(ClientSchema);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ClientFormData>( { resolver } );
 
@@ -40,7 +34,7 @@ export function ClientModal({ open, mode, client, patientProfile, loading, onClo
         email: client.email,
         phone: client.phone ?? "",
         documentNumber: client.documentNumber ?? "",
-        birthDate: formatDateForInput(client.birthDate),
+        birthDate: formatBirthDateForInput(client.birthDate),
         address: client.address ?? "",
         notes: client.notes ?? "",
         antecedentes: patientProfile?.antecedentes ?? "",
@@ -64,7 +58,7 @@ export function ClientModal({ open, mode, client, patientProfile, loading, onClo
       contactoEmergencia: "",
       observaciones: "",
     });
-  }, [mode, client, patientProfile, reset]);
+  }, [open, mode, client, patientProfile, reset]);
 
   return (
     <Modal
@@ -77,10 +71,10 @@ export function ClientModal({ open, mode, client, patientProfile, loading, onClo
         onSubmit={handleSubmit(onSubmit)}
         className="space-y-6"
       >
-        <ClientForm
-          register={register}
-          errors={errors}
-        />
+        {notice && <p role="status" className="text-sm text-muted-foreground">{notice}</p>}
+        <fieldset disabled={disabled || loading}>
+          <ClientForm register={register} errors={errors} />
+        </fieldset>
 
         <div className="flex justify-end gap-2">
           <button
@@ -94,7 +88,7 @@ export function ClientModal({ open, mode, client, patientProfile, loading, onClo
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || disabled}
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
           >
             {loading  ? "Guardando..."  : mode === "create" ? "Crear" : "Guardar"}

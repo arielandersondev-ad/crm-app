@@ -4,6 +4,8 @@ import { ConsultationEntity, ConsultationStatus } from "../../domain/entities/co
 import { UpdateConsultationDto } from "../../presentation/dto/update-consultation.dto";
 import { PrismaService } from "../../../../common/infrastructure/database/prisma/prisma.service";
 import { CitaRepository } from "../../../cita/domain/repositories/cita.repository";
+import { SucursalRepository } from "../../../sucursal/domain/repositories/sucursal.repository";
+import { toUTC } from "../../../../common/utils/timezone.util";
 
 @Injectable()
 export class UpdateConsultationUseCase {
@@ -11,6 +13,7 @@ export class UpdateConsultationUseCase {
     private readonly repo: ConsultationRepository,
     private readonly citaRepo: CitaRepository,
     private readonly prisma: PrismaService,
+    private readonly sucursalRepo: SucursalRepository,
   ) {}
 
   async execute(id: string, dto: UpdateConsultationDto, tenantId: string, userId: string, sucursalId: string): Promise<ConsultationEntity> {
@@ -26,14 +29,23 @@ export class UpdateConsultationUseCase {
       throw new ForbiddenException("Solo se pueden editar consultas en estado borrador");
     }
 
-    if (dto.nextControlAt) {
+    const sucursal = await this.sucursalRepo.findById(sucursalId);
+    const timezone = sucursal?.timezone ?? "America/La_Paz";
+    const normalizedDto = {
+      ...dto,
+      nextControlAt: dto.nextControlAt ? toUTC(dto.nextControlAt, timezone).toISOString() : undefined,
+      consultationDate: dto.consultationDate ? toUTC(dto.consultationDate, timezone).toISOString() : undefined,
+    };
+
+    if (normalizedDto.nextControlAt) {
       const existingAppointments = await this.citaRepo.findByClientId(existing.clientId);
-      const nextDate = new Date(dto.nextControlAt);
+      const nextDate = new Date(normalizedDto.nextControlAt);
       const hasAppointment = existingAppointments.some(
         (a) =>
-          a.scheduledAt.toDateString() === nextDate.toDateString() &&
-          a.status !== "CANCELLED" &&
-          a.status !== "NO_SHOW",
+          a.tenantId === tenantId && a.sucursalId === sucursalId &&
+          a.id !== existing.appointmentId &&
+          a.scheduledAt.getTime() === nextDate.getTime() &&
+          (a.status === "PENDING" || a.status === "CONFIRMED"),
       );
 
       if (!hasAppointment) {
@@ -47,7 +59,7 @@ export class UpdateConsultationUseCase {
       }
     }
 
-    const updated = await this.repo.update(id, tenantId, dto);
+    const updated = await this.repo.update(id, tenantId, normalizedDto);
 
     // Si se finaliza la consulta, sincronizar la cita asociada a COMPLETED
     if (isFinalizing && existing.appointmentId) {

@@ -30,7 +30,7 @@ export function ClientForm({ register, errors }: ClientFormProps) {
 
       <div>
         <div className="flex flex-col md:flex-row justify-between">
-          <label className="block mb-1">Email</label>
+          <label className="block mb-1">Correo electrónico</label>
           <label className="text-sm text-muted-foreground">requerido</label>
         </div>
 

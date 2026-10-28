@@ -26,6 +26,7 @@ function formatDate(dateString: string | null | undefined): string {
     year: "numeric",
     month: "long",
     day: "numeric",
+    ...(/^\d{4}-\d{2}-\d{2}$/.test(dateString) ? { timeZone: "UTC" } : {}),
   });
 }
 

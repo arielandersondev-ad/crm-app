@@ -86,7 +86,7 @@ export class PrismaClienteRepository implements ClienteRepository {
         email: email,
         phone: phone,
         documentNumber: documentNumber || null,
-        birthDate: birthday? new Date(birthday) : null,
+        birthDate: birthday === undefined ? undefined : birthday ? new Date(birthday) : null,
         address: address || '',
         isActive: isActive || true,
         notes: notes || '',
